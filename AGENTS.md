@@ -2,33 +2,35 @@
 
 ## Project Structure & Module Organization
 
-This repository is in its design phase. `init/init_build_multi_agent_system.md` defines the MVP architecture; `init/init_cource_plan.md` defines the course. No source, tests, or assets exist yet.
+This repository is an early implementation of an Agentic Data Platform. `init/` contains the original architecture and course proposals; it is not implementation evidence. Use `plan/development-plan.md` for the roadmap, `plan/steps/` for active work, `plan/decisions/` for ADRs, and `plan/problems/` for reproducible failures.
 
-Follow the proposed monorepo layout when scaffolding: orchestration in `orchestrator/`, shared execution code in `runtime/`, roles in `agents/`, typed handoffs in `contracts/`, and authorization in `policies/`. Put data-platform code under `platform/`, evaluation scenarios and graders under `evals/`, and automated checks under `tests/`. Keep deterministic workflow and policy logic out of agent prompts.
+The local Python control plane is split into `orchestrator/`, `runtime/`, role-specific `agents/`, typed `contracts/`, and deterministic `policies/`. Containerized platform code belongs in `platform/`; tests are grouped under `tests/unit`, `tests/integration`, `tests/workflow`, `tests/policy`, and `tests/adversarial`. Keep workflow and authorization logic out of prompts.
 
 ## Build, Test, and Development Commands
 
-No `Makefile`, `pyproject.toml`, or runnable services exist yet. For documentation-only changes, run:
+- `make bootstrap` creates or updates the Python 3.12 `.venv` strictly from `uv.lock`.
+- `make check` runs Ruff lint/format checks, pytest, and Compose validation.
+- `make platform-up` starts ClickHouse and waits for its healthcheck.
+- `make seed` recreates the deterministic local `raw` dataset.
+- `make platform-test` validates table counts and required edge cases.
+- `make platform-down` stops services without deleting their volumes.
 
-```bash
-git diff --check       # detect whitespace errors
-git status --short     # confirm only intended files changed
-```
+Run `git diff --check` before handoff. Do not advertise planned dbt, Airflow, scenario, or agent commands until their active step proves them executable.
 
-When scaffolding lands, preserve the designed interface: `uv sync --frozen` for locked dependencies, `pytest` for Python tests, and `make platform-up`, `make seed`, `make dbt-build`, and `make platform-test` for the baseline. For scenarios, run `make scenario-reset SCENARIO=net-revenue`, followed by `scenario-run` and `scenario-grade`.
+## Planning and Evidence
+
+Before nontrivial changes, update one active `plan/steps/STEP-NNNN-short-name.md` with scope, acceptance criteria, risks, steps, and verification. Record architectural choices before implementation as ADRs. Record systematic failures with reproduction, cause, fix, and regression check. A claim such as “tests passed” is insufficient; include the exact command and result in the step log.
 
 ## Coding Style & Naming Conventions
 
-Write Markdown in UTF-8, keep sections focused, label fenced blocks, and match the edited document's language. Use English identifiers and paths. Target Python 3.12 with four-space indentation, type hints, `snake_case` functions/modules, and `PascalCase` classes and Pydantic models. Pin dependencies in `uv.lock`; avoid floating versions. No formatter or linter is configured yet; add its configuration with the first code scaffold.
+Use Python 3.12, four-space indentation, type hints, `snake_case` functions/modules, and `PascalCase` classes. Ruff is authoritative; run it through `make check`. Keep Markdown in UTF-8 with focused sections and labeled fences. For dbt, use `stg_*.sql`, `int_*.sql`, `fct_*.sql`, and `dim_*.sql`. Pin Python dependencies in `uv.lock` and Docker images to explicit versions.
 
-For dbt, use `stg_*.sql`, `int_*.sql`, `fct_*.sql`, and `dim_*.sql` in the matching model layers.
+## Testing and Security
 
-## Testing Guidelines
+Name Python tests `test_<behavior>.py`; add regression coverage for every fixed defect. Acceptance criteria must map to deterministic evidence. Hidden graders and policy tests must remain independent from agent-created tests.
 
-Place tests in `tests/unit`, `tests/integration`, `tests/workflow`, `tests/policy`, or `tests/adversarial`; name Python files `test_<behavior>.py`. Add dbt schema and business tests with model changes. No numeric coverage threshold exists; map every acceptance criterion to reproducible evidence, including regressions and failure paths.
+Keep `.env` ignored. `API_TOKEN` is used only for the GateLLM gateway and must never appear in logs, plans, fixtures, or containers. Bind local services to loopback, use dev-only credentials, and never delete volumes or access production without explicit approval.
 
 ## Commit & Pull Request Guidelines
 
-The repository has no commit history, so no existing convention can be inferred. Use short, imperative Conventional Commit-style subjects, for example `feat(orchestrator): add checkpoint transition` or `docs(init): clarify QA gate`.
-
-PRs should explain the problem and approach, list affected layers, link the issue or task, and include exact validation commands and results. Add screenshots only for UI or dashboard changes. Require independent review; authors must not approve or merge their own changes.
+There is no commit history yet. Use short imperative subjects such as `feat(platform): add dbt baseline`. PRs should describe the problem, affected layers, linked task, validation commands/results, relevant ADR/problem records, and remaining risks. Require independent review; authors must not approve their own changes.

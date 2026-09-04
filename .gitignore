@@ -1,0 +1,29 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Runtime artifacts
+artifacts/
+logs/
+target/
+dbt_packages/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+

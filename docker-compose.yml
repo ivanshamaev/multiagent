@@ -1,0 +1,60 @@
+name: ${COMPOSE_PROJECT_NAME:-agentic-data-platform}
+
+services:
+  clickhouse:
+    image: ${CLICKHOUSE_IMAGE:-clickhouse/clickhouse-server:25.8.33.6}
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-agentic}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-agentic_dev_only}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    ports:
+      - "127.0.0.1:${CLICKHOUSE_HTTP_PORT:-8123}:8123"
+      - "127.0.0.1:${CLICKHOUSE_NATIVE_PORT:-9000}:9000"
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          clickhouse-client
+          --user "$${CLICKHOUSE_USER}"
+          --password "$${CLICKHOUSE_PASSWORD}"
+          --query "SELECT 1"
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - data-platform
+
+  dbt:
+    image: ${DBT_IMAGE:-agentic-data-platform-dbt:1.11.14-1.10.2}
+    build:
+      context: ./platform/dbt
+      dockerfile: Dockerfile
+    environment:
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-agentic}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-agentic_dev_only}
+      DBT_PROFILES_DIR: /workspace
+    volumes:
+      - ./platform/dbt:/workspace
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    profiles:
+      - tools
+    networks:
+      - data-platform
+
+volumes:
+  clickhouse-data:
+
+networks:
+  data-platform:
+    driver: bridge
