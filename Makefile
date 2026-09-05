@@ -22,12 +22,21 @@ export AIRFLOW_API_REQUEST_TIMEOUT_SECONDS AIRFLOW_API_POLL_TIMEOUT_SECONDS
 export AIRFLOW_API_POLL_INTERVAL_SECONDS
 AIRFLOW = $(COMPOSE) exec -T airflow-scheduler airflow
 AIRFLOW_VERSION = $(COMPOSE) run --rm --no-deps --entrypoint airflow airflow-init version
+SCENARIO ?= net-revenue
+SCENARIO_HARNESS = $(UV) run python -m runtime.scenario_harness
+SCENARIO_WORKSPACE = $(abspath .scenario-state/workspaces/$(SCENARIO))
+SCENARIO_DBT_PROJECT = $(SCENARIO_WORKSPACE)/platform/dbt
+SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
+	$(COMPOSE) run --rm --no-deps scenario-grader
 
 .PHONY: bootstrap lint format-check test check compose-validate \
 	clickhouse-up platform-up platform-status platform-down seed platform-test \
 	clickhouse-test dbt-baseline-test dbt-image dbt-version dbt-debug \
 	dbt-parse dbt-compile dbt-build dbt-test airflow-version airflow-init \
-	airflow-image airflow-up airflow-validate airflow-test airflow-failure-test
+	airflow-image airflow-up airflow-validate airflow-test airflow-failure-test \
+	scenario-init scenario-reset scenario-status scenario-verify scenario-fingerprint \
+	scenario-baseline-build scenario-run scenario-grader-image scenario-grade \
+	scenario-grade-baseline-test scenario-repro-test scenario-test
 
 bootstrap:
 	$(UV) sync --frozen
@@ -126,3 +135,65 @@ platform-test: clickhouse-up dbt-image airflow-test
 	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/001_smoke.sql
 	$(DBT) test --fail-fast
 	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/002_dbt_baseline.sql
+
+scenario-init:
+	$(SCENARIO_HARNESS) reset --scenario "$(SCENARIO)"
+
+scenario-verify:
+	$(SCENARIO_HARNESS) verify --scenario "$(SCENARIO)"
+
+scenario-status:
+	$(SCENARIO_HARNESS) status --scenario "$(SCENARIO)"
+
+scenario-fingerprint:
+	$(SCENARIO_HARNESS) fingerprint --scenario "$(SCENARIO)"
+
+scenario-baseline-build: scenario-verify clickhouse-up dbt-image
+	DBT_PROJECT_PATH="$(SCENARIO_DBT_PROJECT)" $(DBT) build --full-refresh --fail-fast
+	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/002_dbt_baseline.sql
+
+scenario-reset: scenario-init
+	$(MAKE) --no-print-directory seed
+	$(MAKE) --no-print-directory scenario-baseline-build SCENARIO="$(SCENARIO)"
+	@set -o pipefail; \
+		$(CLICKHOUSE_CLIENT) --multiquery \
+			< platform/clickhouse/tests/003_scenario_fingerprint.sql \
+		| $(SCENARIO_HARNESS) record-data --scenario "$(SCENARIO)"
+
+scenario-run: scenario-verify clickhouse-up dbt-image
+	DBT_PROJECT_PATH="$(SCENARIO_DBT_PROJECT)" $(DBT) build --full-refresh --fail-fast
+	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/001_smoke.sql
+
+scenario-grader-image:
+	$(COMPOSE) build scenario-grader
+
+scenario-grade: scenario-verify clickhouse-up scenario-grader-image
+	$(SCENARIO_HARNESS) verify-oracle --scenario "$(SCENARIO)"
+	$(SCENARIO_GRADER)
+
+scenario-grade-baseline-test: scenario-verify clickhouse-up scenario-grader-image
+	$(SCENARIO_HARNESS) verify-oracle --scenario "$(SCENARIO)"
+	@set +e; output="$$( $(SCENARIO_GRADER) 2>&1 )"; status="$$?"; set -e; \
+		printf '%s\n' "$$output"; \
+		test "$$status" -eq 10 || { \
+			printf 'expected baseline grader exit 10, received %s\n' "$$status" >&2; \
+			exit 1; \
+		}
+
+scenario-repro-test:
+	@first="$$( \
+		$(MAKE) --no-print-directory -s scenario-reset SCENARIO="$(SCENARIO)" >/dev/null \
+		&& $(SCENARIO_HARNESS) fingerprint --scenario "$(SCENARIO)" \
+	)"; \
+	second="$$( \
+		$(MAKE) --no-print-directory -s scenario-reset SCENARIO="$(SCENARIO)" >/dev/null \
+		&& $(SCENARIO_HARNESS) fingerprint --scenario "$(SCENARIO)" \
+	)"; \
+	test "$$first" = "$$second" || { \
+		printf 'first:  %s\nsecond: %s\n' "$$first" "$$second" >&2; \
+		exit 1; \
+	}; \
+	printf '%s\n' "$$second"
+
+scenario-test: scenario-repro-test
+	$(MAKE) --no-print-directory scenario-grade-baseline-test SCENARIO="$(SCENARIO)"

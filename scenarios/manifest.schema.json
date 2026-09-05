@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-data-platform.local/scenarios/manifest.schema.json",
+  "title": "Agentic Data Platform scenario manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "version",
+    "task_file",
+    "source",
+    "workspace",
+    "budgets",
+    "setup",
+    "public_validation",
+    "hidden_grade"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "task_file": {"type": "string", "minLength": 1},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "snapshot_paths", "excluded_names"],
+      "properties": {
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "snapshot_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "excluded_names": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["editable_paths", "required_paths"],
+      "properties": {
+        "editable_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[^/].*/\\*\\*$"}
+        },
+        "required_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wall_time_seconds", "tool_calls", "model_tokens", "rework_attempts"],
+      "properties": {
+        "wall_time_seconds": {"type": "integer", "minimum": 1},
+        "tool_calls": {"type": "integer", "minimum": 1},
+        "model_tokens": {"type": "integer", "minimum": 1},
+        "rework_attempts": {"type": "integer", "minimum": 0}
+      }
+    },
+    "setup": {"$ref": "#/$defs/commands"},
+    "public_validation": {"$ref": "#/$defs/commands"},
+    "hidden_grade": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interface_version", "command", "container_service", "oracle_sha256"],
+      "properties": {
+        "interface_version": {"const": 1},
+        "command": {"type": "string", "minLength": 1},
+        "container_service": {"type": "string", "minLength": 1},
+        "oracle_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  },
+  "$defs": {
+    "commands": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commands"],
+      "properties": {
+        "commands": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

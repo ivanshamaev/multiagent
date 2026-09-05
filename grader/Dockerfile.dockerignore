@@ -1,0 +1,4 @@
+*
+!grader/
+!grader/hidden/
+!grader/hidden/grade.py

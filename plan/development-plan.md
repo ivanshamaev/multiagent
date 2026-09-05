@@ -168,4 +168,7 @@ Gate: каждая практическая глава ссылается на �
 
 ## 7. Текущая итерация
 
-`STEP-0001…0003` завершены: governance/bootstrap, ClickHouse, dbt и Airflow orchestration contract проверены; свежие transcripts сохранены в `plan/evidence/`. Следующий запланированный `STEP-0004` подключит фактическое выполнение dbt к Airflow; только после этого Phase A готова к scenario/agent runtime.
+`STEP-0001…0005` завершены: governance, golden ClickHouse/dbt/Airflow+Cosmos и reproducible
+scenario reset/run/hidden-grade lifecycle проверены; transcripts сохранены в `plan/evidence/`.
+Активный `STEP-0006` реализует versioned Pydantic artifacts и deterministic state machine без LLM
+calls. Только после его gate начинается local agent runtime.

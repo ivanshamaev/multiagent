@@ -54,6 +54,17 @@ pytest → SQL correctness → repository policy tests
 
 Ненулевой exit code означает failure; reasoning не может его переопределить. Hidden graders независимы от agent-created tests и недоступны рабочему агенту. Не ослабляй assertion, fixture, grader или policy ради зелёного результата.
 
+Scenario lifecycle задаётся versioned manifest в `scenarios/<id>/manifest.json`. Всегда выполняй
+`scenario-reset` перед новым run; не используй основной checkout как task workspace. Agent может
+менять только manifest `editable_paths`. Baseline record хранится вне workspace, а stale source,
+protected edit, unsafe path и grader failure имеют разные deterministic states. Не копируй
+`grader/`, `.env`, `.git`, `plan/` или runtime source в agent snapshot.
+
+Hidden oracle изменяется только human-authored change с обновлением SHA-256 manifest и regression
+evidence. Он запускается отдельным non-root container с read-only submission и internal сетью до
+fixture ClickHouse. Не запускай submission code внутри grader и не передавай ему `API_TOKEN`,
+Docker socket или внешнюю сеть.
+
 Тестируй сначала минимальный затронутый модуль, затем интеграционную границу. Тесты размещай в `tests/unit/`, `tests/integration/`, `tests/workflow/`, `tests/policy/` и `tests/adversarial/`. Любой исправленный системный дефект получает regression test.
 
 ## LLM gateway и стоимость

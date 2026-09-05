@@ -23,8 +23,8 @@
 
 ## Текущий статус
 
-- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0004`](steps/STEP-0004-airflow-dbt-execution.md); persistent gate transcripts сохранены в `evidence/`.
-- Активный шаг: [`STEP-0005`](steps/STEP-0005-scenario-harness.md) — воспроизводимый scenario reset/run/grade lifecycle.
-- Текущая фаза: Phase B — Scenario Harness.
-- Ближайшая продуктовая цель: изолировать benchmark workspace и hidden grader до подключения agent runtime.
+- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0005`](steps/STEP-0005-scenario-harness.md); persistent gate transcripts сохранены в `evidence/`.
+- Активный шаг: [`STEP-0006`](steps/STEP-0006-contracts-state-machine.md) — typed contracts и deterministic workflow core.
+- Текущая фаза: Phase C — Contracts и deterministic workflow.
+- Ближайшая продуктовая цель: доказать валидность artifacts/transitions до подключения agent runtime.
 - Ближайший исследовательский milestone: один Data Engineer Agent реализует Net Revenue и проходит независимый hidden grader.

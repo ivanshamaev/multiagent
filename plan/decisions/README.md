@@ -15,3 +15,5 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0009](ADR-0009-airflow-local-topology.md) | LocalExecutor, FAB auth и public Airflow API boundary | accepted |
 | [ADR-0010](ADR-0010-airflow-isolated-dbt.md) | Изолированный dbt venv внутри Airflow Docker image | accepted |
 | [ADR-0011](ADR-0011-use-astronomer-cosmos.md) | Astronomer Cosmos управляет dbt-графом и выполнением | accepted |
+| [ADR-0012](ADR-0012-disposable-scenario-snapshots.md) | Allowlisted content snapshot создаёт disposable workspace | accepted |
+| [ADR-0013](ADR-0013-isolated-hidden-grader.md) | Hidden grader работает в отдельном capability boundary | accepted |

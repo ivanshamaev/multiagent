@@ -4,7 +4,7 @@
 
 ## Текущий статус
 
-Реализуется foundation-слой. Agent runtime будет работать локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в Docker Compose. Все будущие LLM-вызовы пойдут через OpenAI-совместимый GateLLM с токеном из локального `.env`. Работают ClickHouse, контейнерный dbt baseline и Airflow 3.3.1 с Astronomer Cosmos 1.15.0 и PostgreSQL 16.15. Agent runtime пока не реализован.
+Реализованы golden Data Platform и reproducible scenario harness. Agent runtime будет работать локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в Docker Compose. Все будущие LLM-вызовы пойдут через OpenAI-совместимый GateLLM с токеном из локального `.env`. Работают ClickHouse, контейнерный dbt baseline, Airflow 3.3.1 с Astronomer Cosmos 1.15.0 и PostgreSQL 16.15. Agent runtime пока не реализован.
 
 Актуальный roadmap: [`plan/development-plan.md`](plan/development-plan.md). Фактически выполненная работа: [`plan/progress.md`](plan/progress.md).
 
@@ -26,6 +26,24 @@ ClickHouse публикуется только на loopback-интерфейс�
 
 `make dbt-build` создаёт 6 views и 2 MergeTree marts и выполняет 68 tests. `make platform-test` проверяет Airflow через API, повторяет dbt tests и независимо проверяет физические таблицы и фиксированные агрегаты. Net Revenue намеренно отсутствует: это будущая benchmark-задача Data Engineer Agent.
 
+## Scenario harness
+
+Benchmark `net-revenue` запускается только в disposable workspace; основной checkout не меняется:
+
+```bash
+make scenario-reset SCENARIO=net-revenue
+make scenario-status SCENARIO=net-revenue
+# После изменений агента в показанном workspace:
+make scenario-run SCENARIO=net-revenue
+make scenario-grade SCENARIO=net-revenue
+```
+
+Reset повторно загружает fixture data, строит baseline и фиксирует logical checksums. `scenario-run`
+видит только public task и dbt project. Hidden grader работает non-root в отдельном read-only
+container и не исполняет submission code. На неизменённом baseline он ожидаемо возвращает JSON
+`INCOMPLETE`; regression target `make scenario-grade-baseline-test` трактует это как успешную
+проверку boundary. `make scenario-repro-test` доказывает совпадение двух полных reset.
+
 Airflow UI доступен на `http://127.0.0.1:8080`; локальные defaults — пользователь `airflow`, пароль `airflow_dev_only`. PostgreSQL не публикует host port. DAG `ecommerce_hourly` строится Cosmos из dbt lineage и остаётся paused по умолчанию; `make airflow-test` запускает его manual twin и проверяет JWT, exact 11-task graph и результат SQL. Подробнее: [`platform/airflow/README.md`](platform/airflow/README.md).
 
 Образы Airflow и PostgreSQL занимают примерно 2.8 GB дополнительно к ClickHouse/dbt; оставляйте запас для данных и логов. Существующий `.env` не перезаписывайте: он может содержать `API_TOKEN`.
@@ -41,6 +59,7 @@ make platform-down
 - `orchestrator/`, `runtime/`, `agents/` — будущий local agent control plane.
 - `contracts/`, `policies/` — typed artifacts и deterministic authorization.
 - `platform/` — контейнеризованная Data Platform.
+- `scenarios/`, `grader/` — public benchmark contracts и изолированный hidden oracle.
 - `tests/` — unit, integration, workflow, policy и adversarial checks.
 - `plan/` — обязательные планы, ADR, проблемы, эксперименты и журнал прогресса.
 - `init/` — исходные архитектурные материалы; это не статус реализации.

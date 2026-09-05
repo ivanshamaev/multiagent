@@ -67,6 +67,7 @@ services:
         hard: 262144
     networks:
       - data-platform
+      - grader
 
   dbt:
     image: ${DBT_IMAGE:-agentic-data-platform-dbt:1.11.14-1.10.2}
@@ -79,7 +80,7 @@ services:
       CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-agentic_dev_only}
       DBT_PROFILES_DIR: /workspace
     volumes:
-      - ./platform/dbt:/workspace
+      - ${DBT_PROJECT_PATH:-./platform/dbt}:/workspace
     depends_on:
       clickhouse:
         condition: service_healthy
@@ -87,6 +88,33 @@ services:
       - tools
     networks:
       - data-platform
+
+  scenario-grader:
+    image: ${SCENARIO_GRADER_IMAGE:-agentic-data-platform-grader:0.1.0}
+    build:
+      context: .
+      dockerfile: grader/Dockerfile
+    environment:
+      CLICKHOUSE_HTTP_URL: http://clickhouse:8123/
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-agentic}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-agentic_dev_only}
+    volumes:
+      - ${SCENARIO_WORKSPACE_PATH:-./.scenario-state/workspaces/net-revenue}:/submission:ro
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    user: "65532:65532"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    profiles:
+      - grader
+    networks:
+      - grader
 
   airflow-postgres:
     image: ${AIRFLOW_POSTGRES_IMAGE:-postgres:16.15-bookworm@sha256:bb3e1a57e5407e0a5280b4211980a5e537f4abd234a87014ac979849a78dd825}
@@ -211,3 +239,6 @@ volumes:
 networks:
   data-platform:
     driver: bridge
+  grader:
+    driver: bridge
+    internal: true

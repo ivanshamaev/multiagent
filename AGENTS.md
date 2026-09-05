@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This platform underpins a course. `init/` contains proposals, not evidence. Use `plan/development-plan.md` for the roadmap, `plan/steps/` for active work, and `plan/{decisions,problems,evidence}/` for records.
+`init/` contains proposals, not evidence. Use `plan/development-plan.md` for the roadmap, `plan/steps/` for active work, and `plan/{decisions,problems,evidence}/` for records.
 
 Local control-plane code belongs in `orchestrator/`, `runtime/`, role-specific `agents/`, typed `contracts/`, and deterministic `policies/`. Containerized services and dbt code live in `platform/`. Python tests are grouped under `tests/{unit,integration,workflow,policy,adversarial}`. Keep authorization and workflow transitions in code, not prompts.
 
@@ -17,6 +17,8 @@ Local control-plane code belongs in `orchestrator/`, `runtime/`, role-specific `
 - `make airflow-test` validates JWT auth and an 11-task Cosmos/dbt execution graph.
 - `make airflow-failure-test` proves a failed dbt test blocks `publish`.
 - `make platform-test` combines Airflow, dbt, and independent SQL checks.
+- `make scenario-reset` recreates the disposable Net Revenue baseline.
+- `make scenario-run` runs public gates; `make scenario-grade` invokes the isolated grader.
 - `make platform-down` stops services without deleting volumes.
 
 `ecommerce_hourly` and its manual acceptance twin use Cosmos `DbtTaskGroup`; keep scheduled execution paused unless data readiness is intentional.
@@ -25,13 +27,13 @@ Local control-plane code belongs in `orchestrator/`, `runtime/`, role-specific `
 
 Before a nontrivial change, update `plan/steps/STEP-NNNN-short-name.md` with scope, acceptance criteria, risks, and verification. Record architectural choices before implementation. A systematic defect needs reproduction, cause, fix, and regression check. On completion, record exact commands, exit codes, remaining risks, and a compact persistent evidence summary.
 
-Name Python tests `test_<behavior>.py`; every fixed defect needs regression coverage. Keep hidden graders independent from agent-created tests. Never weaken an assertion, fixture, policy, or grader to obtain a pass.
+Name Python tests `test_<behavior>.py`; every defect needs regression coverage. Keep hidden graders independent from agent-created tests. Never weaken assertions to obtain a pass.
 
 ## Coding Style & Security
 
 Use four-space Python indentation, type hints, `snake_case` modules/functions, and `PascalCase` classes. Ruff is authoritative. dbt models use `stg_*.sql`, `int_*.sql`, `fct_*.sql`, or `dim_*.sql`; state each grain and avoid implicit `SELECT *`. Pin dependencies and Docker images.
 
-Keep `.env` ignored. `API_TOKEN` names the GateLLM secret; its value must never enter logs, fixtures, plans, build contexts, or Data Platform containers. Bind exposed services to loopback. Never delete volumes or access production without explicit approval.
+Keep `.env` ignored. `API_TOKEN` must never enter logs, plans, images, or Data Platform containers. Bind services to loopback. Never delete volumes or access production without approval.
 
 ## Commit & Pull Request Guidelines
 

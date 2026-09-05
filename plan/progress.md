@@ -48,3 +48,16 @@
 - Три API runs завершились 11/11 success и прошли independent SQL. Negative Cosmos test дал `dbt_tests=failed`, `publish=upstream_failed`; baseline не изменился.
 - `make platform-test` подтвердил raw assertions, 68 dbt tests и mart assertions. `make check` — 32 tests; API_TOKEN отсутствует в Data Platform.
 - Persistent summary и transcript: `plan/evidence/STEP-0004-airflow-cosmos.md`. Следующий активный шаг: `STEP-0005-scenario-harness.md`.
+
+## 2026-09-05 — STEP-0005 завершён
+
+- Добавлены versioned manifest/schema и transactional allowlisted snapshot для `net-revenue`;
+  основной checkout, `.env`, `.git`, planning/runtime и grader source в workspace не попадают.
+- Два полных reset дали одинаковые source/workspace/ClickHouse fingerprints и baseline dbt result.
+- Public `scenario-run` отделён от hidden grader. Grader работает non-root, read-only, без Docker
+  socket/API token и только во внутренней сети ClickHouse; baseline ожидаемо имеет `INCOMPLETE`.
+- 60 pytest checks покрывают traversal, symlink, unmanaged target, protected edit, stale source,
+  contamination recovery и isolation policy. PRB-0012 исправил mode managed workspace.
+- `make platform-test` после network change: Airflow/Cosmos 11/11 success, 68 dbt tests и SQL PASS.
+- Evidence: `plan/evidence/STEP-0005-scenario-harness.md`. LLM calls и удаление volumes не выполнялись.
+- Следующий активный шаг: `STEP-0006-contracts-state-machine.md`.

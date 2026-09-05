@@ -22,6 +22,7 @@ logs/
 target/
 dbt_packages/
 .user.yml
+.scenario-state/
 
 # Editors and OS
 .idea/

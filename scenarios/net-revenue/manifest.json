@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "net-revenue",
+  "version": "1.0.0",
+  "task_file": "scenarios/net-revenue/task.md",
+  "source": {
+    "commit": "0a6fb5f9fb666c8918eb6c621c5565c88b7cf6e9",
+    "snapshot_paths": [
+      "platform/dbt",
+      "platform/airflow/dags/ecommerce_hourly.py",
+      "platform/airflow/dags/cosmos_pipeline.py"
+    ],
+    "excluded_names": [
+      ".user.yml",
+      "__pycache__",
+      "dbt_packages",
+      "logs",
+      "target"
+    ]
+  },
+  "workspace": {
+    "editable_paths": [
+      "platform/dbt/models/**",
+      "platform/dbt/tests/**"
+    ],
+    "required_paths": [
+      "TASK.md",
+      "platform/dbt/dbt_project.yml",
+      "platform/dbt/profiles.yml",
+      "platform/dbt/models/staging/sources.yml",
+      "platform/airflow/dags/ecommerce_hourly.py"
+    ]
+  },
+  "budgets": {
+    "wall_time_seconds": 1200,
+    "tool_calls": 80,
+    "model_tokens": 30000,
+    "rework_attempts": 2
+  },
+  "setup": {
+    "commands": [
+      "make seed",
+      "make scenario-baseline-build SCENARIO=net-revenue"
+    ]
+  },
+  "public_validation": {
+    "commands": [
+      "make scenario-verify SCENARIO=net-revenue",
+      "make scenario-run SCENARIO=net-revenue"
+    ]
+  },
+  "hidden_grade": {
+    "interface_version": 1,
+    "command": "make scenario-grade SCENARIO=net-revenue",
+    "container_service": "scenario-grader",
+    "oracle_sha256": "ec93302cc53ace5dece582c773a05d66034232f54f93cd04958b9346dfff6de0"
+  }
+}
