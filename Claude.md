@@ -41,6 +41,8 @@ Agent control plane работает на Ubuntu локально: Python 3.12, 
 
 Make targets — стабильный пользовательский интерфейс. Детали `docker compose` и service networking остаются внутри Make/config. Добавляй healthchecks, детерминированный seed и идемпотентные операции. Не заявляй, что target работает, пока он не выполнен с exit code `0`.
 
+Airflow baseline использует LocalExecutor и public `airflow.sdk`; будущие tools обращаются к `/api/v2`. DAG-файлы являются исполняемым кодом: агентские изменения нельзя сразу монтировать в активную папку DAG. Текущий `ecommerce_hourly` проверяет только orchestration contract; реальную интеграцию с dbt требуется реализовать и проверить отдельно. Не выдавай успешный marker task за выполненную transformation.
+
 ## Contracts, evidence и validation
 
 Утверждение агента не является evidence. Structured evidence должно содержать source, command/query/test/artifact, exit code, timestamp и output reference. Целевой deterministic validator выполняет:

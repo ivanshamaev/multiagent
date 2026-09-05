@@ -9,6 +9,7 @@
 - `decisions/` — ADR с принятыми архитектурными решениями.
 - `problems/` — воспроизводимые проблемы, причины, исправления и regression checks.
 - `experiments/` — эксперименты с агентами, метрики и ссылки на evidence.
+- `evidence/` — компактные persistent summaries выполненных validation gates.
 - `progress.md` — короткая хронология фактически выполненной работы.
 
 ## Обязательный цикл работы
@@ -22,8 +23,8 @@
 
 ## Текущий статус
 
-- Завершённый foundation: [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md).
-- Активный шаг: [`STEP-0002`](steps/STEP-0002-dbt-baseline.md).
+- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md), [`STEP-0002`](steps/STEP-0002-dbt-baseline.md) и [`STEP-0003`](steps/STEP-0003-airflow-baseline.md); persistent gate transcripts сохранены в `evidence/`.
+- Следующий запланированный шаг: [`STEP-0004`](steps/STEP-0004-airflow-dbt-execution.md) — фактическое выполнение dbt из Airflow.
 - Текущая фаза: Phase A — Golden Data Platform.
-- Ближайшая продуктовая цель: дополнить healthy ClickHouse baseline контейнерными dbt и Airflow.
+- Ближайшая продуктовая цель: заменить Airflow marker tasks реальными dbt transformations/tests и завершить Phase A.
 - Ближайший исследовательский milestone: один Data Engineer Agent реализует Net Revenue и проходит независимый hidden grader.

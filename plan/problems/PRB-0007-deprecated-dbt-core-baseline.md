@@ -1,6 +1,6 @@
 # PRB-0007 — Первоначальный dbt Core baseline уже deprecated
 
-Status: validating  
+Status: validating
 Detected: 2026-09-04
 
 ## Symptom
@@ -22,15 +22,15 @@ This version of dbt is deprecated and no longer receives regular patches.
 
 ## Attempted fixes
 
-Переход сразу на Core 1.12 отклонён: поддержка этой ветки в `dbt-clickhouse` ещё выделена в отдельную upstream work item. Официальный changelog адаптера 1.10.2 сообщает о переходе его test matrix на Core 1.11.
+Переход сразу на Core 1.12 был отклонён как выход за проверенный scope опубликованного adapter release. В immutable changelog для [`dbt-clickhouse` 1.10.2](https://github.com/ClickHouse/dbt-clickhouse/blob/c2eca075e47c3cc7b17b261a0b35a2954fd178d4/CHANGELOG.md#release-1101-2026-06-16) переход local test dependencies на Core 1.11 относится к release 1.10.1, а не 1.10.2. README того же [release commit](https://github.com/ClickHouse/dbt-clickhouse/blob/c2eca075e47c3cc7b17b261a0b35a2954fd178d4/README.md) заявляет feature support только до Core 1.10, поэтому full Core 1.11 compatibility не утверждается.
 
-## Candidate fix
+## Accepted fix
 
-Зафиксировать последний patch поддерживаемой ветки `dbt-core==1.11.14`, пересобрать hash lock/image и повторить весь `debug → parse → compile → build → test` gate на ClickHouse 25.8.
+Зафиксирован [`dbt-core==1.11.14`](https://pypi.org/project/dbt-core/1.11.14/) вместе с опубликованным [`dbt-clickhouse==1.10.2`](https://pypi.org/project/dbt-clickhouse/1.10.2/); hash lock и image пересобраны. Эта связка локально проверяется только для используемого baseline feature set. Core 1.12 и неиспользуемые Core 1.11 features остаются вне текущего scope.
 
 ## Regression check
 
-Pending: отсутствие deprecated-version warning и повторяемый полный platform gate.
+Historical local artifacts сообщают, что `dbt --version`, `debug`, `parse`, `compile`, `build` и `test` завершились с exit code `0`, deprecated-version warning исчез, build дал `PASS=76`, отдельный test — `PASS=68`, а independent SQL smoke — `dbt baseline: PASS`. После reseed `build` и `test` были повторены успешно. Source revision, точные timestamps и persistent output transcript этого прогона не были сохранены, поэтому fresh regression transcript остаётся pending в STEP-0002.
 
 ## Follow-up
 

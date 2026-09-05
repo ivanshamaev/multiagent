@@ -4,7 +4,7 @@
 
 ## Текущий статус
 
-Реализуется foundation-слой. Agent runtime будет работать локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в Docker Compose. Все LLM-вызовы будут идти через OpenAI-совместимый GateLLM gateway с токеном из локального `.env`. Сейчас доступен минимальный ClickHouse baseline. dbt, Airflow и агенты добавляются следующими изолированными шагами.
+Реализуется foundation-слой. Agent runtime будет работать локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в Docker Compose. Все будущие LLM-вызовы пойдут через OpenAI-совместимый GateLLM с токеном из локального `.env`. Работают ClickHouse, контейнерный dbt baseline и Airflow 3.3.1 с PostgreSQL 16.15. Agent runtime пока не реализован.
 
 Актуальный roadmap: [`plan/development-plan.md`](plan/development-plan.md). Фактически выполненная работа: [`plan/progress.md`](plan/progress.md).
 
@@ -13,15 +13,22 @@
 Требования: Ubuntu, Docker Engine с Compose v2, GNU Make, Python 3.12 и `uv 0.12.9`.
 
 ```bash
-cp .env.example .env
+test -f .env || cp .env.example .env
 make bootstrap
 make check
 make platform-up
 make seed
+make dbt-build
 make platform-test
 ```
 
 ClickHouse публикуется только на loopback-интерфейсе. HTTP и native endpoints по умолчанию доступны на `127.0.0.1:8123` и `127.0.0.1:9000`.
+
+`make dbt-build` создаёт 6 views и 2 MergeTree marts и выполняет 68 tests. `make platform-test` проверяет Airflow через API, повторяет dbt tests и независимо проверяет физические таблицы и фиксированные агрегаты. Net Revenue намеренно отсутствует: это будущая benchmark-задача Data Engineer Agent.
+
+Airflow UI доступен на `http://127.0.0.1:8080`; локальные defaults — пользователь `airflow`, пароль `airflow_dev_only`. PostgreSQL не публикует host port. DAG `ecommerce_hourly` пока исполняет только проверку последовательности шести стадий; фактическое выполнение dbt из Airflow — следующий шаг. `make airflow-test` проверяет imports, JWT, зависимости и успешное завершение всех задач. Подробнее: [`platform/airflow/README.md`](platform/airflow/README.md).
+
+Образы Airflow и PostgreSQL занимают примерно 2.8 GB дополнительно к ClickHouse/dbt; оставляйте запас для данных и логов. Существующий `.env` не перезаписывайте: он может содержать `API_TOKEN`.
 
 Остановить сервисы без удаления данных:
 

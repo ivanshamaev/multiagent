@@ -12,3 +12,4 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0006](ADR-0006-deny-by-default.md) | Deny-by-default capabilities | accepted |
 | [ADR-0007](ADR-0007-evidence-based-course.md) | Курс строится после проверенной системы | accepted |
 | [ADR-0008](ADR-0008-gatellm-gateway.md) | GateLLM и cost-first model policy | accepted |
+| [ADR-0009](ADR-0009-airflow-local-topology.md) | LocalExecutor, FAB auth и public Airflow API boundary | accepted |

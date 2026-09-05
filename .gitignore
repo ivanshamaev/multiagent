@@ -21,9 +21,9 @@ artifacts/
 logs/
 target/
 dbt_packages/
+.user.yml
 
 # Editors and OS
 .idea/
 .vscode/
 .DS_Store
-

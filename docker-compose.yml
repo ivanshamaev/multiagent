@@ -1,5 +1,35 @@
 name: ${COMPOSE_PROJECT_NAME:-agentic-data-platform}
 
+x-airflow-common-env: &airflow-common-env
+  AIRFLOW__CORE__EXECUTOR: LocalExecutor
+  AIRFLOW__CORE__PARALLELISM: "2"
+  AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+  AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-YWdlbnRpYy1kYXRhLXBsYXRmb3JtLWZlcm5ldC0wMV8=}
+  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+  AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+  AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-api-server:8080/execution/
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: >-
+    postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD:-airflow_dev_only}@airflow-postgres:5432/${AIRFLOW_DB_NAME:-airflow}
+  AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_JWT_SECRET:-YWdlbnRpYy1kYXRhLXBsYXRmb3JtLWp3dC1kZXYtMDE=}
+  AIRFLOW__API_AUTH__JWT_ISSUER: agentic-data-platform-airflow
+  AIRFLOW__API__SECRET_KEY: ${AIRFLOW_API_SECRET_KEY:-YWdlbnRpYy1kYXRhLXBsYXRmb3JtLWFwaS1kZXYtMDE=}
+  AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+
+x-airflow-common: &airflow-common
+  image: ${AIRFLOW_IMAGE:-apache/airflow:3.3.1-python3.12@sha256:b01a795dfbd113bbbfdf3ee169b8f27e9a0090ccef105f1a452b3594a11ed316}
+  environment: *airflow-common-env
+  user: "${AIRFLOW_UID:-50000}:0"
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+  volumes:
+    - ./platform/airflow/dags:/opt/airflow/dags:ro
+    - airflow-logs:/opt/airflow/logs
+  networks:
+    - data-platform
+
 services:
   clickhouse:
     image: ${CLICKHOUSE_IMAGE:-clickhouse/clickhouse-server:25.8.33.6}
@@ -52,8 +82,113 @@ services:
     networks:
       - data-platform
 
+  airflow-postgres:
+    image: ${AIRFLOW_POSTGRES_IMAGE:-postgres:16.15-bookworm@sha256:bb3e1a57e5407e0a5280b4211980a5e537f4abd234a87014ac979849a78dd825}
+    environment:
+      POSTGRES_USER: ${AIRFLOW_DB_USER:-airflow}
+      POSTGRES_PASSWORD: ${AIRFLOW_DB_PASSWORD:-airflow_dev_only}
+      POSTGRES_DB: ${AIRFLOW_DB_NAME:-airflow}
+    volumes:
+      - airflow-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          pg_isready
+          -U "$${POSTGRES_USER}"
+          -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - data-platform
+
+  airflow-init:
+    <<: *airflow-common
+    command: version
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_MIGRATE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_ADMIN_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD:-airflow_dev_only}
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+    restart: "no"
+
+  airflow-api-server:
+    <<: *airflow-common
+    command: api-server
+    ports:
+      - "127.0.0.1:${AIRFLOW_API_PORT:-8080}:8080"
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - http://localhost:8080/api/v2/monitor/health
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          airflow jobs check
+          --job-type SchedulerJob
+          --hostname "$${HOSTNAME}"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+      airflow-api-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          airflow jobs check
+          --job-type DagProcessorJob
+          --hostname "$${HOSTNAME}"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
 volumes:
   clickhouse-data:
+  airflow-postgres-data:
+  airflow-logs:
 
 networks:
   data-platform:

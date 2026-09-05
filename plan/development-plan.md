@@ -75,6 +75,7 @@ Gate: новый checkout получает локальное окружение
 - A05: dbt layers `staging → intermediate → marts`; Net Revenue намеренно отсутствует.
 - A06: dbt schema/business tests и SQL correctness tests.
 - A07: Airflow 3 baseline DAG `ecommerce_hourly` с API-first управлением.
+- A07b: подключить фактические dbt transformations/tests к Airflow с изолированными dependencies; marker DAG недостаточен для завершения Phase A.
 - A08: единый Make-интерфейс и сохранение test evidence.
 
 Gate:
@@ -167,4 +168,4 @@ Gate: каждая практическая глава ссылается на �
 
 ## 7. Текущая итерация
 
-В рамках `STEP-0001` выполняются Phase 0 и начало Phase A: установка `uv`, локальный Python scaffold, Docker Compose, ClickHouse healthcheck, детерминированный seed и smoke validation. dbt и Airflow добавляются следующими отдельными шагами, чтобы каждое усложнение имело собственный gate и журнал проблем.
+`STEP-0001…0003` завершены: governance/bootstrap, ClickHouse, dbt и Airflow orchestration contract проверены; свежие transcripts сохранены в `plan/evidence/`. Следующий запланированный `STEP-0004` подключит фактическое выполнение dbt к Airflow; только после этого Phase A готова к scenario/agent runtime.
