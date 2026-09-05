@@ -54,3 +54,10 @@ domain contracts, workflow state и serialized event envelope. Нельзя ис
 `make check`, targeted contract/workflow tests, JSON round-trip fixtures, transition matrix,
 tamper/replay/self-approval adversarial tests, `make scenario-repro-test`, `make platform-test` и
 `git diff --check`.
+
+## Work log
+
+- 2026-09-05: проверены официальные Pydantic 2.13.5 и MAF workflow state/samples; MAF dependency
+  отложена до adapter phase.
+- 2026-09-05: принят ADR-0014 — strict frozen contracts, pure reducer, deterministic budgets и
+  canonical hash chain.

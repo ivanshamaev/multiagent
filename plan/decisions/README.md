@@ -17,3 +17,4 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0011](ADR-0011-use-astronomer-cosmos.md) | Astronomer Cosmos управляет dbt-графом и выполнением | accepted |
 | [ADR-0012](ADR-0012-disposable-scenario-snapshots.md) | Allowlisted content snapshot создаёт disposable workspace | accepted |
 | [ADR-0013](ADR-0013-isolated-hidden-grader.md) | Hidden grader работает в отдельном capability boundary | accepted |
+| [ADR-0014](ADR-0014-domain-contracts-and-workflow-events.md) | Strict domain contracts, pure reducer и hash-chained events | accepted |
