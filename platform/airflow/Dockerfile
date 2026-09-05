@@ -8,6 +8,7 @@ RUN python -m venv /opt/airflow/dbt-venv \
        --no-cache-dir --require-hashes -r /tmp/dbt-requirements.lock \
     && /opt/airflow/dbt-venv/bin/python -m pip check \
     && python -m pip check
-
-# Docker copies this directory's owner/mode into a fresh named volume.
-RUN mkdir -p /opt/airflow/dbt-artifacts && chmod 0770 /opt/airflow/dbt-artifacts
+COPY platform/airflow/requirements.lock /tmp/airflow-requirements.lock
+RUN python -m pip install --no-cache-dir --no-deps --require-hashes \
+       -r /tmp/airflow-requirements.lock \
+    && python -m pip check

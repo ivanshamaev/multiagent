@@ -17,18 +17,34 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-DAG_ID = "ecommerce_hourly"
+DAG_ID = "ecommerce_acceptance"
 FAILURE_PROBE_DAG_ID = "ecommerce_failure_probe"
 PROBE_DAG_ID = FAILURE_PROBE_DAG_ID
-TASK_CHAIN = (
-    "load_raw",
-    "dbt_staging",
-    "dbt_intermediate",
-    "dbt_marts",
-    "dbt_tests",
-    "publish",
-)
-EXPECTED_TASK_IDS = frozenset(TASK_CHAIN)
+POSITIVE_GRAPH = {
+    "load_raw": frozenset(
+        {
+            "dbt.stg_customers_run",
+            "dbt.stg_orders_run",
+            "dbt.stg_payments_run",
+            "dbt.stg_refunds_run",
+        }
+    ),
+    "dbt.stg_customers_run": frozenset({"dbt.dim_customers_run"}),
+    "dbt.stg_orders_run": frozenset({"dbt.fct_orders_run"}),
+    "dbt.stg_payments_run": frozenset({"dbt.int_order_payments_run"}),
+    "dbt.stg_refunds_run": frozenset({"dbt.int_order_refunds_run"}),
+    "dbt.int_order_payments_run": frozenset({"dbt.fct_orders_run"}),
+    "dbt.int_order_refunds_run": frozenset({"dbt.fct_orders_run"}),
+    "dbt.dim_customers_run": frozenset({"dbt.fct_orders_run"}),
+    "dbt.fct_orders_run": frozenset({"dbt.dbt_test"}),
+    "dbt.dbt_test": frozenset({"publish"}),
+    "publish": frozenset(),
+}
+FAILURE_GRAPH = {
+    "load_raw": frozenset({"dbt_tests"}),
+    "dbt_tests": frozenset({"publish"}),
+    "publish": frozenset(),
+}
 
 DEFAULT_REQUEST_TIMEOUT_SECONDS = 10.0
 DEFAULT_POLL_TIMEOUT_SECONDS = 300.0
@@ -274,25 +290,30 @@ def _wait_for_health(
         _pause(deadline, interval_seconds, "healthy Airflow components", monotonic, sleep)
 
 
-def _extract_task_ids(payload: object | None, operation: str) -> frozenset[str]:
+def _extract_task_graph(payload: object | None, operation: str) -> dict[str, frozenset[str]]:
     body = _require_object(payload, operation)
     tasks = body.get("tasks")
     if not isinstance(tasks, list):
         raise SmokeError(f"{operation} response is missing tasks")
 
-    task_ids: set[str] = set()
+    graph: dict[str, frozenset[str]] = {}
     for task in tasks:
         if not isinstance(task, dict) or not isinstance(task.get("task_id"), str):
             raise SmokeError(f"{operation} returned an invalid task entry")
-        if task["task_id"] in task_ids:
+        task_id = task["task_id"]
+        downstream = task.get("downstream_task_ids")
+        if task_id in graph:
             raise SmokeError(f"{operation} returned duplicate tasks")
-        task_ids.add(task["task_id"])
-        if task["task_id"] in EXPECTED_TASK_IDS:
-            position = TASK_CHAIN.index(task["task_id"])
-            expected = list(TASK_CHAIN[position + 1 : position + 2])
-            if task.get("downstream_task_ids") != expected:
-                raise SmokeError("Airflow DAG task dependencies differ from the baseline chain")
-    return frozenset(task_ids)
+        if not isinstance(downstream, list) or any(
+            not isinstance(item, str) for item in downstream
+        ):
+            raise SmokeError(f"{operation} returned invalid task dependencies")
+        graph[task_id] = frozenset(downstream)
+    return graph
+
+
+def _expected_graph(dag_id: str) -> dict[str, frozenset[str]]:
+    return FAILURE_GRAPH if dag_id == FAILURE_PROBE_DAG_ID else POSITIVE_GRAPH
 
 
 def _wait_for_dag_contract(
@@ -315,10 +336,9 @@ def _wait_for_dag_contract(
                 token=token,
             )
             _require_status(tasks_response, 200, "Airflow task discovery")
-            if (
-                _extract_task_ids(tasks_response.payload, "Airflow task discovery")
-                == EXPECTED_TASK_IDS
-            ):
+            if _extract_task_graph(
+                tasks_response.payload, "Airflow task discovery"
+            ) == _expected_graph(dag_id):
                 return
         elif dag_response.status != 404:
             _require_status(dag_response, 200, "Airflow DAG discovery")
@@ -352,7 +372,7 @@ def _wait_for_run(
         if state == "success":
             if expect_failure:
                 raise SmokeError("failure probe unexpectedly succeeded")
-            _verify_task_instances(client, token, run_path)
+            _verify_task_instances(client, token, run_path, dag_id)
             _verify_publication(client, token, run_path, run_id)
             return
         if state == "failed":
@@ -365,7 +385,9 @@ def _wait_for_run(
         _pause(deadline, interval_seconds, "Airflow DAG run success", monotonic, sleep)
 
 
-def _get_task_states(client: AirflowApiClient, token: str, run_path: str) -> dict[str, str]:
+def _get_task_states(
+    client: AirflowApiClient, token: str, run_path: str, expected_ids: frozenset[str]
+) -> dict[str, str]:
     response = client.request_json(
         "GET",
         f"{run_path}/taskInstances?limit=100",
@@ -389,13 +411,15 @@ def _get_task_states(client: AirflowApiClient, token: str, run_path: str) -> dic
             raise SmokeError(f"Airflow task instance lookup returned duplicate task {task_id}")
         states[task_id] = state
 
-    if frozenset(states) != EXPECTED_TASK_IDS:
-        raise SmokeError("Airflow DAG run did not contain the exact six task instances")
+    if frozenset(states) != expected_ids:
+        raise SmokeError("Airflow DAG run task instances differ from the expected graph")
     return states
 
 
-def _verify_task_instances(client: AirflowApiClient, token: str, run_path: str) -> None:
-    states = _get_task_states(client, token, run_path)
+def _verify_task_instances(
+    client: AirflowApiClient, token: str, run_path: str, dag_id: str
+) -> None:
+    states = _get_task_states(client, token, run_path, frozenset(_expected_graph(dag_id)))
     unsuccessful = sorted(task_id for task_id, state in states.items() if state != "success")
     if unsuccessful:
         raise SmokeError(
@@ -404,9 +428,9 @@ def _verify_task_instances(client: AirflowApiClient, token: str, run_path: str) 
 
 
 def _verify_failure_task_instances(client: AirflowApiClient, token: str, run_path: str) -> None:
-    states = _get_task_states(client, token, run_path)
+    states = _get_task_states(client, token, run_path, frozenset(FAILURE_GRAPH))
     expected = {
-        **dict.fromkeys(TASK_CHAIN[:4], "success"),
+        "load_raw": "success",
         "dbt_tests": "failed",
         "publish": "upstream_failed",
     }
@@ -427,18 +451,12 @@ def _verify_publication(client: AirflowApiClient, token: str, run_path: str, run
         except json.JSONDecodeError:
             raise SmokeError("Airflow publish evidence is invalid JSON") from None
     evidence = _require_object(value, "Airflow publish evidence")
-    invocations = evidence.get("invocation_ids")
     if (
         evidence.get("published") is not True
-        or evidence.get("runner") != "dbt-subprocess-v1"
+        or evidence.get("runner") != "astronomer-cosmos"
         or evidence.get("run_id") != run_id
-        or evidence.get("stages") != list(TASK_CHAIN[:-1])
-        or not isinstance(invocations, list)
-        or len(invocations) != 5
-        or any(not isinstance(item, str) or not item for item in invocations)
-        or len(set(invocations)) != 5
     ):
-        raise SmokeError("Airflow publish evidence does not prove five current-run dbt invocations")
+        raise SmokeError("Airflow publish evidence does not prove a current-run Cosmos gate")
 
 
 def _set_pause(client: AirflowApiClient, token: str, dag_id: str, is_paused: bool) -> None:
@@ -585,7 +603,11 @@ def main(
         print(f"Airflow API smoke: FAIL: {exc}", file=sys.stderr)
         return 1
 
-    result = "expected failure" if expect_failure else "6/6 success"
+    result = (
+        "expected failure"
+        if expect_failure
+        else f"{len(POSITIVE_GRAPH)}/{len(POSITIVE_GRAPH)} success"
+    )
     print(f"Airflow API smoke: PASS; dag={selected_dag}; run_id={run_id}; tasks={result}")
     return 0
 

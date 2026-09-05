@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This Agentic Data Platform will underpin a practice-based course. `init/` contains proposals, not evidence. Use `plan/development-plan.md` for the roadmap, `plan/steps/` for the active task, `plan/decisions/` for ADRs, `plan/problems/` for failures, and `plan/evidence/` for completed gates.
+This platform underpins a course. `init/` contains proposals, not evidence. Use `plan/development-plan.md` for the roadmap, `plan/steps/` for active work, and `plan/{decisions,problems,evidence}/` for records.
 
 Local control-plane code belongs in `orchestrator/`, `runtime/`, role-specific `agents/`, typed `contracts/`, and deterministic `policies/`. Containerized services and dbt code live in `platform/`. Python tests are grouped under `tests/{unit,integration,workflow,policy,adversarial}`. Keep authorization and workflow transitions in code, not prompts.
 
@@ -14,11 +14,12 @@ Local control-plane code belongs in `orchestrator/`, `runtime/`, role-specific `
 - `make seed` recreates deterministic `raw` data and resets `analytics`.
 - `make dbt-debug`, `make dbt-parse`, and `make dbt-compile` validate dbt configuration and SQL.
 - `make dbt-build` builds all models and runs 68 data tests.
-- `make airflow-test` validates DAG imports, JWT authentication, dependencies, and six-task execution.
+- `make airflow-test` validates JWT auth and an 11-task Cosmos/dbt execution graph.
+- `make airflow-failure-test` proves a failed dbt test blocks `publish`.
 - `make platform-test` combines Airflow, dbt, and independent SQL checks.
 - `make platform-down` stops services without deleting volumes.
 
-The Airflow DAG currently validates orchestration; its dbt execution wiring is pending.
+`ecommerce_hourly` and its manual acceptance twin use Cosmos `DbtTaskGroup`; keep scheduled execution paused unless data readiness is intentional.
 
 ## Planning, Evidence, and Testing
 

@@ -75,16 +75,16 @@ def _config(password: str = "unit-password") -> object:
 
 
 def _tasks(state: str = "success") -> list[dict[str, str]]:
-    return [{"task_id": task_id, "state": state} for task_id in sorted(api_smoke.EXPECTED_TASK_IDS)]
+    return [{"task_id": task_id, "state": state} for task_id in sorted(api_smoke.POSITIVE_GRAPH)]
 
 
 def _task_definitions() -> list[dict[str, object]]:
     return [
         {
             "task_id": task_id,
-            "downstream_task_ids": list(api_smoke.TASK_CHAIN[index + 1 : index + 2]),
+            "downstream_task_ids": sorted(downstream),
         }
-        for index, task_id in enumerate(api_smoke.TASK_CHAIN)
+        for task_id, downstream in api_smoke.POSITIVE_GRAPH.items()
     ]
 
 
@@ -102,61 +102,64 @@ def test_run_smoke_uses_v2_contract_and_checks_all_tasks() -> None:
         ("GET", "/api/v2/dags?limit=1", 401, {"detail": "Not authenticated"}),
         ("POST", "/auth/token", 201, {"access_token": token}),
         ("GET", "/api/v2/monitor/health", 200, healthy),
-        ("GET", "/api/v2/dags/ecommerce_hourly", 404, {"detail": "Not found"}),
+        ("GET", "/api/v2/dags/ecommerce_acceptance", 404, {"detail": "Not found"}),
         (
             "GET",
-            "/api/v2/dags/ecommerce_hourly",
+            "/api/v2/dags/ecommerce_acceptance",
             200,
-            {"dag_id": "ecommerce_hourly", "is_paused": True},
+            {"dag_id": "ecommerce_acceptance", "is_paused": True},
         ),
-        ("GET", "/api/v2/dags/ecommerce_hourly/tasks?limit=100", 200, {"tasks": task_definitions}),
         (
             "GET",
-            "/api/v2/dags/ecommerce_hourly",
+            "/api/v2/dags/ecommerce_acceptance/tasks?limit=100",
             200,
-            {"dag_id": "ecommerce_hourly", "is_paused": True},
+            {"tasks": task_definitions},
         ),
-        ("PATCH", "/api/v2/dags/ecommerce_hourly", 200, {"is_paused": False}),
+        (
+            "GET",
+            "/api/v2/dags/ecommerce_acceptance",
+            200,
+            {"dag_id": "ecommerce_acceptance", "is_paused": True},
+        ),
+        ("PATCH", "/api/v2/dags/ecommerce_acceptance", 200, {"is_paused": False}),
         (
             "POST",
-            "/api/v2/dags/ecommerce_hourly/dagRuns",
+            "/api/v2/dags/ecommerce_acceptance/dagRuns",
             200,
-            {"dag_id": "ecommerce_hourly", "dag_run_id": run_id, "state": "queued"},
+            {"dag_id": "ecommerce_acceptance", "dag_run_id": run_id, "state": "queued"},
         ),
         (
             "GET",
-            f"/api/v2/dags/ecommerce_hourly/dagRuns/{run_id}",
+            f"/api/v2/dags/ecommerce_acceptance/dagRuns/{run_id}",
             200,
-            {"dag_id": "ecommerce_hourly", "dag_run_id": run_id, "state": "running"},
+            {"dag_id": "ecommerce_acceptance", "dag_run_id": run_id, "state": "running"},
         ),
         (
             "GET",
-            f"/api/v2/dags/ecommerce_hourly/dagRuns/{run_id}",
+            f"/api/v2/dags/ecommerce_acceptance/dagRuns/{run_id}",
             200,
-            {"dag_id": "ecommerce_hourly", "dag_run_id": run_id, "state": "success"},
+            {"dag_id": "ecommerce_acceptance", "dag_run_id": run_id, "state": "success"},
         ),
         (
             "GET",
-            f"/api/v2/dags/ecommerce_hourly/dagRuns/{run_id}/taskInstances?limit=100",
+            f"/api/v2/dags/ecommerce_acceptance/dagRuns/{run_id}/taskInstances?limit=100",
             200,
             {"task_instances": _tasks()},
         ),
-        ("PATCH", "/api/v2/dags/ecommerce_hourly", 200, {"is_paused": True}),
+        ("PATCH", "/api/v2/dags/ecommerce_acceptance", 200, {"is_paused": True}),
     ]
 
     responses.insert(
         -1,
         (
             "GET",
-            f"/api/v2/dags/ecommerce_hourly/dagRuns/{run_id}/taskInstances/publish/xcomEntries/return_value",
+            f"/api/v2/dags/ecommerce_acceptance/dagRuns/{run_id}/taskInstances/publish/xcomEntries/return_value",
             200,
             {
                 "value": {
                     "published": True,
-                    "runner": "dbt-subprocess-v1",
+                    "runner": "astronomer-cosmos",
                     "run_id": run_id,
-                    "stages": list(api_smoke.TASK_CHAIN[:-1]),
-                    "invocation_ids": [f"inv-{i}" for i in range(5)],
                 }
             },
         ),
@@ -209,31 +212,36 @@ def test_run_smoke_fails_immediately_when_dag_run_fails() -> None:
         ("GET", "/api/v2/monitor/health", 200, healthy),
         (
             "GET",
-            "/api/v2/dags/ecommerce_hourly",
+            "/api/v2/dags/ecommerce_acceptance",
             200,
-            {"dag_id": "ecommerce_hourly", "is_paused": True},
+            {"dag_id": "ecommerce_acceptance", "is_paused": True},
         ),
-        ("GET", "/api/v2/dags/ecommerce_hourly/tasks?limit=100", 200, {"tasks": task_definitions}),
         (
             "GET",
-            "/api/v2/dags/ecommerce_hourly",
+            "/api/v2/dags/ecommerce_acceptance/tasks?limit=100",
             200,
-            {"dag_id": "ecommerce_hourly", "is_paused": True},
+            {"tasks": task_definitions},
         ),
-        ("PATCH", "/api/v2/dags/ecommerce_hourly", 200, {"is_paused": False}),
+        (
+            "GET",
+            "/api/v2/dags/ecommerce_acceptance",
+            200,
+            {"dag_id": "ecommerce_acceptance", "is_paused": True},
+        ),
+        ("PATCH", "/api/v2/dags/ecommerce_acceptance", 200, {"is_paused": False}),
         (
             "POST",
-            "/api/v2/dags/ecommerce_hourly/dagRuns",
+            "/api/v2/dags/ecommerce_acceptance/dagRuns",
             200,
-            {"dag_id": "ecommerce_hourly", "dag_run_id": run_id},
+            {"dag_id": "ecommerce_acceptance", "dag_run_id": run_id},
         ),
         (
             "GET",
-            f"/api/v2/dags/ecommerce_hourly/dagRuns/{run_id}",
+            f"/api/v2/dags/ecommerce_acceptance/dagRuns/{run_id}",
             200,
             {"state": "failed"},
         ),
-        ("PATCH", "/api/v2/dags/ecommerce_hourly", 200, {"is_paused": True}),
+        ("PATCH", "/api/v2/dags/ecommerce_acceptance", 200, {"is_paused": True}),
     ]
     transport = SequenceTransport(responses)
     clock = FakeClock()
@@ -342,7 +350,7 @@ def test_invalid_run_state_is_not_reflected_in_the_error() -> None:
         [
             (
                 "GET",
-                f"/api/v2/dags/ecommerce_hourly/dagRuns/{run_id}",
+                f"/api/v2/dags/ecommerce_acceptance/dagRuns/{run_id}",
                 200,
                 {"state": reflected_secret},
             )
@@ -375,8 +383,10 @@ def test_task_contract_rejects_a_changed_dependency_edge() -> None:
     tasks = _task_definitions()
     tasks[0]["downstream_task_ids"] = []
 
-    with pytest.raises(api_smoke.SmokeError, match="dependencies differ"):
-        api_smoke._extract_task_ids({"tasks": tasks}, "Airflow task discovery")
+    assert (
+        api_smoke._extract_task_graph({"tasks": tasks}, "Airflow task discovery")
+        != api_smoke.POSITIVE_GRAPH
+    )
 
 
 def test_task_contract_rejects_duplicate_task_ids() -> None:
@@ -384,7 +394,7 @@ def test_task_contract_rejects_duplicate_task_ids() -> None:
     tasks.append(dict(tasks[0]))
 
     with pytest.raises(api_smoke.SmokeError, match="duplicate tasks"):
-        api_smoke._extract_task_ids({"tasks": tasks}, "Airflow task discovery")
+        api_smoke._extract_task_graph({"tasks": tasks}, "Airflow task discovery")
 
 
 def test_plain_http_base_url_is_rejected_outside_loopback() -> None:
@@ -392,13 +402,43 @@ def test_plain_http_base_url_is_rejected_outside_loopback() -> None:
         api_smoke._validate_base_url("http://airflow.example.test:8080")
 
 
+def test_pause_update_requires_confirmed_state() -> None:
+    clock = FakeClock()
+    transport = SequenceTransport(
+        [("PATCH", "/api/v2/dags/ecommerce_acceptance", 200, {"is_paused": False})]
+    )
+    client = api_smoke.AirflowApiClient(
+        "http://127.0.0.1:8080", 7.0, transport, 30.0, clock.monotonic
+    )
+
+    with pytest.raises(api_smoke.SmokeError, match="did not confirm"):
+        api_smoke._set_pause(client, "jwt", api_smoke.DAG_ID, True)
+
+
+def test_legacy_failure_environment_cannot_change_positive_gate(monkeypatch, capsys) -> None:
+    selected = {}
+
+    def fake_run(config, **kwargs):
+        selected.update(kwargs)
+        return "positive-run"
+
+    monkeypatch.setattr(api_smoke, "run_smoke", fake_run)
+    environ = {
+        "AIRFLOW_API_BASE_URL": "http://127.0.0.1:8080",
+        "AIRFLOW_ADMIN_USERNAME": "unit-admin",
+        "AIRFLOW_ADMIN_PASSWORD": "unit-password",
+        "AIRFLOW_EXPECT_FAILURE": "true",
+    }
+
+    assert api_smoke.main(environ, argv=[]) == 0
+    assert selected["dag_id"] == api_smoke.DAG_ID
+    assert selected["expect_failure"] is False
+    assert "ecommerce_acceptance" in capsys.readouterr().out
+
+
 def test_failure_probe_accepts_only_expected_task_states() -> None:
     run_id = "probe_failed"
-    states = {
-        **{task_id: "success" for task_id in api_smoke.TASK_CHAIN[:4]},
-        "dbt_tests": "failed",
-        "publish": "upstream_failed",
-    }
+    states = {"load_raw": "success", "dbt_tests": "failed", "publish": "upstream_failed"}
     transport = SequenceTransport(
         [
             (

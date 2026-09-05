@@ -2,5 +2,6 @@
 !platform/
 !platform/airflow/
 !platform/airflow/Dockerfile
+!platform/airflow/requirements.lock
 !platform/dbt/
 !platform/dbt/requirements.lock

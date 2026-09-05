@@ -16,7 +16,7 @@ x-airflow-common-env: &airflow-common-env
   AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
 
 x-airflow-common: &airflow-common
-  image: ${AIRFLOW_DBT_IMAGE:-agentic-data-platform-airflow:3.3.1-dbt1.11.14-1.10.2}
+  image: ${AIRFLOW_COSMOS_IMAGE:-agentic-data-platform-airflow:3.3.1-cosmos1.15.0-dbt1.11.14}
   build:
     context: .
     dockerfile: platform/airflow/Dockerfile
@@ -32,7 +32,6 @@ x-airflow-common: &airflow-common
     - ./platform/dbt:/opt/airflow/dbt:ro
     - ./platform/airflow/fixtures:/opt/airflow/fixtures:ro
     - ./platform/clickhouse/tests:/opt/airflow/checks:ro
-    - airflow-dbt-artifacts:/opt/airflow/dbt-artifacts
     - airflow-logs:/opt/airflow/logs
   networks:
     - data-platform
@@ -181,6 +180,11 @@ services:
   airflow-dag-processor:
     <<: *airflow-common
     command: dag-processor
+    environment:
+      <<: *airflow-common-env
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-agentic}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-agentic_dev_only}
     healthcheck:
       test:
         - CMD-SHELL
@@ -203,7 +207,6 @@ volumes:
   clickhouse-data:
   airflow-postgres-data:
   airflow-logs:
-  airflow-dbt-artifacts:
 
 networks:
   data-platform:

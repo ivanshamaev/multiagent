@@ -1,0 +1,7 @@
+# Runtime integration only. Airflow itself is supplied by the digest-pinned base image.
+aenum==3.1.17 \
+    --hash=sha256:8b883a37a04e74cc838ac442bdd28c266eae5bbf13e1342c7ef123ed25230139
+astronomer-cosmos==1.15.0 \
+    --hash=sha256:9eea20d391851357fe8fad5b230101b64edc227a38a9cc5bd1e3300fa1a755a7
+deprecation==2.1.0 \
+    --hash=sha256:a10811591210e1fb0e768a8c25517cabeabcba6f0bf96564f8ff45189f90b14a

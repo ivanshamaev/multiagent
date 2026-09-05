@@ -59,12 +59,13 @@ def test_data_platform_does_not_receive_llm_token() -> None:
         "!platform/",
         "!platform/airflow/",
         "!platform/airflow/Dockerfile",
+        "!platform/airflow/requirements.lock",
         "!platform/dbt/",
         "!platform/dbt/requirements.lock",
     ]
     assert "./platform/dbt:/opt/airflow/dbt:ro" in compose
     assert "./platform/airflow/fixtures:/opt/airflow/fixtures:ro" in compose
-    assert "airflow-dbt-artifacts:/opt/airflow/dbt-artifacts" in compose
+    assert "./platform/clickhouse/tests:/opt/airflow/checks:ro" in compose
 
 
 def test_airflow_has_minimal_localexecutor_topology() -> None:
@@ -101,19 +102,32 @@ def test_airflow_dags_use_only_the_public_sdk() -> None:
 
 def test_airflow_keeps_dbt_dependencies_isolated() -> None:
     dockerfile = (ROOT / "platform/airflow/Dockerfile").read_text(encoding="utf-8")
+    airflow_lock = (ROOT / "platform/airflow/requirements.lock").read_text(encoding="utf-8")
 
     assert "python -m venv /opt/airflow/dbt-venv" in dockerfile
     assert "--system-site-packages" not in dockerfile
     assert "--require-hashes" in dockerfile
     assert "COPY platform/dbt/requirements.lock" in dockerfile
-    assert "mkdir -p /opt/airflow/dbt-artifacts" in dockerfile
-    assert "chmod 0770 /opt/airflow/dbt-artifacts" in dockerfile
+    assert "--no-deps --require-hashes" in dockerfile
+    assert "astronomer-cosmos==1.15.0" in airflow_lock
+    assert "--hash=sha256:" in airflow_lock
 
 
 def test_airflow_entrypoints_are_eligible_for_safe_discovery() -> None:
-    for name in ("ecommerce_hourly.py", "ecommerce_failure_probe.py"):
+    for name in ("ecommerce_hourly.py", "ecommerce_acceptance.py", "ecommerce_failure_probe.py"):
         source = (ROOT / "platform/airflow/dags" / name).read_bytes().lower()
         assert b"airflow" in source and b"dag" in source
+
+
+def test_airflow_uses_cosmos_instead_of_a_custom_dbt_runner() -> None:
+    source = (ROOT / "platform/airflow/dags/cosmos_pipeline.py").read_text(encoding="utf-8")
+
+    assert "DbtTaskGroup" in source
+    assert "ExecutionMode.LOCAL" in source
+    assert "InvocationMode.SUBPROCESS" in source
+    assert "TestBehavior.AFTER_ALL" in source
+    assert "subprocess" not in source
+    assert not (ROOT / "platform/airflow/dags/dbt_pipeline.py").exists()
 
 
 def test_dbt_dependencies_and_project_are_pinned() -> None:

@@ -4,7 +4,7 @@
 
 ## Текущий статус
 
-Реализуется foundation-слой. Agent runtime будет работать локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в Docker Compose. Все будущие LLM-вызовы пойдут через OpenAI-совместимый GateLLM с токеном из локального `.env`. Работают ClickHouse, контейнерный dbt baseline и Airflow 3.3.1 с PostgreSQL 16.15. Agent runtime пока не реализован.
+Реализуется foundation-слой. Agent runtime будет работать локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в Docker Compose. Все будущие LLM-вызовы пойдут через OpenAI-совместимый GateLLM с токеном из локального `.env`. Работают ClickHouse, контейнерный dbt baseline и Airflow 3.3.1 с Astronomer Cosmos 1.15.0 и PostgreSQL 16.15. Agent runtime пока не реализован.
 
 Актуальный roadmap: [`plan/development-plan.md`](plan/development-plan.md). Фактически выполненная работа: [`plan/progress.md`](plan/progress.md).
 
@@ -26,7 +26,7 @@ ClickHouse публикуется только на loopback-интерфейс�
 
 `make dbt-build` создаёт 6 views и 2 MergeTree marts и выполняет 68 tests. `make platform-test` проверяет Airflow через API, повторяет dbt tests и независимо проверяет физические таблицы и фиксированные агрегаты. Net Revenue намеренно отсутствует: это будущая benchmark-задача Data Engineer Agent.
 
-Airflow UI доступен на `http://127.0.0.1:8080`; локальные defaults — пользователь `airflow`, пароль `airflow_dev_only`. PostgreSQL не публикует host port. DAG `ecommerce_hourly` пока исполняет только проверку последовательности шести стадий; фактическое выполнение dbt из Airflow — следующий шаг. `make airflow-test` проверяет imports, JWT, зависимости и успешное завершение всех задач. Подробнее: [`platform/airflow/README.md`](platform/airflow/README.md).
+Airflow UI доступен на `http://127.0.0.1:8080`; локальные defaults — пользователь `airflow`, пароль `airflow_dev_only`. PostgreSQL не публикует host port. DAG `ecommerce_hourly` строится Cosmos из dbt lineage и остаётся paused по умолчанию; `make airflow-test` запускает его manual twin и проверяет JWT, exact 11-task graph и результат SQL. Подробнее: [`platform/airflow/README.md`](platform/airflow/README.md).
 
 Образы Airflow и PostgreSQL занимают примерно 2.8 GB дополнительно к ClickHouse/dbt; оставляйте запас для данных и логов. Существующий `.env` не перезаписывайте: он может содержать `API_TOKEN`.
 

@@ -37,11 +37,11 @@ workflow/control plane → agents/reasoning → MCP/tools → Data Platform
 
 ## Runtime и зависимости
 
-Agent control plane работает на Ubuntu локально: Python 3.12, `uv`, `.venv`, Microsoft Agent Framework, Pydantic и pytest. Data Platform работает в Docker Compose: ClickHouse, dbt runner, Airflow 3, PostgreSQL и observability. Не устанавливай project dependencies глобально. `uv.lock` обязателен; floating dependencies и Docker tag `latest` запрещены.
+Agent control plane работает на Ubuntu локально: Python 3.12, `uv`, `.venv`, Microsoft Agent Framework, Pydantic и pytest. Data Platform работает в Docker Compose: ClickHouse, dbt, Airflow 3 + Astronomer Cosmos, PostgreSQL и observability. Не устанавливай project dependencies глобально. `uv.lock` обязателен; floating dependencies и Docker tag `latest` запрещены.
 
 Make targets — стабильный пользовательский интерфейс. Детали `docker compose` и service networking остаются внутри Make/config. Добавляй healthchecks, детерминированный seed и идемпотентные операции. Не заявляй, что target работает, пока он не выполнен с exit code `0`.
 
-Airflow baseline использует LocalExecutor и public `airflow.sdk`; будущие tools обращаются к `/api/v2`. DAG-файлы являются исполняемым кодом: агентские изменения нельзя сразу монтировать в активную папку DAG. Текущий `ecommerce_hourly` проверяет только orchestration contract; реальную интеграцию с dbt требуется реализовать и проверить отдельно. Не выдавай успешный marker task за выполненную transformation.
+Airflow baseline использует LocalExecutor, public `airflow.sdk` и pinned Astronomer Cosmos; будущие tools обращаются к `/api/v2`. dbt выполняется Cosmos в `ExecutionMode.LOCAL` через отдельный hash-locked virtualenv; собственный dbt subprocess runner запрещён без нового ADR. DAG-файлы являются исполняемым кодом: агентские изменения нельзя сразу монтировать в активную папку DAG. Scheduled `ecommerce_hourly` остаётся paused по умолчанию, а API acceptance выполняется на его manual twin.
 
 ## Contracts, evidence и validation
 

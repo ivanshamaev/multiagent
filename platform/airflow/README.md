@@ -4,10 +4,12 @@ This directory contains the active Airflow 3 DAG bundle. The Compose stack uses
 PostgreSQL state, `LocalExecutor`, an API Server, Scheduler and Dag Processor.
 The public API is bound to `127.0.0.1:8080`; PostgreSQL is internal-only.
 
-`ecommerce_hourly` is currently an executable orchestration contract. Its six
-Task SDK tasks validate dependency order and task execution, but do **not** run
-the ClickHouse seed or dbt commands yet. Connecting a separate dbt runner is a
-later change; mounting the Docker socket is not an accepted implementation.
+`ecommerce_hourly` uses Astronomer Cosmos to render and execute the dbt lineage:
+four staging models, two intermediate models, two marts and an `AFTER_ALL` test
+gate. dbt runs from an isolated virtualenv; no Docker socket is mounted. The
+manual `ecommerce_acceptance` DAG shares this graph and avoids enabling the
+hourly schedule during tests. `ecommerce_failure_probe` proves that a failing
+Cosmos test prevents `publish`.
 
 Use the repository interface:
 
@@ -16,6 +18,7 @@ make airflow-version
 make airflow-up
 make airflow-validate
 make airflow-test
+make airflow-failure-test
 ```
 
 Authentication uses a local-development FAB user and JWT from `/auth/token`.

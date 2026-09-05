@@ -23,8 +23,8 @@
 
 ## Текущий статус
 
-- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md), [`STEP-0002`](steps/STEP-0002-dbt-baseline.md) и [`STEP-0003`](steps/STEP-0003-airflow-baseline.md); persistent gate transcripts сохранены в `evidence/`.
-- Следующий запланированный шаг: [`STEP-0004`](steps/STEP-0004-airflow-dbt-execution.md) — фактическое выполнение dbt из Airflow.
-- Текущая фаза: Phase A — Golden Data Platform.
-- Ближайшая продуктовая цель: заменить Airflow marker tasks реальными dbt transformations/tests и завершить Phase A.
+- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0004`](steps/STEP-0004-airflow-dbt-execution.md); persistent gate transcripts сохранены в `evidence/`.
+- Активный шаг: [`STEP-0005`](steps/STEP-0005-scenario-harness.md) — воспроизводимый scenario reset/run/grade lifecycle.
+- Текущая фаза: Phase B — Scenario Harness.
+- Ближайшая продуктовая цель: изолировать benchmark workspace и hidden grader до подключения agent runtime.
 - Ближайший исследовательский milestone: один Data Engineer Agent реализует Net Revenue и проходит независимый hidden grader.

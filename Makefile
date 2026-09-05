@@ -95,7 +95,7 @@ airflow-image:
 airflow-version: airflow-image
 	$(AIRFLOW_VERSION)
 	$(COMPOSE) run --rm --no-deps --entrypoint bash airflow-init -c \
-		'python -m pip check && /opt/airflow/dbt-venv/bin/python -m pip check && /opt/airflow/dbt-venv/bin/dbt --version'
+		'python -m pip check && python -c "import cosmos; print(cosmos.__version__)" && /opt/airflow/dbt-venv/bin/python -m pip check && /opt/airflow/dbt-venv/bin/dbt --version'
 
 airflow-init: airflow-image
 	$(COMPOSE) up -d --wait airflow-postgres
@@ -111,6 +111,8 @@ airflow-validate: airflow-up
 			exit 1; \
 		}
 	$(AIRFLOW) dags details ecommerce_hourly --output=json >/dev/null
+	$(AIRFLOW) dags details ecommerce_acceptance --output=json >/dev/null
+	$(AIRFLOW) dags details ecommerce_failure_probe --output=json >/dev/null
 
 airflow-test: airflow-validate
 	$(UV) run python platform/airflow/scripts/api_smoke.py

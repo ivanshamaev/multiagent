@@ -1,9 +1,9 @@
 # STEP-0004 — Фактическое выполнение dbt из Airflow
 
-Status: active  
-Owner: primary agent  
-Updated: 2026-09-05  
-Current step: изолированный dbt runner и API-driven positive/negative gates
+Status: complete
+Owner: primary agent
+Updated: 2026-09-05
+Current step: complete; evidence сохранён, следующий шаг — STEP-0005
 
 ## Goal
 
@@ -15,14 +15,14 @@ Current step: изолированный dbt runner и API-driven positive/negat
 
 ## Acceptance criteria
 
-- [x] Перед реализацией ADR-0010 сравнивает отдельный runner interface и изолированный dbt venv внутри Docker; уточняет boundary ADR-0009.
-- [ ] Airflow и dbt не делят конфликтующий Python dependency graph; применён существующий hash-locked dbt requirements.
-- [ ] `load_raw` проверяет готовность seed; destructive fixture reset не запускается по hourly schedule.
-- [ ] Staging, intermediate и marts действительно строятся, полный dbt test gate исполняется до publish.
-- [ ] dbt project смонтирован read-only, target/log output направлен в отдельный writable path.
-- [ ] Ошибка dbt task делает DAG failed и исключает publish; имеется независимый negative test.
-- [ ] Два API-triggered runs успешны; independent SQL smoke подтверждает counts/aggregates после каждого.
-- [ ] Повторный `make platform-test`, local checks и secret isolation проходят с persistent evidence.
+- [x] ADR-0011 заменяет custom runner на Astronomer Cosmos, сохраняя изолированный dbt venv.
+- [x] Airflow и dbt не делят конфликтующий Python dependency graph; применён существующий hash-locked dbt requirements.
+- [x] `load_raw` проверяет готовность seed; destructive fixture reset не запускается по hourly schedule.
+- [x] Staging, intermediate и marts действительно строятся, полный dbt test gate исполняется до publish.
+- [x] dbt project смонтирован read-only; Cosmos выполняет каждую команду в writable temporary clone.
+- [x] Ошибка dbt task делает DAG failed и исключает publish; имеется независимый negative test.
+- [x] Два API-triggered runs успешны; independent SQL smoke подтверждает counts/aggregates после каждого.
+- [x] Повторный `make platform-test`, local checks и secret isolation проходят с persistent evidence.
 
 ## Risks
 
@@ -43,10 +43,10 @@ Current step: изолированный dbt runner и API-driven positive/negat
 
 ## Implementation contract and verification details
 
-- Pinned Airflow base + `/opt/airflow/dbt-venv`, installed at image build from existing hash-locked requirements. No runtime pip installs.
-- Read-only dbt source mount; per-run/per-stage outputs in named `airflow-dbt-artifacts` volume; compact invocation/result metadata returned through XCom.
-- `load_raw`: source tests; three dbt layer runs; `dbt_tests`: full test suite; `publish`: validate upstream evidence and expose in-place marts without copying data.
-- Manual-only `ecommerce_failure_probe` uses the same pipeline factory, but points its validation task at a separate immutable fixture containing a guaranteed failing SQL test. It must produce failed run/failed dbt_tests/upstream_failed publish. It cannot modify baseline source or hidden expected values.
+- Pinned Airflow base + pinned Cosmos in the Airflow environment; `/opt/airflow/dbt-venv` is installed at image build from the existing hash-locked requirements. No runtime installs.
+- `DbtTaskGroup` owns model lineage and execution with `ExecutionMode.LOCAL`, explicit isolated executable and `TestBehavior.AFTER_ALL`; the dbt source mount stays read-only.
+- `load_raw` runs deterministic seed-readiness SQL. Cosmos renders and runs staging, intermediate, marts and their final full test gate; `publish` is downstream from the complete task group.
+- Manual-only `ecommerce_failure_probe` uses a Cosmos test operator and immutable guaranteed-failing fixture. It must fail before publish without changing baseline source or expected values.
 - API smoke explicitly unpauses only the local allowlisted DAG, restores its previous paused state, uses unique IDs and bounded polling. Hourly pipeline remains paused by default until operator opts in.
 - Planned gate commands: `make airflow-image`, `make airflow-version`, `make platform-up`, `make seed`, `make airflow-test`, `make dbt-baseline-test`, repeated `make airflow-test`, `make airflow-failure-test`, `make platform-test`, `make check`.
 
@@ -54,3 +54,11 @@ Current step: изолированный dbt runner и API-driven positive/negat
 
 - 2026-09-05 12:25 UTC: confirmed user commit `cad4b38`, clean worktree and about 6.2 GiB free disk; STEP-0003 local check record restored. Airflow base contains Python 3.12.13, git, standard provider 1.17.0 and FAB 3.8.0.
 - 2026-09-05: ADR-0010 accepted before implementation; two isolated dependency graphs selected for local Docker runtime.
+- 2026-09-05: user selected Astronomer Cosmos to avoid maintaining a custom dbt runner. ADR-0011 supersedes that part of ADR-0010 before live acceptance; Cosmos 1.15.0 LOCAL mode with isolated dbt executable selected from current official documentation.
+- 2026-09-05 17:57–18:02 UTC: три manual Cosmos runs завершились 11/11 success; два требуемых повтора и дополнительный full platform gate подтверждены independent SQL.
+- 2026-09-05 17:59 UTC: negative Cosmos test сделал DAG failed; `publish=upstream_failed`, baseline SQL остался green.
+- 2026-09-05 18:06 UTC: STEP закрыт; версии, run IDs, task states, local gates и ограничения сохранены в `plan/evidence/STEP-0004-airflow-cosmos.md` и fresh transcript.
+
+## Actual verification
+
+`make airflow-version`, `make seed`, `make dbt-build`, два `make airflow-test`, `make airflow-failure-test`, `make platform-test`, `make check` и `git diff --check` завершились exit code `0`. Три positive run IDs и negative task states сохранены в evidence. Phase A завершена без LLM calls.

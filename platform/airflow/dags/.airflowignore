@@ -1,1 +1,2 @@
-dbt_pipeline.py
+cosmos_pipeline.py
+seed_readiness.py
