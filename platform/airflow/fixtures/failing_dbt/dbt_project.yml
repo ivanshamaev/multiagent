@@ -1,0 +1,8 @@
+name: failing_dbt
+version: 0.1.0
+config-version: 2
+require-dbt-version: [">=1.11.0", "<1.12.0"]
+profile: agentic_data_platform
+test-paths: [tests]
+flags:
+  send_anonymous_usage_stats: false

@@ -26,13 +26,14 @@ def test_python_version_is_pinned_to_312() -> None:
 
 def test_compose_uses_pinned_image_and_loopback_ports() -> None:
     compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+    airflow_image = (ROOT / "platform/airflow/Dockerfile").read_text(encoding="utf-8")
 
     assert ":latest" not in compose
     assert "clickhouse/clickhouse-server:25.8.33.6" in compose
     assert "agentic-data-platform-dbt:1.11.14-1.10.2" in compose
     assert (
         "apache/airflow:3.3.1-python3.12@sha256:"
-        "b01a795dfbd113bbbfdf3ee169b8f27e9a0090ccef105f1a452b3594a11ed316" in compose
+        "b01a795dfbd113bbbfdf3ee169b8f27e9a0090ccef105f1a452b3594a11ed316" in airflow_image
     )
     assert (
         "postgres:16.15-bookworm@sha256:"
@@ -52,6 +53,18 @@ def test_data_platform_does_not_receive_llm_token() -> None:
     assert "/var/run/docker.sock" not in compose
     assert "_PIP_ADDITIONAL_REQUIREMENTS" not in compose
     assert dockerignore.splitlines() == ["*", "!Dockerfile", "!requirements.lock"]
+    airflow_ignore = (ROOT / "platform/airflow/Dockerfile.dockerignore").read_text(encoding="utf-8")
+    assert airflow_ignore.splitlines() == [
+        "*",
+        "!platform/",
+        "!platform/airflow/",
+        "!platform/airflow/Dockerfile",
+        "!platform/dbt/",
+        "!platform/dbt/requirements.lock",
+    ]
+    assert "./platform/dbt:/opt/airflow/dbt:ro" in compose
+    assert "./platform/airflow/fixtures:/opt/airflow/fixtures:ro" in compose
+    assert "airflow-dbt-artifacts:/opt/airflow/dbt-artifacts" in compose
 
 
 def test_airflow_has_minimal_localexecutor_topology() -> None:
@@ -74,40 +87,33 @@ def test_airflow_has_minimal_localexecutor_topology() -> None:
     assert "airflow-triggerer:" not in compose
 
 
-def test_airflow_dag_uses_public_sdk_and_exact_stage_chain() -> None:
-    dag_path = ROOT / "platform/airflow/dags/ecommerce_hourly.py"
-    tree = ast.parse(dag_path.read_text(encoding="utf-8"))
-
-    imports = [node for node in tree.body if isinstance(node, ast.ImportFrom)]
-    assert any(
-        node.module == "airflow.sdk" and {alias.name for alias in node.names} == {"dag", "task"}
-        for node in imports
-    )
-    assert all(node.module not in {"airflow.models", "airflow.decorators"} for node in imports)
-
-    dag_function = next(
+def test_airflow_dags_use_only_the_public_sdk() -> None:
+    # Runtime API tests own the exact graph assertion, independent of factory layout.
+    imports = [
         node
-        for node in tree.body
-        if isinstance(node, ast.FunctionDef) and node.name == "ecommerce_hourly"
-    )
-    tasks = [node.name for node in dag_function.body if isinstance(node, ast.FunctionDef)]
-    assert tasks == [
-        "load_raw",
-        "dbt_staging",
-        "dbt_intermediate",
-        "dbt_marts",
-        "dbt_tests",
-        "publish",
+        for path in (ROOT / "platform/airflow/dags").glob("*.py")
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8")))
+        if isinstance(node, ast.ImportFrom) and (node.module or "").startswith("airflow")
     ]
+    assert imports
+    assert all(node.module == "airflow.sdk" for node in imports)
 
-    chain = next(
-        node
-        for node in dag_function.body
-        if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call)
-    )
-    assert ast.unparse(chain.value) == (
-        "publish(dbt_tests(dbt_marts(dbt_intermediate(dbt_staging(load_raw())))))"
-    )
+
+def test_airflow_keeps_dbt_dependencies_isolated() -> None:
+    dockerfile = (ROOT / "platform/airflow/Dockerfile").read_text(encoding="utf-8")
+
+    assert "python -m venv /opt/airflow/dbt-venv" in dockerfile
+    assert "--system-site-packages" not in dockerfile
+    assert "--require-hashes" in dockerfile
+    assert "COPY platform/dbt/requirements.lock" in dockerfile
+    assert "mkdir -p /opt/airflow/dbt-artifacts" in dockerfile
+    assert "chmod 0770 /opt/airflow/dbt-artifacts" in dockerfile
+
+
+def test_airflow_entrypoints_are_eligible_for_safe_discovery() -> None:
+    for name in ("ecommerce_hourly.py", "ecommerce_failure_probe.py"):
+        source = (ROOT / "platform/airflow/dags" / name).read_bytes().lower()
+        assert b"airflow" in source and b"dag" in source
 
 
 def test_dbt_dependencies_and_project_are_pinned() -> None:

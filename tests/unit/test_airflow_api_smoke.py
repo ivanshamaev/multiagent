@@ -103,8 +103,20 @@ def test_run_smoke_uses_v2_contract_and_checks_all_tasks() -> None:
         ("POST", "/auth/token", 201, {"access_token": token}),
         ("GET", "/api/v2/monitor/health", 200, healthy),
         ("GET", "/api/v2/dags/ecommerce_hourly", 404, {"detail": "Not found"}),
-        ("GET", "/api/v2/dags/ecommerce_hourly", 200, {"dag_id": "ecommerce_hourly"}),
+        (
+            "GET",
+            "/api/v2/dags/ecommerce_hourly",
+            200,
+            {"dag_id": "ecommerce_hourly", "is_paused": True},
+        ),
         ("GET", "/api/v2/dags/ecommerce_hourly/tasks?limit=100", 200, {"tasks": task_definitions}),
+        (
+            "GET",
+            "/api/v2/dags/ecommerce_hourly",
+            200,
+            {"dag_id": "ecommerce_hourly", "is_paused": True},
+        ),
+        ("PATCH", "/api/v2/dags/ecommerce_hourly", 200, {"is_paused": False}),
         (
             "POST",
             "/api/v2/dags/ecommerce_hourly/dagRuns",
@@ -129,7 +141,26 @@ def test_run_smoke_uses_v2_contract_and_checks_all_tasks() -> None:
             200,
             {"task_instances": _tasks()},
         ),
+        ("PATCH", "/api/v2/dags/ecommerce_hourly", 200, {"is_paused": True}),
     ]
+
+    responses.insert(
+        -1,
+        (
+            "GET",
+            f"/api/v2/dags/ecommerce_hourly/dagRuns/{run_id}/taskInstances/publish/xcomEntries/return_value",
+            200,
+            {
+                "value": {
+                    "published": True,
+                    "runner": "dbt-subprocess-v1",
+                    "run_id": run_id,
+                    "stages": list(api_smoke.TASK_CHAIN[:-1]),
+                    "invocation_ids": [f"inv-{i}" for i in range(5)],
+                }
+            },
+        ),
+    )
 
     def verify_request(request: Request) -> None:
         path = urlsplit(request.full_url).path
@@ -176,8 +207,20 @@ def test_run_smoke_fails_immediately_when_dag_run_fails() -> None:
         ("GET", "/api/v2/dags?limit=1", 401, {}),
         ("POST", "/auth/token", 201, {"access_token": "unit-jwt"}),
         ("GET", "/api/v2/monitor/health", 200, healthy),
-        ("GET", "/api/v2/dags/ecommerce_hourly", 200, {"dag_id": "ecommerce_hourly"}),
+        (
+            "GET",
+            "/api/v2/dags/ecommerce_hourly",
+            200,
+            {"dag_id": "ecommerce_hourly", "is_paused": True},
+        ),
         ("GET", "/api/v2/dags/ecommerce_hourly/tasks?limit=100", 200, {"tasks": task_definitions}),
+        (
+            "GET",
+            "/api/v2/dags/ecommerce_hourly",
+            200,
+            {"dag_id": "ecommerce_hourly", "is_paused": True},
+        ),
+        ("PATCH", "/api/v2/dags/ecommerce_hourly", 200, {"is_paused": False}),
         (
             "POST",
             "/api/v2/dags/ecommerce_hourly/dagRuns",
@@ -190,6 +233,7 @@ def test_run_smoke_fails_immediately_when_dag_run_fails() -> None:
             200,
             {"state": "failed"},
         ),
+        ("PATCH", "/api/v2/dags/ecommerce_hourly", 200, {"is_paused": True}),
     ]
     transport = SequenceTransport(responses)
     clock = FakeClock()
@@ -346,3 +390,77 @@ def test_task_contract_rejects_duplicate_task_ids() -> None:
 def test_plain_http_base_url_is_rejected_outside_loopback() -> None:
     with pytest.raises(api_smoke.SmokeError, match="requires HTTPS"):
         api_smoke._validate_base_url("http://airflow.example.test:8080")
+
+
+def test_failure_probe_accepts_only_expected_task_states() -> None:
+    run_id = "probe_failed"
+    states = {
+        **{task_id: "success" for task_id in api_smoke.TASK_CHAIN[:4]},
+        "dbt_tests": "failed",
+        "publish": "upstream_failed",
+    }
+    transport = SequenceTransport(
+        [
+            (
+                "GET",
+                f"/api/v2/dags/ecommerce_failure_probe/dagRuns/{run_id}",
+                200,
+                {"state": "failed"},
+            ),
+            (
+                "GET",
+                f"/api/v2/dags/ecommerce_failure_probe/dagRuns/{run_id}/taskInstances?limit=100",
+                200,
+                {
+                    "task_instances": [
+                        {"task_id": key, "state": value} for key, value in states.items()
+                    ]
+                },
+            ),
+        ]
+    )
+    clock = FakeClock()
+    client = api_smoke.AirflowApiClient(
+        "http://127.0.0.1:8080", 7.0, transport, 30.0, clock.monotonic
+    )
+    api_smoke._wait_for_run(
+        client,
+        "jwt",
+        run_id,
+        30.0,
+        1.0,
+        clock.monotonic,
+        clock.sleep,
+        api_smoke.FAILURE_PROBE_DAG_ID,
+        True,
+    )
+
+
+def test_failure_probe_fails_closed_when_publish_succeeds() -> None:
+    run_id = "probe_unexpected"
+    transport = SequenceTransport(
+        [
+            (
+                "GET",
+                f"/api/v2/dags/ecommerce_failure_probe/dagRuns/{run_id}",
+                200,
+                {"state": "success"},
+            ),
+        ]
+    )
+    clock = FakeClock()
+    client = api_smoke.AirflowApiClient(
+        "http://127.0.0.1:8080", 7.0, transport, 30.0, clock.monotonic
+    )
+    with pytest.raises(api_smoke.SmokeError, match="unexpectedly succeeded"):
+        api_smoke._wait_for_run(
+            client,
+            "jwt",
+            run_id,
+            30.0,
+            1.0,
+            clock.monotonic,
+            clock.sleep,
+            api_smoke.FAILURE_PROBE_DAG_ID,
+            True,
+        )

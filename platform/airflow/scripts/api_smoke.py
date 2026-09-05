@@ -18,6 +18,8 @@ from urllib.parse import quote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 DAG_ID = "ecommerce_hourly"
+FAILURE_PROBE_DAG_ID = "ecommerce_failure_probe"
+PROBE_DAG_ID = FAILURE_PROBE_DAG_ID
 TASK_CHAIN = (
     "load_raw",
     "dbt_staging",
@@ -29,8 +31,9 @@ TASK_CHAIN = (
 EXPECTED_TASK_IDS = frozenset(TASK_CHAIN)
 
 DEFAULT_REQUEST_TIMEOUT_SECONDS = 10.0
-DEFAULT_POLL_TIMEOUT_SECONDS = 180.0
+DEFAULT_POLL_TIMEOUT_SECONDS = 300.0
 DEFAULT_POLL_INTERVAL_SECONDS = 2.0
+DEFAULT_CLEANUP_TIMEOUT_SECONDS = 10.0
 
 
 class SmokeError(RuntimeError):
@@ -299,14 +302,13 @@ def _wait_for_dag_contract(
     interval_seconds: float,
     monotonic: Callable[[], float],
     sleep: Callable[[float], None],
+    dag_id: str = DAG_ID,
 ) -> None:
-    dag_path = f"/api/v2/dags/{quote(DAG_ID, safe='')}"
+    dag_path = f"/api/v2/dags/{quote(dag_id, safe='')}"
     while True:
         dag_response = client.request_json("GET", dag_path, token=token)
         if dag_response.status == 200:
-            dag = _require_object(dag_response.payload, "Airflow DAG discovery")
-            if dag.get("is_paused") is True:
-                raise SmokeError("Airflow baseline DAG is paused; unpause it before the smoke")
+            _require_object(dag_response.payload, "Airflow DAG discovery")
             tasks_response = client.request_json(
                 "GET",
                 f"{dag_path}/tasks?limit=100",
@@ -336,26 +338,34 @@ def _wait_for_run(
     interval_seconds: float,
     monotonic: Callable[[], float],
     sleep: Callable[[float], None],
+    dag_id: str = DAG_ID,
+    expect_failure: bool = False,
 ) -> None:
-    dag_id = quote(DAG_ID, safe="")
+    encoded_dag_id = quote(dag_id, safe="")
     encoded_run_id = quote(run_id, safe="")
-    run_path = f"/api/v2/dags/{dag_id}/dagRuns/{encoded_run_id}"
+    run_path = f"/api/v2/dags/{encoded_dag_id}/dagRuns/{encoded_run_id}"
     while True:
         response = client.request_json("GET", run_path, token=token)
         _require_status(response, 200, "Airflow DAG run lookup")
         run = _require_object(response.payload, "Airflow DAG run lookup")
         state = run.get("state")
         if state == "success":
+            if expect_failure:
+                raise SmokeError("failure probe unexpectedly succeeded")
             _verify_task_instances(client, token, run_path)
+            _verify_publication(client, token, run_path, run_id)
             return
         if state == "failed":
-            raise SmokeError(f"Airflow DAG run {run_id} failed")
+            if not expect_failure:
+                raise SmokeError(f"Airflow DAG run {run_id} failed")
+            _verify_failure_task_instances(client, token, run_path)
+            return
         if state not in {"queued", "running"}:
             raise SmokeError("Airflow DAG run returned an invalid state")
         _pause(deadline, interval_seconds, "Airflow DAG run success", monotonic, sleep)
 
 
-def _verify_task_instances(client: AirflowApiClient, token: str, run_path: str) -> None:
+def _get_task_states(client: AirflowApiClient, token: str, run_path: str) -> dict[str, str]:
     response = client.request_json(
         "GET",
         f"{run_path}/taskInstances?limit=100",
@@ -381,11 +391,74 @@ def _verify_task_instances(client: AirflowApiClient, token: str, run_path: str) 
 
     if frozenset(states) != EXPECTED_TASK_IDS:
         raise SmokeError("Airflow DAG run did not contain the exact six task instances")
+    return states
+
+
+def _verify_task_instances(client: AirflowApiClient, token: str, run_path: str) -> None:
+    states = _get_task_states(client, token, run_path)
     unsuccessful = sorted(task_id for task_id, state in states.items() if state != "success")
     if unsuccessful:
         raise SmokeError(
             f"Airflow DAG run has unsuccessful task instances: {', '.join(unsuccessful)}"
         )
+
+
+def _verify_failure_task_instances(client: AirflowApiClient, token: str, run_path: str) -> None:
+    states = _get_task_states(client, token, run_path)
+    expected = {
+        **dict.fromkeys(TASK_CHAIN[:4], "success"),
+        "dbt_tests": "failed",
+        "publish": "upstream_failed",
+    }
+    if states != expected:
+        raise SmokeError("failure probe returned unexpected task states")
+
+
+def _verify_publication(client: AirflowApiClient, token: str, run_path: str, run_id: str) -> None:
+    response = client.request_json(
+        "GET", f"{run_path}/taskInstances/publish/xcomEntries/return_value", token=token
+    )
+    _require_status(response, 200, "Airflow publish evidence lookup")
+    body = _require_object(response.payload, "Airflow publish evidence lookup")
+    value = body.get("value")
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError:
+            raise SmokeError("Airflow publish evidence is invalid JSON") from None
+    evidence = _require_object(value, "Airflow publish evidence")
+    invocations = evidence.get("invocation_ids")
+    if (
+        evidence.get("published") is not True
+        or evidence.get("runner") != "dbt-subprocess-v1"
+        or evidence.get("run_id") != run_id
+        or evidence.get("stages") != list(TASK_CHAIN[:-1])
+        or not isinstance(invocations, list)
+        or len(invocations) != 5
+        or any(not isinstance(item, str) or not item for item in invocations)
+        or len(set(invocations)) != 5
+    ):
+        raise SmokeError("Airflow publish evidence does not prove five current-run dbt invocations")
+
+
+def _set_pause(client: AirflowApiClient, token: str, dag_id: str, is_paused: bool) -> None:
+    path = f"/api/v2/dags/{quote(dag_id, safe='')}"
+    response = client.request_json("PATCH", path, payload={"is_paused": is_paused}, token=token)
+    _require_status(response, 200, "Airflow DAG pause update")
+    body = _require_object(response.payload, "Airflow DAG pause update")
+    if body.get("is_paused") is not is_paused:
+        raise SmokeError("Airflow DAG pause update did not confirm the requested state")
+
+
+def _read_pause(client: AirflowApiClient, token: str, dag_id: str) -> bool:
+    path = f"/api/v2/dags/{quote(dag_id, safe='')}"
+    response = client.request_json("GET", path, token=token)
+    _require_status(response, 200, "Airflow DAG pause lookup")
+    dag = _require_object(response.payload, "Airflow DAG pause lookup")
+    paused = dag.get("is_paused")
+    if not isinstance(paused, bool):
+        raise SmokeError("Airflow DAG pause lookup returned an invalid flag")
+    return paused
 
 
 def run_smoke(
@@ -395,8 +468,14 @@ def run_smoke(
     monotonic: Callable[[], float] = time.monotonic,
     sleep: Callable[[float], None] = time.sleep,
     run_id_factory: Callable[[], str] = _new_run_id,
+    dag_id: str = DAG_ID,
+    expect_failure: bool = False,
 ) -> str:
     """Execute the complete authenticated Airflow API acceptance contract."""
+    if dag_id not in {DAG_ID, FAILURE_PROBE_DAG_ID}:
+        raise SmokeError("DAG is not in the Airflow API smoke allowlist")
+    if expect_failure != (dag_id == FAILURE_PROBE_DAG_ID):
+        raise SmokeError("Airflow smoke DAG and expected outcome do not match")
     deadline = monotonic() + config.poll_timeout_seconds
     client = AirflowApiClient(
         config.base_url,
@@ -429,40 +508,51 @@ def run_smoke(
         sleep,
     )
     _wait_for_dag_contract(
-        client,
-        token,
-        deadline,
-        config.poll_interval_seconds,
-        monotonic,
-        sleep,
+        client, token, deadline, config.poll_interval_seconds, monotonic, sleep, dag_id
     )
-
-    run_id = run_id_factory()
-    trigger_response = client.request_json(
-        "POST",
-        f"/api/v2/dags/{quote(DAG_ID, safe='')}/dagRuns",
-        payload={
-            "dag_run_id": run_id,
-            "logical_date": None,
-            "conf": {"source": "api_smoke"},
-        },
-        token=token,
-    )
-    _require_status(trigger_response, 200, "Airflow DAG trigger")
-    triggered_run = _require_object(trigger_response.payload, "Airflow DAG trigger")
-    if triggered_run.get("dag_id") != DAG_ID or triggered_run.get("dag_run_id") != run_id:
-        raise SmokeError("Airflow DAG trigger returned a different run identity")
-
-    _wait_for_run(
-        client,
-        token,
-        run_id,
-        deadline,
-        config.poll_interval_seconds,
-        monotonic,
-        sleep,
-    )
-    return run_id
+    previous_paused = _read_pause(client, token, dag_id)
+    try:
+        _set_pause(client, token, dag_id, False)
+        run_id = run_id_factory()
+        trigger_response = client.request_json(
+            "POST",
+            f"/api/v2/dags/{quote(dag_id, safe='')}/dagRuns",
+            payload={"dag_run_id": run_id, "logical_date": None, "conf": {"source": "api_smoke"}},
+            token=token,
+        )
+        _require_status(trigger_response, 200, "Airflow DAG trigger")
+        triggered_run = _require_object(trigger_response.payload, "Airflow DAG trigger")
+        if triggered_run.get("dag_id") != dag_id or triggered_run.get("dag_run_id") != run_id:
+            raise SmokeError("Airflow DAG trigger returned a different run identity")
+        _wait_for_run(
+            client,
+            token,
+            run_id,
+            deadline,
+            config.poll_interval_seconds,
+            monotonic,
+            sleep,
+            dag_id,
+            expect_failure,
+        )
+        return run_id
+    finally:
+        cleanup_deadline = monotonic() + min(
+            DEFAULT_CLEANUP_TIMEOUT_SECONDS, config.request_timeout_seconds
+        )
+        cleanup_client = AirflowApiClient(
+            config.base_url,
+            config.request_timeout_seconds,
+            transport,
+            cleanup_deadline,
+            monotonic,
+        )
+        try:
+            _set_pause(cleanup_client, token, dag_id, previous_paused)
+        except SmokeError:
+            raise SmokeError(
+                "failed to restore the previous DAG pause state; check it manually"
+            ) from None
 
 
 def main(
@@ -472,24 +562,33 @@ def main(
     monotonic: Callable[[], float] = time.monotonic,
     sleep: Callable[[float], None] = time.sleep,
     run_id_factory: Callable[[], str] = _new_run_id,
+    argv: list[str] | None = None,
 ) -> int:
     """CLI entrypoint with deliberately secret-free output."""
     try:
         config = Config.from_env(os.environ if environ is None else environ)
+        args = [] if argv is None else argv
+        if any(arg != "--expect-failure" for arg in args):
+            raise SmokeError("usage: api_smoke.py [--expect-failure]")
+        expect_failure = "--expect-failure" in args
+        selected_dag = FAILURE_PROBE_DAG_ID if expect_failure else DAG_ID
         run_id = run_smoke(
             config,
             transport=transport,
             monotonic=monotonic,
             sleep=sleep,
             run_id_factory=run_id_factory,
+            dag_id=selected_dag,
+            expect_failure=expect_failure,
         )
     except SmokeError as exc:
         print(f"Airflow API smoke: FAIL: {exc}", file=sys.stderr)
         return 1
 
-    print(f"Airflow API smoke: PASS; dag={DAG_ID}; run_id={run_id}; tasks=6/6 success")
+    result = "expected failure" if expect_failure else "6/6 success"
+    print(f"Airflow API smoke: PASS; dag={selected_dag}; run_id={run_id}; tasks={result}")
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(argv=sys.argv[1:]))

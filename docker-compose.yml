@@ -5,7 +5,7 @@ x-airflow-common-env: &airflow-common-env
   AIRFLOW__CORE__PARALLELISM: "2"
   AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
   AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-YWdlbnRpYy1kYXRhLXBsYXRmb3JtLWZlcm5ldC0wMV8=}
-  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
   AIRFLOW__CORE__LOAD_EXAMPLES: "false"
   AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-api-server:8080/execution/
   AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: >-
@@ -16,7 +16,10 @@ x-airflow-common-env: &airflow-common-env
   AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
 
 x-airflow-common: &airflow-common
-  image: ${AIRFLOW_IMAGE:-apache/airflow:3.3.1-python3.12@sha256:b01a795dfbd113bbbfdf3ee169b8f27e9a0090ccef105f1a452b3594a11ed316}
+  image: ${AIRFLOW_DBT_IMAGE:-agentic-data-platform-airflow:3.3.1-dbt1.11.14-1.10.2}
+  build:
+    context: .
+    dockerfile: platform/airflow/Dockerfile
   environment: *airflow-common-env
   user: "${AIRFLOW_UID:-50000}:0"
   logging:
@@ -26,6 +29,10 @@ x-airflow-common: &airflow-common
       max-file: "3"
   volumes:
     - ./platform/airflow/dags:/opt/airflow/dags:ro
+    - ./platform/dbt:/opt/airflow/dbt:ro
+    - ./platform/airflow/fixtures:/opt/airflow/fixtures:ro
+    - ./platform/clickhouse/tests:/opt/airflow/checks:ro
+    - airflow-dbt-artifacts:/opt/airflow/dbt-artifacts
     - airflow-logs:/opt/airflow/logs
   networks:
     - data-platform
@@ -144,6 +151,11 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
+    environment:
+      <<: *airflow-common-env
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-agentic}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-agentic_dev_only}
     healthcheck:
       test:
         - CMD-SHELL
@@ -161,6 +173,8 @@ services:
       airflow-init:
         condition: service_completed_successfully
       airflow-api-server:
+        condition: service_healthy
+      clickhouse:
         condition: service_healthy
     restart: unless-stopped
 
@@ -189,6 +203,7 @@ volumes:
   clickhouse-data:
   airflow-postgres-data:
   airflow-logs:
+  airflow-dbt-artifacts:
 
 networks:
   data-platform:

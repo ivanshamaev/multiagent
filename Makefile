@@ -7,15 +7,15 @@ COMPOSE ?= docker compose
 
 CLICKHOUSE_USER ?= agentic
 CLICKHOUSE_PASSWORD ?= agentic_dev_only
-CLICKHOUSE_CLIENT = $(COMPOSE) exec -T clickhouse clickhouse-client \
-	--user "$(CLICKHOUSE_USER)" --password "$(CLICKHOUSE_PASSWORD)"
+# clickhouse-client reads credentials from the container environment.
+CLICKHOUSE_CLIENT = $(COMPOSE) exec -T clickhouse clickhouse-client
 DBT = $(COMPOSE) run --rm --no-deps dbt
 AIRFLOW_API_PORT ?= 8080
 AIRFLOW_API_BASE_URL ?= http://127.0.0.1:$(AIRFLOW_API_PORT)
 AIRFLOW_ADMIN_USERNAME ?= airflow
 AIRFLOW_ADMIN_PASSWORD ?= airflow_dev_only
 AIRFLOW_API_REQUEST_TIMEOUT_SECONDS ?= 10
-AIRFLOW_API_POLL_TIMEOUT_SECONDS ?= 180
+AIRFLOW_API_POLL_TIMEOUT_SECONDS ?= 300
 AIRFLOW_API_POLL_INTERVAL_SECONDS ?= 2
 export AIRFLOW_API_BASE_URL AIRFLOW_ADMIN_USERNAME AIRFLOW_ADMIN_PASSWORD
 export AIRFLOW_API_REQUEST_TIMEOUT_SECONDS AIRFLOW_API_POLL_TIMEOUT_SECONDS
@@ -27,7 +27,7 @@ AIRFLOW_VERSION = $(COMPOSE) run --rm --no-deps --entrypoint airflow airflow-ini
 	clickhouse-up platform-up platform-status platform-down seed platform-test \
 	clickhouse-test dbt-baseline-test dbt-image dbt-version dbt-debug \
 	dbt-parse dbt-compile dbt-build dbt-test airflow-version airflow-init \
-	airflow-up airflow-validate airflow-test
+	airflow-image airflow-up airflow-validate airflow-test airflow-failure-test
 
 bootstrap:
 	$(UV) sync --frozen
@@ -49,7 +49,7 @@ check: lint format-check test compose-validate
 clickhouse-up:
 	$(COMPOSE) up -d --wait clickhouse
 
-platform-up:
+platform-up: airflow-image
 	$(COMPOSE) up -d --wait --wait-timeout 240 clickhouse airflow-api-server airflow-scheduler airflow-dag-processor
 
 platform-status:
@@ -89,14 +89,19 @@ dbt-test: clickhouse-up dbt-image
 dbt-baseline-test: clickhouse-up
 	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/002_dbt_baseline.sql
 
-airflow-version:
-	$(AIRFLOW_VERSION)
+airflow-image:
+	$(COMPOSE) build airflow-init
 
-airflow-init:
+airflow-version: airflow-image
+	$(AIRFLOW_VERSION)
+	$(COMPOSE) run --rm --no-deps --entrypoint bash airflow-init -c \
+		'python -m pip check && /opt/airflow/dbt-venv/bin/python -m pip check && /opt/airflow/dbt-venv/bin/dbt --version'
+
+airflow-init: airflow-image
 	$(COMPOSE) up -d --wait airflow-postgres
 	$(COMPOSE) run --rm --no-deps airflow-init
 
-airflow-up:
+airflow-up: airflow-image
 	$(COMPOSE) up -d --wait --wait-timeout 240 airflow-api-server airflow-scheduler airflow-dag-processor
 
 airflow-validate: airflow-up
@@ -109,6 +114,11 @@ airflow-validate: airflow-up
 
 airflow-test: airflow-validate
 	$(UV) run python platform/airflow/scripts/api_smoke.py
+	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/002_dbt_baseline.sql
+
+airflow-failure-test: airflow-validate
+	$(UV) run python platform/airflow/scripts/api_smoke.py --expect-failure
+	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/002_dbt_baseline.sql
 
 platform-test: clickhouse-up dbt-image airflow-test
 	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/001_smoke.sql
