@@ -234,6 +234,44 @@ class ToolCallEvidence(VersionedModel):
         return self
 
 
+class ToolResult(VersionedModel):
+    """Bounded untrusted content tied to independently retained execution evidence."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        str_strip_whitespace=False,
+        validate_default=True,
+    )
+
+    request_id: Identifier
+    task_id: Identifier
+    tool: ToolName
+    content: Annotated[str, StringConstraints(max_length=2_000_000)] = Field(repr=False)
+    content_type: ShortText
+    size_bytes: NonNegativeInt
+    sha256: Sha256
+    evidence: ToolCallEvidence
+
+    @model_validator(mode="after")
+    def validate_content_address(self) -> Self:
+        encoded = self.content.encode("utf-8")
+        if self.size_bytes != len(encoded) or self.sha256 != sha256(encoded).hexdigest():
+            raise ValueError("tool result content address does not match content")
+        if (
+            self.evidence.status is not ToolCallStatus.SUCCESS
+            or self.evidence.request_id != self.request_id
+            or self.evidence.task_id != self.task_id
+            or self.evidence.tool != self.tool
+            or self.evidence.output is None
+            or self.evidence.output.sha256 != self.sha256
+            or self.evidence.output.size_bytes != self.size_bytes
+            or self.evidence.output.media_type != self.content_type
+        ):
+            raise ValueError("tool result does not match its successful evidence")
+        return self
+
+
 def tool_arguments_sha256(call: ToolCall) -> str:
     """Hash canonical arguments without retaining their potentially sensitive contents."""
 

@@ -44,6 +44,8 @@ services:
       CLICKHOUSE_USER: ${CLICKHOUSE_USER:-agentic}
       CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-agentic_dev_only}
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+      MCP_CLICKHOUSE_READER_PASSWORD: ${MCP_CLICKHOUSE_READER_PASSWORD:-mcp_reader_dev_only}
+      MCP_DBT_PASSWORD: ${MCP_DBT_PASSWORD:-dbt_agent_dev_only}
     ports:
       - "127.0.0.1:${CLICKHOUSE_HTTP_PORT:-8123}:8123"
       - "127.0.0.1:${CLICKHOUSE_NATIVE_PORT:-9000}:9000"
@@ -68,6 +70,7 @@ services:
     networks:
       - data-platform
       - grader
+      - mcp
 
   dbt:
     image: ${DBT_IMAGE:-agentic-data-platform-dbt:1.11.14-1.10.2}
@@ -88,6 +91,78 @@ services:
       - tools
     networks:
       - data-platform
+
+  clickhouse-mcp:
+    image: ${CLICKHOUSE_MCP_IMAGE:-ghcr.io/clickhouse/mcp-clickhouse:0.6.0@sha256:b437cf15922702563d59124ad15f86337d93169cf2831d7fac6756d5dc23abff}
+    environment:
+      CHDB_ENABLED: "false"
+      CLICKHOUSE_ALLOW_DROP: "false"
+      CLICKHOUSE_ALLOW_WRITE_ACCESS: "false"
+      CLICKHOUSE_CONNECT_TIMEOUT: "5"
+      CLICKHOUSE_ENABLED: "true"
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_MCP_MAX_WORKERS: "1"
+      CLICKHOUSE_MCP_QUERY_TIMEOUT: "15"
+      CLICKHOUSE_MCP_SERVER_TRANSPORT: stdio
+      CLICKHOUSE_PASSWORD: ${MCP_CLICKHOUSE_READER_PASSWORD:-mcp_reader_dev_only}
+      CLICKHOUSE_PORT: "8123"
+      CLICKHOUSE_SECURE: "false"
+      CLICKHOUSE_USER: ${MCP_CLICKHOUSE_USER:-mcp_reader}
+      CLICKHOUSE_VERIFY: "true"
+      FASTMCP_CHECK_FOR_UPDATES: "off"
+      FASTMCP_SHOW_SERVER_BANNER: "false"
+      PYTHONDONTWRITEBYTECODE: "1"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    user: "65532:65532"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    profiles:
+      - tools
+    networks:
+      - mcp
+
+  dbt-mcp:
+    image: ${DBT_MCP_IMAGE:-agentic-data-platform-dbt-mcp:2.2.1-dbt1.11.14}
+    build:
+      context: ./mcp/dbt
+      dockerfile: Dockerfile
+    environment:
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PASSWORD: ${MCP_DBT_PASSWORD:-dbt_agent_dev_only}
+      CLICKHOUSE_USER: ${MCP_DBT_USER:-dbt_agent}
+      DBT_CLI_TIMEOUT: "120"
+      DBT_MCP_ENABLE_TOOLS: parse,compile,build,test,show,list,get_lineage_dev,get_node_details_dev
+      DBT_PATH: /usr/local/bin/dbt
+      DBT_PROFILES_DIR: /workspace
+      DBT_PROJECT_DIR: /workspace
+      DBT_SEND_ANONYMOUS_USAGE_STATS: "false"
+      DISABLE_MCP_APPS: "true"
+      FASTMCP_CHECK_FOR_UPDATES: "off"
+      FASTMCP_SHOW_SERVER_BANNER: "false"
+      MCP_TRANSPORT: stdio
+    volumes:
+      - ${DBT_PROJECT_PATH:-./platform/dbt}:/workspace
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    profiles:
+      - tools
+    networks:
+      - mcp
 
   scenario-grader:
     image: ${SCENARIO_GRADER_IMAGE:-agentic-data-platform-grader:0.1.0}
@@ -240,5 +315,8 @@ networks:
   data-platform:
     driver: bridge
   grader:
+    driver: bridge
+    internal: true
+  mcp:
     driver: bridge
     internal: true

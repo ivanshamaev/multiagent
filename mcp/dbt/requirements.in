@@ -1,0 +1,4 @@
+# Keep the official MCP server and the scenario adapter in one isolated, resolved environment.
+dbt-clickhouse==1.10.2
+dbt-core==1.11.14
+dbt-mcp==2.2.1

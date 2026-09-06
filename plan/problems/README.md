@@ -10,3 +10,5 @@ grader; [PRB-0013](PRB-0013-openai3-httpx2-import.md) фиксирует сме�
 [`PRB-0015`](PRB-0015-catalog-model-not-routable.md) добавляет live capability gate после catalog.
 [`PRB-0016`](PRB-0016-schema-probe-and-model-reliability.md) заменяет text probe строгой schema
 проверкой и фиксирует измеренный PM model override.
+[`PRB-0017`](PRB-0017-fastmcp-update-egress.md) закрывает обнаруженный FastMCP update-check egress
+через disabled update check и отдельную internal-only MCP network.

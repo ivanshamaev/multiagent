@@ -38,7 +38,8 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	airflow-image airflow-up airflow-validate airflow-test airflow-failure-test \
 	scenario-init scenario-reset scenario-status scenario-verify scenario-fingerprint \
 	scenario-baseline-build scenario-run scenario-grader-image scenario-grade \
-	scenario-grade-baseline-test scenario-repro-test scenario-test llm-catalog llm-smoke
+	scenario-grade-baseline-test scenario-repro-test scenario-test llm-catalog llm-smoke \
+	mcp-images mcp-users
 
 bootstrap:
 	$(UV) sync --frozen
@@ -75,6 +76,18 @@ seed: clickhouse-up
 
 clickhouse-test: clickhouse-up
 	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/001_smoke.sql
+
+mcp-images:
+	$(COMPOSE) --profile tools pull clickhouse-mcp
+	$(COMPOSE) --profile tools build dbt-mcp
+
+mcp-users: clickhouse-up
+	@$(COMPOSE) exec -T clickhouse sh -c 'clickhouse-client \
+		--user "$$CLICKHOUSE_USER" \
+		--password "$$CLICKHOUSE_PASSWORD" \
+		--param_mcp_reader_password "$$MCP_CLICKHOUSE_READER_PASSWORD" \
+		--param_dbt_agent_password "$$MCP_DBT_PASSWORD" \
+		--multiquery' < platform/clickhouse/security/001_mcp_users.sql
 
 dbt-image:
 	$(COMPOSE) build dbt

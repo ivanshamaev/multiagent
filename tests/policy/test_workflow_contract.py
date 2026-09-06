@@ -12,6 +12,7 @@ from contracts import (
     TaskSpecification,
     ToolCallEvidence,
     ToolRequest,
+    ToolResult,
     ValidationResult,
 )
 from orchestrator import ALLOWED_TRANSITIONS, Stage
@@ -51,6 +52,7 @@ def test_all_external_contracts_close_extra_fields_and_pin_schema_version() -> N
         Evidence,
         ToolRequest,
         ToolCallEvidence,
+        ToolResult,
     )
 
     for model in models:
