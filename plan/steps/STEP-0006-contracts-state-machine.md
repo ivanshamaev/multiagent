@@ -1,9 +1,9 @@
 # STEP-0006 — Typed contracts и deterministic state machine
 
-Status: active
+Status: completed
 Owner: primary agent
-Updated: 2026-09-05
-Current step: определить versioned contract schemas и transition invariants
+Updated: 2026-09-06
+Current step: gate закрыт; следующий active step — STEP-0007
 
 ## Goal
 
@@ -20,18 +20,18 @@ checkpoint database или Net Revenue implementation. Разрешены `contr
 
 ## Acceptance criteria
 
-- [ ] Versioned models существуют для TaskRequest, TaskSpecification, AnalysisReport,
+- [x] Versioned models существуют для TaskRequest, TaskSpecification, AnalysisReport,
   ImplementationResult, QAReport, ReviewReport и Evidence.
-- [ ] Contracts запрещают extra fields, пустые IDs, naive timestamps, неизвестные statuses и
+- [x] Contracts запрещают extra fields, пустые IDs, naive timestamps, неизвестные statuses и
   evidence без command/query source, exit code и artifact reference.
-- [ ] Code-owned state machine задаёт допустимые stages/transitions и terminal
-  `DONE/REWORK/BLOCKED/FAILED`; role output не может перескочить gate.
-- [ ] Retry/rework/tool/time/token budgets уменьшаются только deterministic кодом и не уходят ниже 0.
-- [ ] Автор implementation не может approve себя; QA/reviewer failures требуют evidence.
-- [ ] Append-only events имеют sequence, correlation IDs и проверяемый previous-event hash.
-- [ ] Unit/workflow/adversarial tests покрывают happy path, каждый illegal transition, missing
+- [x] Code-owned state machine задаёт допустимые stages/transitions, terminal
+  `DONE/BLOCKED/FAILED` и bounded `REWORK`; role output не может перескочить gate.
+- [x] Retry/rework/tool/time/token budgets изменяются только deterministic кодом и не уходят ниже 0.
+- [x] Автор implementation не может approve себя; QA/reviewer failures требуют evidence.
+- [x] Append-only events имеют sequence, correlation IDs и проверяемый previous-event hash.
+- [x] Unit/workflow/adversarial tests покрывают happy path, каждый illegal transition, missing
   evidence, self-approval, replay/tampering и exhaustion.
-- [ ] `make check` и scenario/platform regression gates остаются зелёными.
+- [x] `make check` и scenario/platform regression gates остаются зелёными.
 
 ## Risks and decisions required
 
@@ -61,3 +61,9 @@ tamper/replay/self-approval adversarial tests, `make scenario-repro-test`, `make
   отложена до adapter phase.
 - 2026-09-05: принят ADR-0014 — strict frozen contracts, pure reducer, deterministic budgets и
   canonical hash chain.
+- 2026-09-06: закрыты все artifact gates и ветви transition table; rework exhaustion завершается
+  `FAILED`, не превышая budget.
+- 2026-09-06: `make check` — exit `0`, 101 tests; scenario reproducibility/isolated grader — PASS.
+- 2026-09-06: `make platform-test` — exit `0`; Airflow/Cosmos 11/11, dbt 68/68 и SQL PASS.
+
+Persistent evidence: [`../evidence/STEP-0006-contracts-state-machine.md`](../evidence/STEP-0006-contracts-state-machine.md).

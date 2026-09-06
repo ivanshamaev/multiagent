@@ -61,3 +61,29 @@
 - `make platform-test` после network change: Airflow/Cosmos 11/11 success, 68 dbt tests и SQL PASS.
 - Evidence: `plan/evidence/STEP-0005-scenario-harness.md`. LLM calls и удаление volumes не выполнялись.
 - Следующий активный шаг: `STEP-0006-contracts-state-machine.md`.
+
+## 2026-09-06 — STEP-0006 завершён
+
+- Реализованы frozen/closed Pydantic v1 contracts для request, specification, analysis,
+  implementation, validation, QA, review и content-addressed evidence.
+- Pure reducer проверяет полную transition matrix, role/task/authorship gates и bounded budgets;
+  исчерпанный rework детерминированно заканчивается `FAILED` без превышения лимита.
+- Canonical hash chain обнаруживает mutation, reorder, replay и truncation относительно ожидаемого
+  state. MAF/provider SDK не связан с domain contracts.
+- `make check` — 101 tests; scenario fingerprints воспроизведены; isolated baseline grader PASS;
+  `make platform-test` — Airflow/Cosmos 11/11, dbt 68/68 и SQL PASS.
+- Evidence: `plan/evidence/STEP-0006-contracts-state-machine.md`. LLM calls не выполнялись.
+- Следующий активный шаг: `STEP-0007-local-agent-runtime.md`.
+
+## 2026-09-06 — STEP-0007 завершён
+
+- Добавлен GateLLM provider через pinned MAF Chat Completions adapter: secret-safe settings,
+  bounded retries/timeouts, cost/config model selection, schema capability probe и fake transport.
+- Controlled PM Agent читает только проверенный content-addressed scenario context, формирует
+  строгий draft и передаёт artifact/usage существующему reducer; prompts/raw responses не хранятся.
+- Cost comparison выявил 404/504/schema failures дешёвых моделей; Llama 3.1 8B прошла полный smoke
+  за ~0.02583 ₽ и зафиксирована как датированный PM default (PRB-0013–0016, EXP-0001).
+- `make check` — 129 tests; scenario fingerprints и baseline grader воспроизведены;
+  `make platform-test` — Airflow/Cosmos 11/11, dbt 68/68 и SQL PASS.
+- Evidence: `plan/evidence/STEP-0007-local-agent-runtime.md`. Следующий активный шаг:
+  `STEP-0008-tool-policy-layer.md`.

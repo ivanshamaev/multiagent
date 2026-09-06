@@ -47,6 +47,13 @@ Airflow baseline использует LocalExecutor, public `airflow.sdk` и pin
 
 Утверждение агента не является evidence. Structured evidence должно содержать source, command/query/test/artifact, exit code, timestamp и output reference. Целевой deterministic validator выполняет:
 
+Domain contracts уже реализованы как frozen Pydantic v1 models с `extra="forbid"`, UTC-only
+timestamps и discriminated artifact types. Любой внешний payload проходит `model_validate` или
+`model_validate_json`; `model_construct` на trust boundary запрещён. Workflow state изменяется
+только `orchestrator` reducer. MAF/provider adapters не определяют transitions и не редактируют
+budgets. Event SHA-256 доказывает целостность последовательности, но не заменяет подпись или
+durable authenticated storage.
+
 ```text
 dbt parse → dbt compile → dbt build → dbt test
 pytest → SQL correctness → repository policy tests
@@ -71,9 +78,18 @@ Docker socket или внешнюю сеть.
 
 Все model calls идут только через OpenAI-совместимый GateLLM endpoint `https://gatellm.ru/v1`. Секрет читается из `API_TOKEN` в ignored `.env`; не переименовывай его, не выводи значение и не передавай в Docker-сервисы Data Platform. Не добавляй прямые provider keys или обход gateway без нового ADR и явного запроса.
 
-Provider abstraction следует проверенному паттерну `research-agent`: lazy OpenAI-compatible client, configurable `base_url`/model, единый internal response contract, bounded retries и token accounting. Конкретный Microsoft Agent Framework adapter добавляется в Phase D поверх этой абстракции.
+Provider abstraction следует проверенному паттерну `research-agent`: lazy OpenAI-compatible client,
+configurable `base_url`/model, единый internal response contract, bounded retries и token accounting.
+Microsoft Agent Framework adapter реализован как тонкий слой поверх этой абстракции и не владеет
+domain transitions.
 
-По умолчанию выбирай самую дешёвую доступную CHAT-модель, которая проходит capability/eval gate. На 2026-09-04 snapshot `/v1/models` даёт `inclusionai/ling-2.6-flash` как самый дешёвый вариант; это конфигурация, а не вечный hard-coded выбор. Перед benchmark обновляй pricing snapshot. Дорогую модель разрешено назначить конкретной роли только после измеренного провала дешёвой и ADR/experiment с quality-cost сравнением.
+По умолчанию выбирай самую дешёвую CHAT-модель, которая проходит live capability/eval gate. На
+2026-09-06 catalog cheapest `inclusionai/ling-2.6-flash` возвращал 404; Mistral Nemo дважды дал 504
+на полном structured request, Ling 3.0 не прошла schema probe, а IBM Granite Micro вернул
+невалидный artifact. Текущий проверенный default для PM role —
+`meta-llama/llama-3.1-8b-instruct`; выбор и стоимость записаны в EXP-0001. Это датированная
+конфигурация, а не вечный hard-code. Перед benchmark обновляй catalog, capability и eval snapshot.
+Более дорогую модель назначай роли только после измеренного провала дешёвой.
 
 Unit/integration tests используют fake transport и не расходуют токены. Live smoke calls должны быть отдельными opt-in командами; для каждого сохраняй model id, max output, usage, latency и pricing snapshot. Ставь минимальный `max_tokens`, temperature `0` для deterministic structured tasks и жёсткие per-run budgets.
 

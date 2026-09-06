@@ -15,8 +15,7 @@ from contracts import (
     ReviewReport,
 )
 from orchestrator import ArtifactGateError, Stage, TransitionCommand, apply_transition
-from tests.workflow.factories import TASK_ID, at, evidence, review_report
-from tests.workflow.test_state_machine import _state_at
+from tests.workflow.factories import TASK_ID, at, evidence, review_report, workflow_state_at
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -92,7 +91,7 @@ def test_approval_cannot_hide_failed_criterion() -> None:
 
 
 def test_reducer_checks_current_implementation_author() -> None:
-    state = _state_at(Stage.REVIEW).model_copy(
+    state = workflow_state_at(Stage.REVIEW).model_copy(
         update={"implementation_author_id": "different-engineer"}
     )
     report = review_report()

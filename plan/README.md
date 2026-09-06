@@ -23,8 +23,9 @@
 
 ## Текущий статус
 
-- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0005`](steps/STEP-0005-scenario-harness.md); persistent gate transcripts сохранены в `evidence/`.
-- Активный шаг: [`STEP-0006`](steps/STEP-0006-contracts-state-machine.md) — typed contracts и deterministic workflow core.
-- Текущая фаза: Phase C — Contracts и deterministic workflow.
-- Ближайшая продуктовая цель: доказать валидность artifacts/transitions до подключения agent runtime.
+- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0007`](steps/STEP-0007-local-agent-runtime.md); persistent gate transcripts сохранены в `evidence/`.
+- Активный шаг: [`STEP-0008`](steps/STEP-0008-tool-policy-layer.md) — MCP tools и deny-by-default policy.
+- Текущая фаза: Phase E — Tool and Policy Layer.
+- Ближайшая продуктовая цель: дать Data Engineer role проверяемые dbt/workspace и read-only
+  ClickHouse tools без grader, shell или production access.
 - Ближайший исследовательский milestone: один Data Engineer Agent реализует Net Revenue и проходит независимый hidden grader.

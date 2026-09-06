@@ -6,6 +6,7 @@ from contracts import (
     ImplementationStatus,
     QADecision,
     ReviewDecision,
+    SpecificationDecision,
     ValidationDecision,
 )
 from orchestrator import (
@@ -13,12 +14,9 @@ from orchestrator import (
     ArtifactGateError,
     BudgetCharge,
     BudgetExceededError,
-    BudgetState,
-    BudgetUsage,
     IllegalTransitionError,
     Stage,
     TransitionCommand,
-    WorkflowState,
     append_transition,
     apply_transition,
     initial_state,
@@ -35,6 +33,7 @@ from tests.workflow.factories import (
     specification,
     task_request,
     validation_result,
+    workflow_state_at,
 )
 
 
@@ -61,35 +60,6 @@ def _command(
         artifact=artifact,
         charge=charge or BudgetCharge(),
         reason=reason,
-    )
-
-
-def _state_at(stage: Stage, *, rework_used: int = 0, rework_limit: int = 2) -> WorkflowState:
-    author = None
-    if stage in {
-        Stage.IMPLEMENTED,
-        Stage.VALIDATING,
-        Stage.VALIDATED,
-        Stage.QA,
-        Stage.QA_PASSED,
-        Stage.REVIEW,
-        Stage.REWORK,
-        Stage.DONE,
-    }:
-        author = "data-engineer"
-    return WorkflowState(
-        workflow_id="workflow-1",
-        correlation_id="correlation-1",
-        task_id=TASK_ID,
-        stage=stage,
-        revision=0,
-        budgets=BudgetState(
-            limits=budget_limits(rework_attempts=rework_limit),
-            used=BudgetUsage(rework_attempts=rework_used),
-        ),
-        artifact_ids=("artifact-task-request",),
-        implementation_author_id=author,
-        terminal_reason="terminal fixture" if stage in {Stage.BLOCKED, Stage.FAILED} else None,
     )
 
 
@@ -151,7 +121,7 @@ def test_every_edge_missing_from_transition_table_is_rejected() -> None:
     for source, target in product(Stage, repeat=2):
         if target in ALLOWED_TRANSITIONS[source]:
             continue
-        state = _state_at(source)
+        state = workflow_state_at(source)
         command = _command(f"command-{source.value}-{target.value}", target, 1)
         with pytest.raises(IllegalTransitionError):
             apply_transition(state, command)
@@ -165,7 +135,7 @@ def test_every_edge_missing_from_transition_table_is_rejected() -> None:
 
 
 def test_role_artifact_cannot_skip_a_gate_or_claim_wrong_decision() -> None:
-    implementing = _state_at(Stage.IMPLEMENTING)
+    implementing = workflow_state_at(Stage.IMPLEMENTING)
     with pytest.raises(IllegalTransitionError):
         apply_transition(
             implementing,
@@ -178,7 +148,7 @@ def test_role_artifact_cannot_skip_a_gate_or_claim_wrong_decision() -> None:
             ),
         )
 
-    validating = _state_at(Stage.VALIDATING)
+    validating = workflow_state_at(Stage.VALIDATING)
     with pytest.raises(ArtifactGateError, match="passing"):
         apply_transition(
             validating,
@@ -193,7 +163,7 @@ def test_role_artifact_cannot_skip_a_gate_or_claim_wrong_decision() -> None:
 
 
 def test_cross_task_or_wrong_actor_artifact_is_rejected() -> None:
-    state = _state_at(Stage.SPECIFYING)
+    state = workflow_state_at(Stage.SPECIFYING)
     wrong_task = specification().model_copy(update={"task_id": "TASK-OTHER"})
     with pytest.raises(ArtifactGateError, match="task"):
         apply_transition(
@@ -216,7 +186,7 @@ def test_cross_task_or_wrong_actor_artifact_is_rejected() -> None:
 
 def test_rework_consumes_one_attempt_and_exhaustion_fails_closed() -> None:
     report = validation_result(decision=ValidationDecision.FAIL, artifact_id="validation-fail-1")
-    state = _state_at(Stage.VALIDATING, rework_used=0, rework_limit=1)
+    state = workflow_state_at(Stage.VALIDATING, rework_used=0, rework_limit=1)
     first = apply_transition(
         state,
         _command(
@@ -231,7 +201,7 @@ def test_rework_consumes_one_attempt_and_exhaustion_fails_closed() -> None:
     assert first.stage is Stage.REWORK
     assert first.budgets.used.rework_attempts == 1
 
-    exhausted = _state_at(Stage.VALIDATING, rework_used=1, rework_limit=1)
+    exhausted = workflow_state_at(Stage.VALIDATING, rework_used=1, rework_limit=1)
     second_report = validation_result(
         decision=ValidationDecision.FAIL, artifact_id="validation-fail-2"
     )
@@ -251,7 +221,7 @@ def test_rework_consumes_one_attempt_and_exhaustion_fails_closed() -> None:
     assert failed.budgets.remaining.rework_attempts == 0
     assert failed.terminal_reason == "rework budget exhausted: deterministic gate decision"
 
-    initial = _state_at(Stage.VALIDATING, rework_used=1, rework_limit=1)
+    initial = workflow_state_at(Stage.VALIDATING, rework_used=1, rework_limit=1)
     _, events = append_transition(
         initial,
         _command(
@@ -269,7 +239,7 @@ def test_rework_consumes_one_attempt_and_exhaustion_fails_closed() -> None:
 
 
 def test_resource_budget_cannot_underflow_or_mutate_original_state() -> None:
-    state = _state_at(Stage.CREATED)
+    state = workflow_state_at(Stage.CREATED)
     original_budget = state.budgets
     command = _command(
         "command-over-budget",
@@ -313,9 +283,46 @@ def test_matching_blocked_and_failed_artifacts_reach_terminal_state(
     stage: Stage, artifact, actor: str, target: Stage
 ) -> None:
     result = apply_transition(
-        _state_at(stage),
+        workflow_state_at(stage),
         _command("command-terminal", target, 12, actor=actor, artifact=artifact),
     )
 
     assert result.stage is target
     assert result.terminal_reason == "deterministic gate decision"
+
+
+@pytest.mark.parametrize(
+    ("stage", "artifact", "actor", "target"),
+    [
+        (
+            Stage.SPECIFYING,
+            specification(decision=SpecificationDecision.BLOCKED),
+            "pm",
+            Stage.BLOCKED,
+        ),
+        (
+            Stage.VALIDATING,
+            validation_result(decision=ValidationDecision.ERROR),
+            "validator",
+            Stage.FAILED,
+        ),
+        (Stage.QA, qa_report(decision=QADecision.FAIL), "qa", Stage.REWORK),
+        (
+            Stage.REVIEW,
+            review_report(decision=ReviewDecision.REQUEST_CHANGES),
+            "reviewer",
+            Stage.REWORK,
+        ),
+    ],
+)
+def test_non_happy_gate_decisions_follow_the_declared_branch(
+    stage: Stage, artifact, actor: str, target: Stage
+) -> None:
+    result = apply_transition(
+        workflow_state_at(stage),
+        _command("command-gate-branch", target, 12, actor=actor, artifact=artifact),
+    )
+
+    assert result.stage is target
+    if target is Stage.REWORK:
+        assert result.budgets.used.rework_attempts == 1

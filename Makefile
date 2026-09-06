@@ -23,6 +23,8 @@ export AIRFLOW_API_POLL_INTERVAL_SECONDS
 AIRFLOW = $(COMPOSE) exec -T airflow-scheduler airflow
 AIRFLOW_VERSION = $(COMPOSE) run --rm --no-deps --entrypoint airflow airflow-init version
 SCENARIO ?= net-revenue
+LLM_DEFAULT_MODEL ?= meta-llama/llama-3.1-8b-instruct
+export LLM_DEFAULT_MODEL
 SCENARIO_HARNESS = $(UV) run python -m runtime.scenario_harness
 SCENARIO_WORKSPACE = $(abspath .scenario-state/workspaces/$(SCENARIO))
 SCENARIO_DBT_PROJECT = $(SCENARIO_WORKSPACE)/platform/dbt
@@ -36,7 +38,7 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	airflow-image airflow-up airflow-validate airflow-test airflow-failure-test \
 	scenario-init scenario-reset scenario-status scenario-verify scenario-fingerprint \
 	scenario-baseline-build scenario-run scenario-grader-image scenario-grade \
-	scenario-grade-baseline-test scenario-repro-test scenario-test
+	scenario-grade-baseline-test scenario-repro-test scenario-test llm-catalog llm-smoke
 
 bootstrap:
 	$(UV) sync --frozen
@@ -197,3 +199,9 @@ scenario-repro-test:
 
 scenario-test: scenario-repro-test
 	$(MAKE) --no-print-directory scenario-grade-baseline-test SCENARIO="$(SCENARIO)"
+
+llm-catalog:
+	$(UV) run python -m runtime.live_smoke --catalog-only
+
+llm-smoke: scenario-verify
+	$(UV) run python -m runtime.live_smoke --scenario "$(SCENARIO)"

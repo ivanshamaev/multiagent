@@ -17,15 +17,22 @@ from orchestrator import ALLOWED_TRANSITIONS, Stage
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_pydantic_is_a_pinned_runtime_dependency() -> None:
+def test_runtime_dependencies_are_pinned() -> None:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     lock = tomllib.loads((ROOT / "uv.lock").read_text(encoding="utf-8"))
 
-    assert project["project"]["dependencies"] == ["pydantic==2.13.5"]
-    assert any(
-        package["name"] == "pydantic" and package["version"] == "2.13.5"
-        for package in lock["package"]
-    )
+    expected = {
+        "agent-framework-core": "1.17.0",
+        "agent-framework-openai": "1.14.2",
+        "httpx2": "2.12.0",
+        "pydantic": "2.13.5",
+        "pydantic-settings": "2.15.0",
+    }
+    assert project["project"]["dependencies"] == [
+        f"{name}=={version}" for name, version in expected.items()
+    ]
+    locked = {package["name"]: package["version"] for package in lock["package"]}
+    assert all(locked[name] == version for name, version in expected.items())
 
 
 def test_all_external_contracts_close_extra_fields_and_pin_schema_version() -> None:

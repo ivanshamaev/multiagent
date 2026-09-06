@@ -168,7 +168,7 @@ Gate: каждая практическая глава ссылается на �
 
 ## 7. Текущая итерация
 
-`STEP-0001…0005` завершены: governance, golden ClickHouse/dbt/Airflow+Cosmos и reproducible
-scenario reset/run/hidden-grade lifecycle проверены; transcripts сохранены в `plan/evidence/`.
-Активный `STEP-0006` реализует versioned Pydantic artifacts и deterministic state machine без LLM
-calls. Только после его gate начинается local agent runtime.
+`STEP-0001…0007` завершены: governance, golden ClickHouse/dbt/Airflow+Cosmos, reproducible scenario
+harness, contracts/workflow и controlled GateLLM/MAF PM runtime проверены; evidence сохранено в
+`plan/evidence/`. Активный `STEP-0008` строит typed MCP/tool boundary и deny-by-default profiles до
+того, как Data Engineer Agent получит возможность читать warehouse или менять dbt workspace.

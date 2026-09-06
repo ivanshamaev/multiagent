@@ -4,7 +4,12 @@
 
 ## Текущий статус
 
-Реализованы golden Data Platform и reproducible scenario harness. Agent runtime будет работать локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в Docker Compose. Все будущие LLM-вызовы пойдут через OpenAI-совместимый GateLLM с токеном из локального `.env`. Работают ClickHouse, контейнерный dbt baseline, Airflow 3.3.1 с Astronomer Cosmos 1.15.0 и PostgreSQL 16.15. Agent runtime пока не реализован.
+Реализованы golden Data Platform, reproducible scenario harness, strict typed artifacts и
+детерминированный workflow с budgets и hash-chained events, а также controlled PM Agent runtime.
+Runtime работает локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в
+Docker Compose. LLM-вызовы идут через OpenAI-совместимый GateLLM с токеном из локального `.env`.
+Работают ClickHouse,
+контейнерный dbt baseline, Airflow 3.3.1 с Astronomer Cosmos 1.15.0 и PostgreSQL 16.15.
 
 Актуальный roadmap: [`plan/development-plan.md`](plan/development-plan.md). Фактически выполненная работа: [`plan/progress.md`](plan/progress.md).
 
@@ -21,6 +26,11 @@ make seed
 make dbt-build
 make platform-test
 ```
+
+`make llm-catalog` безопасно обновляет metadata без completion. `make llm-smoke` — явный платный
+smoke: он проверяет disposable scenario, schema capability и один bounded PM workflow. Команда не
+печатает prompt, model output или token; текущая проверенная role-модель задаётся
+`LLM_DEFAULT_MODEL` и может быть переопределена через окружение.
 
 ClickHouse публикуется только на loopback-интерфейсе. HTTP и native endpoints по умолчанию доступны на `127.0.0.1:8123` и `127.0.0.1:9000`.
 
@@ -56,8 +66,8 @@ make platform-down
 
 ## Основные каталоги
 
-- `orchestrator/`, `runtime/`, `agents/` — будущий local agent control plane.
-- `contracts/`, `policies/` — typed artifacts и deterministic authorization.
+- `orchestrator/`, `contracts/` — готовые artifact gates, workflow reducer и event integrity.
+- `runtime/`, `agents/`, `policies/` — развиваемые agent adapters, execution и authorization.
 - `platform/` — контейнеризованная Data Platform.
 - `scenarios/`, `grader/` — public benchmark contracts и изолированный hidden oracle.
 - `tests/` — unit, integration, workflow, policy и adversarial checks.

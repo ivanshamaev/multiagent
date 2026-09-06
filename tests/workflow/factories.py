@@ -23,7 +23,7 @@ from contracts import (
     ValidationDecision,
     ValidationResult,
 )
-from orchestrator import BudgetLimits
+from orchestrator import BudgetLimits, BudgetState, BudgetUsage, Stage, WorkflowState
 
 TASK_ID = "TASK-001"
 BASE_TIME = datetime(2026, 9, 5, 18, 0, tzinfo=UTC)
@@ -240,4 +240,37 @@ def budget_limits(*, rework_attempts: int = 2) -> BudgetLimits:
         model_tokens=50_000,
         wall_time_seconds=3_600,
         rework_attempts=rework_attempts,
+    )
+
+
+def workflow_state_at(
+    stage: Stage, *, rework_used: int = 0, rework_limit: int = 2
+) -> WorkflowState:
+    """Build a valid state at one stage for isolated reducer tests."""
+
+    author = None
+    if stage in {
+        Stage.IMPLEMENTED,
+        Stage.VALIDATING,
+        Stage.VALIDATED,
+        Stage.QA,
+        Stage.QA_PASSED,
+        Stage.REVIEW,
+        Stage.REWORK,
+        Stage.DONE,
+    }:
+        author = "data-engineer"
+    return WorkflowState(
+        workflow_id="workflow-1",
+        correlation_id="correlation-1",
+        task_id=TASK_ID,
+        stage=stage,
+        revision=0,
+        budgets=BudgetState(
+            limits=budget_limits(rework_attempts=rework_limit),
+            used=BudgetUsage(rework_attempts=rework_used),
+        ),
+        artifact_ids=("artifact-task-request",),
+        implementation_author_id=author,
+        terminal_reason="terminal fixture" if stage in {Stage.BLOCKED, Stage.FAILED} else None,
     )

@@ -8,7 +8,14 @@ from typing import Self
 from pydantic import Field, model_validator
 
 from contracts import TaskRequest
-from contracts.common import FrozenModel, Identifier, NonNegativeInt, VersionedModel, ensure_unique
+from contracts.common import (
+    FrozenModel,
+    Identifier,
+    NonEmptyText,
+    NonNegativeInt,
+    VersionedModel,
+    ensure_unique,
+)
 from orchestrator.errors import BudgetExceededError
 
 
@@ -92,7 +99,7 @@ class WorkflowState(VersionedModel):
     budgets: BudgetState
     artifact_ids: tuple[Identifier, ...]
     implementation_author_id: Identifier | None = None
-    terminal_reason: str | None = None
+    terminal_reason: NonEmptyText | None = None
 
     @model_validator(mode="after")
     def validate_state(self) -> Self:
