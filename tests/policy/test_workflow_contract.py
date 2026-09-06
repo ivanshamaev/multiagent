@@ -10,6 +10,8 @@ from contracts import (
     ReviewReport,
     TaskRequest,
     TaskSpecification,
+    ToolCallEvidence,
+    ToolRequest,
     ValidationResult,
 )
 from orchestrator import ALLOWED_TRANSITIONS, Stage
@@ -25,8 +27,10 @@ def test_runtime_dependencies_are_pinned() -> None:
         "agent-framework-core": "1.17.0",
         "agent-framework-openai": "1.14.2",
         "httpx2": "2.12.0",
+        "mcp": "1.26.0",
         "pydantic": "2.13.5",
         "pydantic-settings": "2.15.0",
+        "sqlglot": "30.18.0",
     }
     assert project["project"]["dependencies"] == [
         f"{name}=={version}" for name, version in expected.items()
@@ -45,6 +49,8 @@ def test_all_external_contracts_close_extra_fields_and_pin_schema_version() -> N
         QAReport,
         ReviewReport,
         Evidence,
+        ToolRequest,
+        ToolCallEvidence,
     )
 
     for model in models:

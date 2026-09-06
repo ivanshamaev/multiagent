@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "profile_id": "data-engineer-v1",
+  "role": "data-engineer",
+  "allowed_tools": [
+    "workspace.read_file",
+    "workspace.write_file",
+    "clickhouse.list_databases",
+    "clickhouse.list_tables",
+    "clickhouse.run_query",
+    "dbt.parse",
+    "dbt.compile",
+    "dbt.build",
+    "dbt.test",
+    "dbt.show",
+    "dbt.list",
+    "dbt.get_lineage_dev",
+    "dbt.get_node_details_dev"
+  ],
+  "readable_paths": [
+    ".scenario/manifest.json",
+    "TASK.md",
+    "platform/dbt/**",
+    "platform/airflow/dags/ecommerce_hourly.py"
+  ],
+  "writable_paths": [
+    "platform/dbt/models/**",
+    "platform/dbt/tests/**"
+  ],
+  "allowed_databases": [
+    "analytics",
+    "raw"
+  ],
+  "max_query_rows": 100,
+  "max_query_chars": 20000,
+  "max_read_bytes": 100000,
+  "max_write_bytes": 100000,
+  "max_tool_calls": 80,
+  "max_wall_time_seconds": 1200,
+  "max_output_bytes": 2000000
+}

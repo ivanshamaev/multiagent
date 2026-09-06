@@ -3,7 +3,7 @@
 Status: active
 Owner: primary agent
 Updated: 2026-09-06
-Current step: проверить official ClickHouse/dbt MCP APIs, packaging и deployment boundaries
+Current step: реализовать typed tool/evidence contracts и pure capability policy
 
 ## Goal
 
@@ -74,3 +74,9 @@ multi-statement SQL, traversal, protected edit, arbitrary command/env and output
 
 - 2026-09-06: STEP-0007 closed before tool implementation. Scope separated from autonomous DE
   behavior so permissions and evidence can be validated independently of model quality.
+- 2026-09-06: official source review зафиксировал mcp-clickhouse 0.6.0, dbt-mcp 2.2.1 и MAF
+  MCPStdioTool/allowed_tools. ADR-0016 принимает isolated stdio processes, explicit dbt enable-list,
+  dedicated ClickHouse read-only grants и repository policy как primary authorization gate.
+- 2026-09-06: ADR-0017 фиксирует pinned SQLGlot ClickHouse AST preflight: single read query,
+  qualified allowlisted databases и literal bounded LIMIT; parser остаётся defense in depth перед
+  server-side read-only grants/timeout.
