@@ -3,7 +3,7 @@
 Status: active
 Owner: primary agent
 Updated: 2026-09-11
-Current step: принять execution-loop ADR и frozen human-authored Net Revenue specification
+Current step: реализовать независимый deterministic validator и negative fixtures
 
 ## Goal
 
@@ -21,9 +21,9 @@ checkpoint database и изменение grader/oracle ради улучшен�
 
 ## Acceptance criteria
 
-- [ ] Human-authored specification фиксирует metric formula, grain, dimensions, edge cases and
+- [x] Human-authored specification фиксирует metric formula, grain, dimensions, edge cases and
   acceptance checks; LLM не может менять её identity или критерии.
-- [ ] Agent получает только verified scenario context и точный profile tool subset; workspace и MCP
+- [x] Agent получает только verified scenario context и точный profile tool subset; workspace и MCP
   вызовы используют один cumulative tool/wall/output budget.
 - [ ] Изменения ограничены dbt models/tests, проходят atomic writes и не касаются main checkout,
   manifest, grader, runtime, policies или `.env`.
@@ -50,6 +50,25 @@ weakening, stale workspace, дорогие repair loops и смешение agen
 5. Реализовать независимый validator и negative fixtures; hidden grader оставить неизменным.
 6. Выполнить один offline/fake vertical slice, затем минимальный live run и failure taxonomy.
 7. Провести 10 fresh runs, сохранить aggregate evidence и только после gate закрыть milestone.
+
+## Work log — 2026-09-11
+
+- Принят ADR-0018: frozen human specification, code-owned identity/evidence/transitions, единый
+  task ledger и независимый validator. `specification.json` привязан к версии сценария и SHA-256
+  `TASK.md`; workspace verification отклоняет tampering.
+- Добавлены Data Engineer instructions и request boundary. Spec проходит обычные reducer gates до
+  `ANALYZING`; prompt явно разделяет immutable specification и untrusted workspace context, а draft
+  не содержит ID, timestamps, evidence или changed-files claims.
+- Workspace и official MCP объединены одним serialized gateway. Интеграционный тест подтверждает:
+  read + dbt consume общий лимит, следующий ClickHouse call получает pre-execution denial.
+- MAF tool loop ограничен 12 roundtrips и 80 calls; profile gateway остаётся жёсткой границей для
+  каждого вызова. Control plane собирает `AnalysisReport`/`ImplementationResult` только из
+  успешных measured evidence и переводит ложный `completed` без dbt changes в `FAILED`.
+- Целевые проверки: `56 passed`, затем `28 passed`, `26 passed`, `25 passed`, все exit `0`.
+  Финальный `make check` — exit `0`: Ruff/format, `227 passed`, Compose config valid.
+
+Следующий незакрытый блок: validator с точным command allowlist, отдельным evidence producer,
+negative implementation fixtures и переходами `VALIDATING → VALIDATED|REWORK|FAILED`.
 
 ## Planned verification
 

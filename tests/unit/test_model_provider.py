@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 
 import httpx2 as httpx
 import pytest
+from agent_framework import tool
 from agent_framework.openai import OpenAIChatCompletionClient
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, ValidationError
@@ -263,6 +264,47 @@ def test_maf_provider_parses_structured_output_and_records_safe_metadata() -> No
     assert client.options["response_format"] is SyntheticResult
     assert TEST_API_TOKEN not in repr(provider)
     assert TEST_API_TOKEN not in invocation.model_dump_json()
+
+
+def test_maf_provider_exposes_only_explicit_tools_for_bounded_generation() -> None:
+    @tool(name="safe_read", approval_mode="never_require")
+    async def safe_read(path: str) -> str:
+        return path
+
+    client = StaticChatClient('{"task_id":"TASK-001","summary":"done"}')
+    provider = MAFModelProvider(
+        gate_settings(),
+        client=client,
+        max_tool_iterations=3,
+        max_function_calls=4,
+    )
+
+    invocation = asyncio.run(
+        provider.generate_with_tools(
+            SyntheticResult,
+            system_prompt="Return strict JSON.",
+            user_prompt="Use only the safe tool when needed.",
+            tools=(safe_read,),
+        )
+    )
+
+    assert invocation.value.summary == "done"
+    assert [item.name for item in client.options["tools"]] == ["safe_read"]
+    assert len(invocation.request_sha256) == 64
+
+
+@pytest.mark.parametrize(
+    ("iterations", "calls"),
+    ((0, 1), (41, 1), (1, 0), (1, 257), (True, 1)),
+)
+def test_maf_provider_rejects_unbounded_tool_loop(iterations: int, calls: int) -> None:
+    with pytest.raises(ValueError):
+        MAFModelProvider(
+            gate_settings(),
+            client=StaticChatClient("{}"),
+            max_tool_iterations=iterations,
+            max_function_calls=calls,
+        )
 
 
 def test_maf_provider_rejects_malformed_or_extra_structured_output() -> None:

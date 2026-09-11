@@ -100,3 +100,14 @@
   воспроизведены; `make check` — 210 tests. PRB-0017–0020 сохраняют найденные проблемы и fixes.
 - Evidence: `plan/evidence/STEP-0008-tool-policy-layer.md`. Следующий planned шаг:
   `STEP-0009-autonomous-data-engineer.md`.
+
+## 2026-09-11 — STEP-0009 в работе: control-plane slice
+
+- Human-authored Net Revenue specification зафиксирована по scenario version и SHA-256 `TASK.md`;
+  identity, evidence и workflow transitions исключены из model-owned draft.
+- Data Engineer получает verified/delimited context и 13 profile tools. Workspace и official MCP
+  вызовы теперь используют единый serialized tool/wall/output ledger.
+- Bounded MAF tool loop и code-owned artifact assembly доводят offline execution до `IMPLEMENTED`;
+  self-reported completion без фактического dbt diff закрывается как `FAILED`.
+- `make check` — 227 tests, Ruff/format и Compose validation PASS. Платные LLM calls не выполнялись.
+- Следующий блок STEP-0009: независимый deterministic validator и negative fixtures.

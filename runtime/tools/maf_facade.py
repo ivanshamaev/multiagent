@@ -27,11 +27,15 @@ from contracts import (
     ToolCall,
     ToolName,
     ToolRequest,
+    WorkspaceReadCall,
+    WorkspaceWriteCall,
 )
 from policies import CapabilityProfile
+from runtime.scenario_harness import ScenarioManifest
 from runtime.tools.evidence_store import ToolEvidenceStore
 from runtime.tools.mcp_gateway import MCPGatewayError, MCPToolGateway
 from runtime.tools.mcp_stdio import create_clickhouse_mcp_tool, create_dbt_mcp_tool
+from runtime.tools.workspace import WorkspaceToolAdapter
 
 
 @dataclass(frozen=True)
@@ -93,6 +97,22 @@ class DataEngineerMCPTools:
         return await self._execute(call)
 
     def _build_candidates(self) -> tuple[tuple[ToolName, FunctionTool], ...]:
+        @tool(
+            name="workspace_read_file",
+            description="Read one bounded UTF-8 file from the verified scenario workspace.",
+            approval_mode="never_require",
+        )
+        async def workspace_read_file(path: str) -> str:
+            return await self._validated(WorkspaceReadCall, path=path)
+
+        @tool(
+            name="workspace_write_file",
+            description="Atomically write one allowed file in the verified scenario workspace.",
+            approval_mode="never_require",
+        )
+        async def workspace_write_file(path: str, content: str) -> str:
+            return await self._validated(WorkspaceWriteCall, path=path, content=content)
+
         @tool(
             name="clickhouse_list_databases",
             description="List ClickHouse databases through the read-only policy gateway.",
@@ -231,6 +251,8 @@ class DataEngineerMCPTools:
             return await self._validated(DbtGetNodeDetailsCall, node_id=node_id)
 
         return (
+            (ToolName.WORKSPACE_READ_FILE, workspace_read_file),
+            (ToolName.WORKSPACE_WRITE_FILE, workspace_write_file),
             (ToolName.CLICKHOUSE_LIST_DATABASES, clickhouse_list_databases),
             (ToolName.CLICKHOUSE_LIST_TABLES, clickhouse_list_tables),
             (ToolName.CLICKHOUSE_RUN_QUERY, clickhouse_run_query),
@@ -262,6 +284,34 @@ async def connect_data_engineer_mcp_tools(
     store = ToolEvidenceStore(repository_root, repository_root / ".scenario-state")
     async with clickhouse, dbt:
         gateway = MCPToolGateway(profile, clickhouse, dbt, store)
+        facade = DataEngineerMCPTools(
+            gateway,
+            task_id=task_id,
+            actor_id=actor_id,
+            role=role,
+        )
+        yield ConnectedDataEngineerMCPTools(tools=facade.tools, gateway=gateway)
+
+
+@asynccontextmanager
+async def connect_data_engineer_tools(
+    repository_root: Path,
+    scenario_workspace: Path,
+    manifest: ScenarioManifest,
+    profile: CapabilityProfile,
+    *,
+    task_id: str,
+    actor_id: str,
+    role: str = "data-engineer",
+) -> AsyncIterator[ConnectedDataEngineerMCPTools]:
+    """Connect one unified workspace/MCP facade with cumulative task budgets."""
+
+    clickhouse = create_clickhouse_mcp_tool(repository_root)
+    dbt = create_dbt_mcp_tool(repository_root, scenario_workspace)
+    store = ToolEvidenceStore(repository_root, repository_root / ".scenario-state")
+    workspace = WorkspaceToolAdapter(repository_root, manifest, profile)
+    async with clickhouse, dbt:
+        gateway = MCPToolGateway(profile, clickhouse, dbt, store, workspace)
         facade = DataEngineerMCPTools(
             gateway,
             task_id=task_id,

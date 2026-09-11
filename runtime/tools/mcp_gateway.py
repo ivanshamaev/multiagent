@@ -8,7 +8,15 @@ from collections.abc import Sequence
 from datetime import UTC, datetime
 from typing import Any, Protocol
 
-from contracts import ToolCallEvidence, ToolCallStatus, ToolName, ToolRequest, ToolResult
+from contracts import (
+    ToolCallEvidence,
+    ToolCallStatus,
+    ToolName,
+    ToolRequest,
+    ToolResult,
+    WorkspaceReadCall,
+    WorkspaceWriteCall,
+)
 from policies import (
     CapabilityProfile,
     PolicyCode,
@@ -17,6 +25,11 @@ from policies import (
     authorize_tool_call,
 )
 from runtime.tools.evidence_store import ToolEvidenceStore
+from runtime.tools.workspace import (
+    WorkspaceAuthorizationError,
+    WorkspaceBoundaryError,
+    WorkspaceToolAdapter,
+)
 
 _CLICKHOUSE_TOOLS = {
     ToolName.CLICKHOUSE_LIST_DATABASES,
@@ -65,11 +78,13 @@ class MCPToolGateway:
         clickhouse: MCPCaller,
         dbt: MCPCaller,
         evidence_store: ToolEvidenceStore,
+        workspace: WorkspaceToolAdapter | None = None,
     ) -> None:
         self._profile = profile
         self._clickhouse = clickhouse
         self._dbt = dbt
         self._evidence_store = evidence_store
+        self._workspace = workspace
         self._usage = ToolUsage()
         self._evidence: list[ToolCallEvidence] = []
         self._execution_lock = asyncio.Lock()
@@ -90,7 +105,10 @@ class MCPToolGateway:
     def allowed_tools(self) -> frozenset[ToolName]:
         """Expose the immutable profile allowlist for facade construction."""
 
-        return frozenset(self._profile.allowed_tools)
+        allowed = set(self._profile.allowed_tools)
+        if self._workspace is None:
+            allowed -= {ToolName.WORKSPACE_READ_FILE, ToolName.WORKSPACE_WRITE_FILE}
+        return frozenset(allowed)
 
     async def execute(self, request: ToolRequest) -> ToolResult:
         """Execute one validated MCP request after a fresh policy decision."""
@@ -111,6 +129,9 @@ class MCPToolGateway:
                 )
                 self._evidence.append(evidence)
                 raise MCPAuthorizationError(decision, evidence)
+
+            if isinstance(request.call, (WorkspaceReadCall, WorkspaceWriteCall)):
+                return self._execute_workspace(request, started_at, started_timer)
 
             try:
                 caller, remote_name = self._route(request.call.tool)
@@ -223,6 +244,59 @@ class MCPToolGateway:
             return self._dbt, tool.value.removeprefix("dbt.")
         raise ValueError("MCP gateway received a non-MCP tool")
 
+    def _execute_workspace(
+        self,
+        request: ToolRequest,
+        started_at: datetime,
+        started_timer: float,
+    ) -> ToolResult:
+        if self._workspace is None:
+            decision = ToolPolicyDecision(
+                allowed=False,
+                code=PolicyCode.TOOL_DENIED,
+                reason="workspace adapter is not configured",
+            )
+            evidence = self._evidence_store.outcome(
+                request,
+                status=ToolCallStatus.DENIED,
+                producer_id="tool-gateway",
+                started_at=started_at,
+                completed_at=datetime.now(UTC),
+                duration_ms=0,
+                error_type="wrong_adapter",
+            )
+            self._evidence.append(evidence)
+            raise MCPAuthorizationError(decision, evidence)
+        try:
+            result = self._workspace.execute(request, self._usage)
+        except WorkspaceAuthorizationError as error:
+            evidence = self._evidence_store.outcome(
+                request,
+                status=ToolCallStatus.DENIED,
+                producer_id="tool-gateway",
+                started_at=started_at,
+                completed_at=datetime.now(UTC),
+                duration_ms=self._duration_ms(started_timer),
+                error_type=error.decision.code.value,
+            )
+            self._evidence.append(evidence)
+            raise MCPAuthorizationError(error.decision, evidence) from error
+        except WorkspaceBoundaryError as error:
+            duration_ms = self._duration_ms(started_timer)
+            self._record_usage(duration_ms, 0)
+            evidence = self._error_evidence(
+                request,
+                started_at,
+                duration_ms,
+                type(error).__name__,
+            )
+            self._evidence.append(evidence)
+            raise MCPGatewayError("workspace call failed its boundary", evidence) from error
+        duration_ms = self._duration_ms(started_timer)
+        self._record_usage(duration_ms, result.size_bytes)
+        self._evidence.append(result.evidence)
+        return result
+
     @staticmethod
     def _text_result(result: str | Sequence[Any]) -> str:
         if isinstance(result, str):
@@ -258,7 +332,7 @@ class MCPToolGateway:
         self._usage = ToolUsage(
             completed_calls=self._usage.completed_calls + 1,
             elapsed_ms=self._usage.elapsed_ms + elapsed_ms,
-            output_bytes=max(self._usage.output_bytes + output_bytes, output_bytes),
+            output_bytes=self._usage.output_bytes + output_bytes,
         )
 
     @staticmethod

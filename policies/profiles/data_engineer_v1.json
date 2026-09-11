@@ -20,6 +20,7 @@
   "readable_paths": [
     ".scenario/manifest.json",
     "TASK.md",
+    "scenarios/net-revenue/specification.json",
     "platform/dbt/**",
     "platform/airflow/dags/ecommerce_hourly.py"
   ],

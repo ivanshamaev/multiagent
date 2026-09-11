@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "scenario_id": "net-revenue",
+  "scenario_version": "1.0.0",
+  "task_sha256": "96e0032a580675be21ef64a798dc7c5a2daa92c9fbf38802e9f51976fa59b924",
+  "specification": {
+    "schema_version": 1,
+    "artifact_type": "task_specification",
+    "artifact_id": "specification-net-revenue-v1-0-0",
+    "task_id": "scenario-net-revenue",
+    "producer_id": "human",
+    "created_at": "2026-09-11T00:00:00Z",
+    "evidence": [],
+    "decision": "ready",
+    "business_goal": "Expose auditable daily Net Revenue by customer country, acquisition channel, and currency for the existing hourly ecommerce pipeline.",
+    "metric_definition": "For each reporting grain, net_revenue_cents equals the sum of every succeeded payment event minus the sum of every succeeded refund event, with refunds attributed to the original order UTC date.",
+    "grain": [
+      "one row per order_date, country, acquisition_channel, currency"
+    ],
+    "dimensions": [
+      "order_date",
+      "country",
+      "acquisition_channel",
+      "currency"
+    ],
+    "source_requirements": [
+      "raw.orders supplies original UTC order date, customer, status, and currency",
+      "raw.customers supplies the order customer's country",
+      "raw.payments contributes every payment event whose payment_status is succeeded",
+      "raw.refunds contributes every partial, multiple, or late refund event whose refund_status is succeeded",
+      "raw.marketing_attribution is deduplicated by attribution_event_id and missing or NULL channels normalize to unknown"
+    ],
+    "acceptance_criteria": [
+      "analytics.fct_net_revenue is a physical table",
+      "all seven required output columns are non-NULL",
+      "the four-column declared grain is unique",
+      "split succeeded payments are summed as distinct events",
+      "failed refunds are excluded while partial, multiple, and late succeeded refunds are included",
+      "net_revenue_cents is a signed integer equal to gross payments minus successful refunds",
+      "currencies are never combined because no FX rates are supplied",
+      "dbt tests cover required fields, grain uniqueness, and metric identity"
+    ],
+    "non_functional_requirements": [
+      "modify only scenario dbt models and tests",
+      "preserve the existing ecommerce_hourly schedule and public validation commands",
+      "do not weaken existing tests or access hidden grader internals"
+    ],
+    "assumptions": [
+      "refunds inherit the original order_date, country, acquisition_channel, and currency",
+      "unknown is the canonical channel for missing attribution or NULL channel values"
+    ],
+    "open_questions": [],
+    "risks": [
+      "joining payment and refund events before per-order aggregation can multiply amounts",
+      "duplicate attribution rows can multiply revenue",
+      "currency omission can combine incompatible monetary values"
+    ]
+  }
+}

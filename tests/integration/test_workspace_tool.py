@@ -1,3 +1,4 @@
+import asyncio
 import json
 from pathlib import Path
 
@@ -7,10 +8,23 @@ from contracts import ToolRequest
 from policies import CapabilityProfile, PolicyCode, ToolUsage
 from runtime.scenario_harness import parse_manifest, reset_workspace, verify_workspace
 from runtime.tools import (
+    DataEngineerMCPTools,
+    MCPAuthorizationError,
+    MCPToolGateway,
+    ToolEvidenceStore,
     WorkspaceAuthorizationError,
     WorkspaceBoundaryError,
     WorkspaceToolAdapter,
 )
+
+
+class _MCPCaller:
+    def __init__(self) -> None:
+        self.calls: list[str] = []
+
+    async def call_tool(self, tool_name: str, **kwargs: object) -> str:
+        self.calls.append(tool_name)
+        return "OK"
 
 
 def _fixture(tmp_path: Path) -> tuple[Path, object, CapabilityProfile, Path]:
@@ -154,6 +168,48 @@ def test_workspace_adapter_rejects_profile_broader_than_manifest(tmp_path: Path)
 
     with pytest.raises(WorkspaceBoundaryError, match="write scope"):
         WorkspaceToolAdapter(repository, manifest, broader)
+
+
+def test_workspace_and_mcp_share_one_cumulative_task_budget(tmp_path: Path) -> None:
+    repository, manifest, profile, _ = _fixture(tmp_path)
+    limited = CapabilityProfile.model_validate(
+        {
+            **profile.model_dump(),
+            "allowed_tools": (*profile.allowed_tools, "dbt.parse"),
+            "max_tool_calls": 2,
+        }
+    )
+    workspace = WorkspaceToolAdapter(repository, manifest, limited)
+    clickhouse = _MCPCaller()
+    dbt = _MCPCaller()
+    gateway = MCPToolGateway(
+        limited,
+        clickhouse,
+        dbt,
+        ToolEvidenceStore(repository, repository / ".scenario-state"),
+        workspace,
+    )
+    facade = DataEngineerMCPTools(
+        gateway,
+        task_id="task-workspace",
+        actor_id="data-engineer-1",
+    )
+    exposed = {item.name: item for item in facade.tools}
+
+    asyncio.run(exposed["workspace_read_file"].invoke(arguments={"path": "TASK.md"}))
+    asyncio.run(exposed["dbt_parse"].invoke(arguments={}))
+    with pytest.raises(MCPAuthorizationError):
+        asyncio.run(gateway.execute(_request("third-call", {"tool": "clickhouse.list_databases"})))
+
+    assert gateway.usage.completed_calls == 2
+    assert gateway.usage.output_bytes > 0
+    assert [item.status.value for item in gateway.evidence] == [
+        "success",
+        "success",
+        "denied",
+    ]
+    assert dbt.calls == ["parse"]
+    assert clickhouse.calls == []
 
 
 def test_failed_atomic_replace_preserves_existing_file(tmp_path: Path, monkeypatch) -> None:

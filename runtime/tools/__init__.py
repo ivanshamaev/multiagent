@@ -5,6 +5,7 @@ from runtime.tools.maf_facade import (
     ConnectedDataEngineerMCPTools,
     DataEngineerMCPTools,
     connect_data_engineer_mcp_tools,
+    connect_data_engineer_tools,
 )
 from runtime.tools.mcp_gateway import (
     MCPAuthorizationError,
@@ -39,6 +40,7 @@ __all__ = [
     "WorkspaceBoundaryError",
     "WorkspaceToolAdapter",
     "connect_data_engineer_mcp_tools",
+    "connect_data_engineer_tools",
     "create_clickhouse_mcp_tool",
     "create_dbt_mcp_tool",
 ]

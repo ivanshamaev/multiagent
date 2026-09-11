@@ -23,6 +23,7 @@ from contracts.artifacts import (
     ValidationResult,
 )
 from contracts.evidence import ArtifactReference, Evidence, EvidenceKind
+from contracts.scenario_specification import ScenarioSpecification
 from contracts.tools import (
     ClickHouseListDatabasesCall,
     ClickHouseListTablesCall,
@@ -79,6 +80,7 @@ __all__ = [
     "ReviewDecision",
     "ReviewFinding",
     "ReviewReport",
+    "ScenarioSpecification",
     "Severity",
     "SpecificationDecision",
     "TaskRequest",

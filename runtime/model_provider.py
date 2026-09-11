@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from decimal import Decimal
 from hashlib import sha256
@@ -10,7 +11,7 @@ from time import monotonic
 from typing import Annotated, Literal, Protocol, TypeVar, cast
 
 import httpx2 as httpx
-from agent_framework import Agent, AgentResponse, BaseChatClient
+from agent_framework import Agent, AgentResponse, BaseChatClient, FunctionTool
 from agent_framework.openai import OpenAIChatCompletionClient
 from openai import AsyncOpenAI
 from pydantic import BaseModel, Field, StringConstraints
@@ -127,6 +128,17 @@ class StructuredModelProvider(Protocol):
         *,
         system_prompt: PromptText,
         user_prompt: PromptText,
+    ) -> ModelInvocation[ResponseT]: ...
+
+
+class ToolEnabledStructuredModelProvider(StructuredModelProvider, Protocol):
+    async def generate_with_tools(
+        self,
+        response_model: type[ResponseT],
+        *,
+        system_prompt: PromptText,
+        user_prompt: PromptText,
+        tools: Sequence[FunctionTool],
     ) -> ModelInvocation[ResponseT]: ...
 
 
@@ -299,6 +311,8 @@ class MAFModelProvider:
         *,
         model_id: str | None = None,
         client: BaseChatClient | None = None,
+        max_tool_iterations: int = 12,
+        max_function_calls: int = 80,
     ) -> None:
         selected_model = model_id or settings.default_model
         if selected_model is None:
@@ -306,6 +320,17 @@ class MAFModelProvider:
         self.settings = settings
         self.model_id = cast(ModelIdentifier, selected_model)
         self._client = client
+        if isinstance(max_tool_iterations, bool) or not 1 <= max_tool_iterations <= 40:
+            raise ValueError("max_tool_iterations must be between 1 and 40")
+        if isinstance(max_function_calls, bool) or not 1 <= max_function_calls <= 256:
+            raise ValueError("max_function_calls must be between 1 and 256")
+        self._function_invocation_configuration = {
+            "max_iterations": max_tool_iterations,
+            "max_function_calls": max_function_calls,
+            "max_consecutive_errors_per_request": 1,
+            "terminate_on_unknown_calls": True,
+            "include_detailed_errors": False,
+        }
 
     def __repr__(self) -> str:
         return f"MAFModelProvider(model_id={self.model_id!r}, base_url={self.settings.base_url!r})"
@@ -321,6 +346,7 @@ class MAFModelProvider:
             self._client = OpenAIChatCompletionClient(
                 model=self.model_id,
                 async_client=openai_client,
+                function_invocation_configuration=self._function_invocation_configuration,
             )
         return self._client
 
@@ -331,13 +357,51 @@ class MAFModelProvider:
         system_prompt: PromptText,
         user_prompt: PromptText,
     ) -> ModelInvocation[ResponseT]:
-        request_sha256 = sha256(f"{system_prompt}\x00{user_prompt}".encode()).hexdigest()
+        return await self._generate(
+            response_model,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            tools=(),
+        )
+
+    async def generate_with_tools(
+        self,
+        response_model: type[ResponseT],
+        *,
+        system_prompt: PromptText,
+        user_prompt: PromptText,
+        tools: Sequence[FunctionTool],
+    ) -> ModelInvocation[ResponseT]:
+        """Run a bounded MAF function loop using only caller-supplied safe tools."""
+
+        if not tools:
+            raise ValueError("tool-enabled generation requires at least one tool")
+        return await self._generate(
+            response_model,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            tools=tuple(tools),
+        )
+
+    async def _generate(
+        self,
+        response_model: type[ResponseT],
+        *,
+        system_prompt: PromptText,
+        user_prompt: PromptText,
+        tools: Sequence[FunctionTool],
+    ) -> ModelInvocation[ResponseT]:
+        tool_names = ",".join(sorted(item.name for item in tools))
+        request_sha256 = sha256(
+            f"{system_prompt}\x00{user_prompt}\x00{tool_names}".encode()
+        ).hexdigest()
         started = monotonic()
         try:
             agent = Agent(
                 client=self._get_client(),
                 name="controlled-structured-agent",
                 instructions=system_prompt,
+                tools=tools or None,
                 default_options={
                     "max_tokens": self.settings.max_output_tokens,
                     "response_format": response_model,
