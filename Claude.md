@@ -45,7 +45,7 @@ Airflow baseline использует LocalExecutor, public `airflow.sdk` и pin
 
 ## Contracts, evidence и validation
 
-Утверждение агента не является evidence. Structured evidence должно содержать source, command/query/test/artifact, exit code, timestamp и output reference. Целевой deterministic validator выполняет:
+Утверждение агента не является evidence. Structured evidence должно содержать source, command/query/test/artifact, exit code, timestamp и output reference. Deterministic validator выполняет:
 
 Domain contracts уже реализованы как frozen Pydantic v1 models с `extra="forbid"`, UTC-only
 timestamps и discriminated artifact types. Любой внешний payload проходит `model_validate` или

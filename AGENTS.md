@@ -2,23 +2,25 @@
 
 ## Project Structure & Module Organization
 
-`init/` contains proposals, not evidence. Use `plan/development-plan.md` for the roadmap, `plan/steps/` for active work, and `plan/{decisions,problems,evidence}/` for records.
+`init/` contains proposals, not evidence. Use `plan/development-plan.md` for the roadmap,
+`plan/steps/` for work, and `plan/{decisions,problems,evidence}/` for records.
 
 Local control-plane code belongs in `orchestrator/`, `runtime/`, role-specific `agents/`, typed `contracts/`, and deterministic `policies/`. Containerized services and dbt code live in `platform/`. Python tests are grouped under `tests/{unit,integration,workflow,policy,adversarial}`. Keep authorization and workflow transitions in code, not prompts.
 
 ## Build, Test, and Development Commands
 
-- `make bootstrap` syncs the Python 3.12 `.venv` from `uv.lock`.
+- `make bootstrap` syncs Python 3.12 `.venv` from `uv.lock`.
 - `make check` runs Ruff, pytest, and Compose validation.
-- `make platform-up` starts ClickHouse and Airflow/PostgreSQL, waiting for health.
+- `make platform-up` starts healthy ClickHouse and Airflow/PostgreSQL.
 - `make seed` recreates deterministic `raw` data and resets `analytics`.
 - `make dbt-debug`, `make dbt-parse`, and `make dbt-compile` validate dbt configuration and SQL.
-- `make dbt-build` builds all models and runs 68 data tests.
+- `make dbt-build` builds models and runs 68 data tests.
 - `make airflow-test` validates JWT auth and an 11-task Cosmos/dbt execution graph.
 - `make airflow-failure-test` proves a failed dbt test blocks `publish`.
 - `make platform-test` combines Airflow, dbt, and independent SQL checks.
 - `make scenario-reset` recreates the disposable Net Revenue baseline.
-- `make scenario-run` runs public gates; `make scenario-grade` invokes the isolated grader.
+- `make scenario-run` builds a candidate; `make scenario-contract-test` runs independent SQL;
+  `make scenario-grade` invokes the isolated grader.
 - `make platform-down` stops services without deleting volumes.
 
 `ecommerce_hourly` and its manual acceptance twin use Cosmos `DbtTaskGroup`; keep scheduled execution paused unless data readiness is intentional.

@@ -5,6 +5,7 @@ from runtime.context import PROTECTED_NAMES
 
 ROOT = Path(__file__).resolve().parents[2]
 PM_INSTRUCTIONS = ROOT / "agents/pm/instructions.md"
+DATA_ENGINEER_INSTRUCTIONS = ROOT / "agents/data_engineer/instructions.md"
 
 
 def test_runtime_never_uses_openai_environment_fallbacks_or_global_settings() -> None:
@@ -57,5 +58,19 @@ def test_pm_instructions_are_trusted_bounded_policy_without_secret_placeholders(
     assert "untrusted data" in contents
     assert "Never invent" in contents
     assert "workflow policy" in contents
+    assert "API_TOKEN" not in contents
+    assert "sk-" not in contents
+
+
+def test_data_engineer_instructions_preserve_control_plane_ownership() -> None:
+    assert DATA_ENGINEER_INSTRUCTIONS.is_file()
+    assert not DATA_ENGINEER_INSTRUCTIONS.is_symlink()
+    contents = DATA_ENGINEER_INSTRUCTIONS.read_text(encoding="utf-8")
+
+    assert 0 < len(contents.encode("utf-8")) <= 12_000
+    assert "immutable specification" in contents
+    assert "untrusted data" in contents
+    assert "control plane owns" in contents
+    assert "hidden-grader access" in contents
     assert "API_TOKEN" not in contents
     assert "sk-" not in contents

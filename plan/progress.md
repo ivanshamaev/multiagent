@@ -111,3 +111,13 @@
   self-reported completion без фактического dbt diff закрывается как `FAILED`.
 - `make check` — 227 tests, Ruff/format и Compose validation PASS. Платные LLM calls не выполнялись.
 - Следующий блок STEP-0009: независимый deterministic validator и negative fixtures.
+
+## 2026-09-11 — STEP-0009 в работе: independent validator
+
+- Добавлены closed four-gate validator и независимый Net Revenue SQL contract вне agent workspace.
+  Agent-reported success не влияет на решение; только exit codes открывают `VALIDATED` или bounded
+  `REWORK`, а infrastructure error приводит к `FAILED`.
+- Baseline корректно отклонён новым SQL gate; реальный workspace-integrity gate прошёл и сохранил
+  content-addressed evidence. Secret и process-injection environment variables отфильтрованы.
+- `make check` — 234 tests, Ruff/format и Compose validation PASS. Следующий блок — связать MAF
+  tool loop, artifact assembly и validator в единый offline execution.

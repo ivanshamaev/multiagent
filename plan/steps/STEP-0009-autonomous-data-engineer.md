@@ -3,7 +3,7 @@
 Status: active
 Owner: primary agent
 Updated: 2026-09-11
-Current step: реализовать независимый deterministic validator и negative fixtures
+Current step: связать MAF executor с tool facade, artifact assembly и validator в один offline run
 
 ## Goal
 
@@ -69,6 +69,25 @@ weakening, stale workspace, дорогие repair loops и смешение agen
 
 Следующий незакрытый блок: validator с точным command allowlist, отдельным evidence producer,
 negative implementation fixtures и переходами `VALIDATING → VALIDATED|REWORK|FAILED`.
+
+## Work log — 2026-09-11, validator increment
+
+- Добавлен независимый public SQL contract вне agent workspace: physical table, семь обязательных
+  columns, non-Nullable schema, unique grain, metric identity и signed `net_revenue_cents`. Exact
+  expected rows остаются только в unchanged hidden grader.
+- Validator выполняет четыре code-owned gates без shell: workspace integrity, full scenario dbt
+  build/test, independent SQL и repository policy/adversarial tests. Команду нельзя подменить;
+  subprocess получает минимальное окружение без `API_TOKEN`, `LLM_*`, `PYTHONPATH` и `MAKEFLAGS`.
+- Output ограничен 2 MB и сохраняется content-addressed. Candidate failure даёт `FAIL → REWORK`,
+  повторный fail при исчерпанном лимите — terminal `FAILED`; timeout/process/output failure даёт
+  `ERROR → FAILED` без расходования rework attempt.
+- `make scenario-contract-test` на baseline ожидаемо отклонён до agent run: outer exit `2`, причина
+  — отсутствие physical `analytics.fct_net_revenue`. SQLGlot разобрал все 7 statements.
+- Реальный integrity gate — exit `0`, evidence SHA-256 `899c4684…`. Целевые validator/policy tests:
+  `46 passed`; полный `make check && git diff --check` — exit `0`, `234 passed`, Compose valid.
+
+Критерий validator остаётся открытым до positive candidate run. Следующий блок — единый MAF
+executor, затем один минимальный live run выбранной cost-first моделью.
 
 ## Planned verification
 

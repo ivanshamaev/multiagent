@@ -37,7 +37,7 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	dbt-parse dbt-compile dbt-build dbt-test airflow-version airflow-init \
 	airflow-image airflow-up airflow-validate airflow-test airflow-failure-test \
 	scenario-init scenario-reset scenario-status scenario-verify scenario-fingerprint \
-	scenario-baseline-build scenario-run scenario-grader-image scenario-grade \
+	scenario-baseline-build scenario-run scenario-contract-test scenario-grader-image scenario-grade \
 	scenario-grade-baseline-test scenario-repro-test scenario-test llm-catalog llm-smoke \
 	mcp-images mcp-users mcp-smoke
 
@@ -183,6 +183,9 @@ scenario-reset: scenario-init
 scenario-run: scenario-verify clickhouse-up dbt-image
 	DBT_PROJECT_PATH="$(SCENARIO_DBT_PROJECT)" $(DBT) build --full-refresh --fail-fast
 	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/001_smoke.sql
+
+scenario-contract-test: scenario-verify clickhouse-up
+	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/004_net_revenue_contract.sql
 
 scenario-grader-image:
 	$(COMPOSE) build scenario-grader
