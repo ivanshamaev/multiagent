@@ -24,7 +24,7 @@
 ## Текущий статус
 
 - Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0007`](steps/STEP-0007-local-agent-runtime.md); persistent gate transcripts сохранены в `evidence/`.
-- Активный шаг: [`STEP-0008`](steps/STEP-0008-tool-policy-layer.md) — MCP tools и deny-by-default policy.
+- Активный шаг: [`STEP-0009`](steps/STEP-0009-autonomous-data-engineer.md) — autonomous Data Engineer milestone.
 - Текущая фаза: Phase E — Tool and Policy Layer.
 - Ближайшая продуктовая цель: дать Data Engineer role проверяемые dbt/workspace и read-only
   ClickHouse tools без grader, shell или production access.

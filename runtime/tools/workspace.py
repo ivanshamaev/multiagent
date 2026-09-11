@@ -13,14 +13,10 @@ from hashlib import sha256
 from pathlib import Path, PurePosixPath
 
 from contracts import (
-    ArtifactReference,
-    ToolCallEvidence,
-    ToolCallStatus,
     ToolRequest,
     ToolResult,
     WorkspaceReadCall,
     WorkspaceWriteCall,
-    tool_arguments_sha256,
 )
 from policies import (
     CapabilityProfile,
@@ -30,6 +26,7 @@ from policies import (
     authorize_tool_call,
 )
 from runtime.scenario_harness import HarnessError, ScenarioManifest, verify_workspace
+from runtime.tools.evidence_store import EvidenceStoreError, ToolEvidenceStore
 
 Clock = Callable[[], datetime]
 Timer = Callable[[], float]
@@ -288,84 +285,16 @@ class WorkspaceToolAdapter:
         duration_ms: int,
         workspace: Path,
     ) -> ToolResult:
-        output_hash = _sha256(output)
-        suffix = ".json" if content_type == "application/json" else ".txt"
-        state_root = workspace.parents[1]
-        evidence_directory = state_root / "evidence/tool-calls"
-        self._ensure_evidence_directory(state_root, evidence_directory)
-        artifact_path = evidence_directory / f"{output_hash}{suffix}"
-        self._retain_content(artifact_path, output)
-        relative_artifact = artifact_path.relative_to(self._repository).as_posix()
-        artifact = ArtifactReference(
-            path=relative_artifact,
-            sha256=output_hash,
-            media_type=content_type,
-            size_bytes=len(output),
-        )
-        evidence_id = (
-            f"tool-{sha256(f'{request.task_id}:{request.request_id}'.encode()).hexdigest()[:24]}"
-        )
-        evidence = ToolCallEvidence(
-            evidence_id=evidence_id,
-            request_id=request.request_id,
-            task_id=request.task_id,
-            producer_id="workspace-adapter",
-            tool=request.call.tool,
-            arguments_sha256=tool_arguments_sha256(request.call),
-            started_at=started_at,
-            completed_at=completed_at,
-            status=ToolCallStatus.SUCCESS,
-            exit_code=0,
-            duration_ms=duration_ms,
-            output_bytes=len(output),
-            output=artifact,
-        )
-        return ToolResult(
-            request_id=request.request_id,
-            task_id=request.task_id,
-            tool=request.call.tool,
-            content=output.decode("utf-8"),
-            content_type=content_type,
-            size_bytes=len(output),
-            sha256=output_hash,
-            evidence=evidence,
-        )
-
-    def _ensure_evidence_directory(self, state_root: Path, target: Path) -> None:
-        current = state_root
-        for part in target.relative_to(state_root).parts:
-            current /= part
-            if current.is_symlink():
-                raise WorkspaceBoundaryError("evidence path contains a symlink")
-            try:
-                current.mkdir(mode=0o700)
-            except FileExistsError:
-                pass
-            except OSError as error:
-                raise WorkspaceBoundaryError(
-                    f"evidence directory cannot be created: {type(error).__name__}"
-                ) from None
-            if not current.is_dir() or current.is_symlink():
-                raise WorkspaceBoundaryError("evidence path is not a real directory")
-
-    def _retain_content(self, target: Path, contents: bytes) -> None:
-        if target.exists() or target.is_symlink():
-            if target.is_symlink() or not target.is_file() or target.read_bytes() != contents:
-                raise WorkspaceBoundaryError("content-addressed evidence path is inconsistent")
-            return
-        descriptor, temporary_text = tempfile.mkstemp(prefix=".evidence-", dir=target.parent)
-        temporary = Path(temporary_text)
         try:
-            with os.fdopen(descriptor, "wb") as stream:
-                stream.write(contents)
-                stream.flush()
-                os.fsync(stream.fileno())
-                os.fchmod(stream.fileno(), 0o600)
-            try:
-                os.link(temporary, target, follow_symlinks=False)
-            except FileExistsError:
-                if target.is_symlink() or not target.is_file() or target.read_bytes() != contents:
-                    raise WorkspaceBoundaryError("content-addressed evidence path raced") from None
-        finally:
-            if temporary.exists():
-                temporary.unlink()
+            store = ToolEvidenceStore(self._repository, workspace.parents[1])
+            return store.success_result(
+                request,
+                output,
+                content_type,
+                producer_id="workspace-adapter",
+                started_at=started_at,
+                completed_at=completed_at,
+                duration_ms=duration_ms,
+            )
+        except EvidenceStoreError as error:
+            raise WorkspaceBoundaryError(str(error)) from None

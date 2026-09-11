@@ -1,13 +1,10 @@
-import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 def _service(compose: str, name: str, next_name: str) -> str:
-    return compose.split(f"  {name}:\n", maxsplit=1)[1].split(
-        f"  {next_name}:\n", maxsplit=1
-    )[0]
+    return compose.split(f"  {name}:\n", maxsplit=1)[1].split(f"  {next_name}:\n", maxsplit=1)[0]
 
 
 def test_mcp_services_are_stdio_only_hardened_and_egress_isolated() -> None:
@@ -22,9 +19,7 @@ def test_mcp_services_are_stdio_only_hardened_and_egress_isolated() -> None:
     assert 'CLICKHOUSE_MCP_MAX_WORKERS: "1"' in clickhouse
     assert 'CLICKHOUSE_MCP_QUERY_TIMEOUT: "15"' in clickhouse
     assert "DBT_MCP_ENABLE_TOOLS: " in dbt
-    assert (
-        "parse,compile,build,test,show,list,get_lineage_dev,get_node_details_dev" in dbt
-    )
+    assert "parse,compile,build,test,show,list,get_lineage_dev,get_node_details_dev" in dbt
     assert "${DBT_PROJECT_PATH:-./platform/dbt}:/workspace" in dbt
     for section in (clickhouse, dbt):
         assert "ports:" not in section
@@ -57,13 +52,11 @@ def test_dbt_mcp_image_is_hash_locked_with_exact_direct_versions() -> None:
         ("dbt-mcp", "2.2.1"),
         ("mcp", "1.26.0"),
     ):
-        assert re.search(rf"^{package}=={re.escape(version)} \\\\$", requirements, re.MULTILINE)
+        assert f"{package}=={version} \\\n" in requirements
 
 
 def test_clickhouse_bootstrap_resets_to_least_privilege_scopes() -> None:
-    sql = (ROOT / "platform/clickhouse/security/001_mcp_users.sql").read_text(
-        encoding="utf-8"
-    )
+    sql = (ROOT / "platform/clickhouse/security/001_mcp_users.sql").read_text(encoding="utf-8")
 
     assert "REVOKE ALL ON *.* FROM mcp_reader" in sql
     assert "GRANT SELECT ON raw.* TO mcp_reader" in sql

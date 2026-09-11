@@ -12,3 +12,9 @@ grader; [PRB-0013](PRB-0013-openai3-httpx2-import.md) фиксирует сме�
 проверкой и фиксирует измеренный PM model override.
 [`PRB-0017`](PRB-0017-fastmcp-update-egress.md) закрывает обнаруженный FastMCP update-check egress
 через disabled update check и отдельную internal-only MCP network.
+[`PRB-0018`](PRB-0018-dbt-mcp-schema-drift.md) синхронизирует локальные typed contracts с живыми
+схемами pinned dbt MCP и добавляет регрессионную проверку сериализации gateway.
+[`PRB-0019`](PRB-0019-docker-registry-dns.md) документирует восстановленный отказ
+системного/VPN DNS, временно блокировавший повторную загрузку platform images.
+[`PRB-0020`](PRB-0020-scenario-repro-false-green.md) исправляет ложный green reproducibility gate,
+который ранее проглатывал ошибку `scenario-reset` и сравнивал две пустые строки.

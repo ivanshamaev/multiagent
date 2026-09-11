@@ -123,7 +123,6 @@ class DbtParseCall(FrozenModel):
 
 
 class DbtSelectionCall(FrozenModel):
-    tool: Literal[ToolName.DBT_COMPILE, ToolName.DBT_BUILD, ToolName.DBT_TEST]
     node_selection: str | None = Field(default=None, min_length=1, max_length=512)
     yml_selector: Identifier | None = None
 
@@ -131,6 +130,24 @@ class DbtSelectionCall(FrozenModel):
     @classmethod
     def safe_node_selection(cls, value: str | None) -> str | None:
         return None if value is None else _safe_dbt_selector(value.strip())
+
+    @model_validator(mode="after")
+    def selectors_are_mutually_exclusive(self) -> Self:
+        if self.node_selection is not None and self.yml_selector is not None:
+            raise ValueError("node_selection and yml_selector are mutually exclusive")
+        return self
+
+
+class DbtCompileCall(DbtSelectionCall):
+    tool: Literal[ToolName.DBT_COMPILE] = ToolName.DBT_COMPILE
+
+
+class DbtBuildCall(DbtSelectionCall):
+    tool: Literal[ToolName.DBT_BUILD] = ToolName.DBT_BUILD
+
+
+class DbtTestCall(DbtSelectionCall):
+    tool: Literal[ToolName.DBT_TEST] = ToolName.DBT_TEST
 
 
 class DbtShowCall(FrozenModel):
@@ -143,19 +160,26 @@ class DbtListCall(FrozenModel):
     tool: Literal[ToolName.DBT_LIST] = ToolName.DBT_LIST
     node_selection: str | None = Field(default=None, min_length=1, max_length=512)
     yml_selector: Identifier | None = None
-    resource_type: DbtResourceType | None = None
+    resource_type: Annotated[tuple[DbtResourceType, ...], Field(max_length=5)] = ()
 
     @field_validator("node_selection")
     @classmethod
     def safe_node_selection(cls, value: str | None) -> str | None:
         return None if value is None else _safe_dbt_selector(value.strip())
 
+    @model_validator(mode="after")
+    def validate_list_filters(self) -> Self:
+        if self.node_selection is not None and self.yml_selector is not None:
+            raise ValueError("node_selection and yml_selector are mutually exclusive")
+        if len(self.resource_type) != len(set(self.resource_type)):
+            raise ValueError("resource_type must not contain duplicates")
+        return self
+
 
 class DbtGetLineageCall(FrozenModel):
     tool: Literal[ToolName.DBT_GET_LINEAGE_DEV] = ToolName.DBT_GET_LINEAGE_DEV
     unique_id: Identifier
-    upstream_depth: StrictInt = Field(default=1, ge=0, le=5)
-    downstream_depth: StrictInt = Field(default=1, ge=0, le=5)
+    depth: StrictInt = Field(default=1, ge=0, le=5)
 
 
 class DbtGetNodeDetailsCall(FrozenModel):
@@ -170,7 +194,9 @@ ToolCall = Annotated[
     | ClickHouseListTablesCall
     | ClickHouseRunQueryCall
     | DbtParseCall
-    | DbtSelectionCall
+    | DbtCompileCall
+    | DbtBuildCall
+    | DbtTestCall
     | DbtShowCall
     | DbtListCall
     | DbtGetLineageCall

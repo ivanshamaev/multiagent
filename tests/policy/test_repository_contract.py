@@ -162,3 +162,9 @@ def test_real_environment_file_is_ignored() -> None:
     assert ".env" in ignored_patterns
     assert ".user.yml" in ignored_patterns
     assert not (ROOT / "platform/dbt/.user.yml").exists()
+
+
+def test_scenario_repro_gate_fails_when_a_reset_fails() -> None:
+    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
+
+    assert 'scenario-repro-test:\n\t@set -e; \\\n\tfirst="$$( \\' in makefile

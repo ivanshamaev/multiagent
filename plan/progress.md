@@ -87,3 +87,16 @@
   `make platform-test` — Airflow/Cosmos 11/11, dbt 68/68 и SQL PASS.
 - Evidence: `plan/evidence/STEP-0007-local-agent-runtime.md`. Следующий активный шаг:
   `STEP-0008-tool-policy-layer.md`.
+
+## 2026-09-11 — STEP-0008 завершён
+
+- Официальные ClickHouse/dbt MCP изолированы в pinned stdio containers; ClickHouse identity имеет
+  только SELECT на `raw.*`/`analytics.*`, а dbt работает только с verified scenario project.
+- Typed contracts, SQLGlot AST gate, capability profile, atomic workspace adapter, cumulative MCP
+  budgets и content-addressed evidence образуют deny-by-default boundary вне prompts.
+- MAF видит только локальный facade; invalid arguments и policy denial завершают loop через
+  `MiddlewareFailure`. Live smoke прошёл query + dbt compile/test и отклонил DDL до MCP.
+- После восстановления удалённых Docker images: Airflow/Cosmos 11/11, dbt 68/68, scenario и grader
+  воспроизведены; `make check` — 210 tests. PRB-0017–0020 сохраняют найденные проблемы и fixes.
+- Evidence: `plan/evidence/STEP-0008-tool-policy-layer.md`. Следующий planned шаг:
+  `STEP-0009-autonomous-data-engineer.md`.

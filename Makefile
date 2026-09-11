@@ -39,7 +39,7 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	scenario-init scenario-reset scenario-status scenario-verify scenario-fingerprint \
 	scenario-baseline-build scenario-run scenario-grader-image scenario-grade \
 	scenario-grade-baseline-test scenario-repro-test scenario-test llm-catalog llm-smoke \
-	mcp-images mcp-users
+	mcp-images mcp-users mcp-smoke
 
 bootstrap:
 	$(UV) sync --frozen
@@ -88,6 +88,11 @@ mcp-users: clickhouse-up
 		--param_mcp_reader_password "$$MCP_CLICKHOUSE_READER_PASSWORD" \
 		--param_dbt_agent_password "$$MCP_DBT_PASSWORD" \
 		--multiquery' < platform/clickhouse/security/001_mcp_users.sql
+
+mcp-smoke: mcp-images
+	$(MAKE) --no-print-directory scenario-reset SCENARIO="$(SCENARIO)"
+	$(MAKE) --no-print-directory mcp-users
+	$(UV) run python -m runtime.tool_smoke --scenario "$(SCENARIO)"
 
 dbt-image:
 	$(COMPOSE) build dbt
@@ -196,7 +201,8 @@ scenario-grade-baseline-test: scenario-verify clickhouse-up scenario-grader-imag
 		}
 
 scenario-repro-test:
-	@first="$$( \
+	@set -e; \
+	first="$$( \
 		$(MAKE) --no-print-directory -s scenario-reset SCENARIO="$(SCENARIO)" >/dev/null \
 		&& $(SCENARIO_HARNESS) fingerprint --scenario "$(SCENARIO)" \
 	)"; \

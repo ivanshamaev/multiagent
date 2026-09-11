@@ -101,6 +101,49 @@ def test_dbt_selector_rejects_option_and_shell_injection(selector: str) -> None:
         )
 
 
+def test_dbt_contracts_match_the_narrow_official_argument_shapes() -> None:
+    listed = ToolRequest(
+        request_id="request-list",
+        task_id="task-1",
+        actor_id="data-engineer-1",
+        role="data-engineer",
+        call={"tool": "dbt.list", "resource_type": ["model", "test"]},
+    )
+    lineage = ToolRequest(
+        request_id="request-lineage",
+        task_id="task-1",
+        actor_id="data-engineer-1",
+        role="data-engineer",
+        call={
+            "tool": "dbt.get_lineage_dev",
+            "unique_id": "model.ecommerce.fct_net_revenue",
+            "depth": 2,
+        },
+    )
+
+    assert listed.call.model_dump(mode="json", exclude={"tool"}) == {
+        "node_selection": None,
+        "yml_selector": None,
+        "resource_type": ["model", "test"],
+    }
+    assert lineage.call.model_dump(mode="json", exclude={"tool"}) == {
+        "unique_id": "model.ecommerce.fct_net_revenue",
+        "depth": 2,
+    }
+    with pytest.raises(ValidationError, match="mutually exclusive"):
+        ToolRequest(
+            request_id="request-selectors",
+            task_id="task-1",
+            actor_id="data-engineer-1",
+            role="data-engineer",
+            call={
+                "tool": "dbt.build",
+                "node_selection": "fct_net_revenue",
+                "yml_selector": "hourly_validation",
+            },
+        )
+
+
 def test_workspace_write_preserves_content_and_hashes_only_normalized_arguments() -> None:
     first = WorkspaceWriteCall(
         path="platform/dbt/models/example.sql",

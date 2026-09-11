@@ -53,10 +53,10 @@ def _request(call: dict[str, object], *, role: str = "data-engineer") -> ToolReq
         {"tool": "dbt.test", "yml_selector": "hourly_validation"},
         {
             "tool": "dbt.show",
-            "sql_query": "SELECT * FROM analytics.fct_net_revenue LIMIT 5",
+            "sql_query": "SELECT * FROM analytics.fct_net_revenue",
             "limit": 5,
         },
-        {"tool": "dbt.list", "resource_type": "model"},
+        {"tool": "dbt.list", "resource_type": ["model", "test"]},
         {"tool": "dbt.get_lineage_dev", "unique_id": "model.ecommerce.fct_net_revenue"},
         {"tool": "dbt.get_node_details_dev", "node_id": "model.ecommerce.fct_net_revenue"},
     ],
@@ -144,6 +144,23 @@ def test_sql_ast_gate_rejects_unsafe_or_unbounded_queries(
     decision = authorize_tool_call(
         profile,
         _request({"tool": "clickhouse.run_query", "query": query}),
+        ToolUsage(),
+    )
+
+    assert not decision.allowed
+    assert decision.code is PolicyCode.QUERY_DENIED
+
+
+def test_dbt_show_uses_only_its_separate_bounded_limit(profile: CapabilityProfile) -> None:
+    decision = authorize_tool_call(
+        profile,
+        _request(
+            {
+                "tool": "dbt.show",
+                "sql_query": "SELECT * FROM analytics.fct_net_revenue LIMIT 5",
+                "limit": 5,
+            }
+        ),
         ToolUsage(),
     )
 

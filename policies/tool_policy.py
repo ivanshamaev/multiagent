@@ -190,7 +190,12 @@ def _path_is_allowed(path: RelativePath, patterns: tuple[str, ...]) -> bool:
     return any(_glob_matches(path, pattern) for pattern in patterns)
 
 
-def _query_denial(query: str, profile: CapabilityProfile) -> str | None:
+def _query_denial(
+    query: str,
+    profile: CapabilityProfile,
+    *,
+    require_literal_limit: bool = True,
+) -> str | None:
     if len(query) > profile.max_query_chars:
         return "query exceeds the profile character limit"
     try:
@@ -206,15 +211,18 @@ def _query_denial(query: str, profile: CapabilityProfile) -> str | None:
         return "query SETTINGS are not allowed"
 
     limit = statement.args.get("limit")
-    if (
-        limit is None
-        or not isinstance(limit.expression, exp.Literal)
-        or not limit.expression.is_int
-    ):
-        return "a literal top-level LIMIT is required"
-    row_limit = int(limit.expression.this)
-    if row_limit < 1 or row_limit > profile.max_query_rows:
-        return "query LIMIT is outside the profile row bound"
+    if require_literal_limit:
+        if (
+            limit is None
+            or not isinstance(limit.expression, exp.Literal)
+            or not limit.expression.is_int
+        ):
+            return "a literal top-level LIMIT is required"
+        row_limit = int(limit.expression.this)
+        if row_limit < 1 or row_limit > profile.max_query_rows:
+            return "query LIMIT is outside the profile row bound"
+    elif limit is not None:
+        return "dbt show SQL must use the separately bounded limit argument"
 
     cte_names = {cte.alias_or_name.casefold() for cte in statement.find_all(exp.CTE)}
     for table in statement.find_all(exp.Table):
@@ -276,6 +284,10 @@ def authorize_tool_call(
     elif isinstance(call, DbtShowCall):
         if call.limit > profile.max_query_rows:
             return _deny(PolicyCode.QUERY_DENIED, "dbt show limit exceeds the profile row bound")
-        if reason := _query_denial(call.sql_query, profile):
+        if reason := _query_denial(
+            call.sql_query,
+            profile,
+            require_literal_limit=False,
+        ):
             return _deny(PolicyCode.QUERY_DENIED, reason)
     return ToolPolicyDecision(allowed=True, code=PolicyCode.ALLOWED, reason="allowed by profile")
