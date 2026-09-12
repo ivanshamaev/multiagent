@@ -36,7 +36,7 @@
   "budgets": {
     "wall_time_seconds": 1200,
     "tool_calls": 80,
-    "model_tokens": 30000,
+    "model_tokens": 42000,
     "rework_attempts": 2
   },
   "setup": {

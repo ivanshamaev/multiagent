@@ -25,12 +25,14 @@ from runtime.model_provider import (
 
 def test_live_metadata_is_deterministic_and_cost_uses_catalog_prices() -> None:
     first = _configuration_fingerprint(
+        budget_limits={"model_tokens": 42_000, "rework_attempts": 2},
         model_id="fake/cheap",
         profile_payload={"allowed_tools": ["workspace.read_file"]},
         scenario_id="net-revenue",
         scenario_version="1.0.0",
     )
     second = _configuration_fingerprint(
+        budget_limits={"model_tokens": 42_000, "rework_attempts": 2},
         model_id="fake/cheap",
         profile_payload={"allowed_tools": ["workspace.read_file"]},
         scenario_id="net-revenue",
@@ -39,6 +41,14 @@ def test_live_metadata_is_deterministic_and_cost_uses_catalog_prices() -> None:
 
     assert first == second
     assert len(first) == 64
+    changed_budget = _configuration_fingerprint(
+        budget_limits={"model_tokens": 30_000, "rework_attempts": 2},
+        model_id="fake/cheap",
+        profile_payload={"allowed_tools": ["workspace.read_file"]},
+        scenario_id="net-revenue",
+        scenario_version="1.0.0",
+    )
+    assert changed_budget != first
     assert _estimated_cost(1_000, 500, Decimal("5.1"), Decimal("33.6")) == "0.021900"
 
 

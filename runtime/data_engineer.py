@@ -44,22 +44,10 @@ DATA_ENGINEER_INSTRUCTIONS_PATH = (
     Path(__file__).resolve().parents[1] / "agents/data_engineer/instructions.md"
 )
 DATA_ENGINEER_CONTEXT_PATHS = (
-    ".scenario/manifest.json",
     "TASK.md",
     "platform/dbt/models/intermediate/int_order_payments.sql",
     "platform/dbt/models/intermediate/int_order_refunds.sql",
     "platform/dbt/models/marts/fct_orders.sql",
-    "platform/dbt/models/models.yml",
-    "platform/dbt/models/staging/sources.yml",
-)
-DATA_ENGINEER_CONTEXT_PATHS = (
-    ".scenario/manifest.json",
-    "TASK.md",
-    "platform/dbt/dbt_project.yml",
-    "platform/dbt/models/intermediate/int_order_payments.sql",
-    "platform/dbt/models/intermediate/int_order_refunds.sql",
-    "platform/dbt/models/marts/fct_orders.sql",
-    "platform/dbt/models/models.yml",
     "platform/dbt/models/staging/sources.yml",
 )
 
@@ -144,14 +132,22 @@ def data_engineer_system_prompt() -> str:
     return instructions
 
 
-def data_engineer_user_prompt(request: DataEngineerRunRequest) -> str:
-    """Render immutable spec separately from explicitly untrusted context."""
+def data_engineer_specification_prompt(request: DataEngineerRunRequest) -> str:
+    """Render the immutable specification without repeating workspace context."""
 
     specification = request.specification.specification.model_dump_json(exclude={"evidence"})
     return (
         "Implement this immutable human-authored specification. Use tools to inspect, edit, and "
         "self-check the disposable workspace. Return only the requested structured draft.\n"
-        f"<immutable_specification>{specification}</immutable_specification>\n"
+        f"<immutable_specification>{specification}</immutable_specification>"
+    )
+
+
+def data_engineer_user_prompt(request: DataEngineerRunRequest) -> str:
+    """Render immutable spec separately from explicitly untrusted context."""
+
+    return (
+        f"{data_engineer_specification_prompt(request)}\n"
         f'<untrusted_workspace_context fingerprint="{request.context.workspace_fingerprint}">\n'
         f"{request.context.as_prompt()}\n"
         "</untrusted_workspace_context>"

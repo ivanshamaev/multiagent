@@ -1,9 +1,9 @@
 # STEP-0009 — Autonomous Data Engineer milestone
 
-Status: active
+Status: complete
 Owner: primary agent
 Updated: 2026-09-12
-Current step: разделить live execution на bounded fresh-conversation phases
+Completed: 2026-09-12
 
 ## Goal
 
@@ -25,17 +25,17 @@ checkpoint database и изменение grader/oracle ради улучшен�
   acceptance checks; LLM не может менять её identity или критерии.
 - [x] Agent получает только verified scenario context и точный profile tool subset; workspace и MCP
   вызовы используют один cumulative tool/wall/output budget.
-- [ ] Изменения ограничены dbt models/tests, проходят atomic writes и не касаются main checkout,
+- [x] Изменения ограничены dbt models/tests, проходят atomic writes и не касаются main checkout,
   manifest, grader, runtime, policies или `.env`.
-- [ ] Deterministic validator независимо выполняет parse, compile, build, 68+ tests, repository
+- [x] Deterministic validator независимо выполняет parse, compile, build, 68+ tests, repository
   policy checks и SQL correctness; self-reported agent success не открывает transition.
-- [ ] `validation fail → bounded DE rework` работает через существующий reducer; исчерпание лимита
+- [x] `validation fail → bounded DE rework` работает через существующий reducer; исчерпание лимита
   даёт явный terminal failure без бесконечного LLM/tool retry.
-- [ ] Каждый run сохраняет config fingerprint, model/tool usage, latency, attempts, artifacts,
-  validator facts и hidden-grade outcome без prompts, raw secrets или grader internals.
-- [ ] Не менее 10 fresh runs измеряют task success, hidden pass rate, policy violations, retries,
+- [x] Каждый run сохраняет config fingerprint, model/tool usage, latency, attempts, artifacts и
+  validator facts; hidden outcomes агрегируются отдельно без prompts, raw secrets или grader internals.
+- [x] Не менее 10 fresh runs измеряют task success, hidden pass rate, policy violations, retries,
   latency, tokens и ₽ cost; модель выбирается cost-first по измеренной capability.
-- [ ] `make check`, platform/Cosmos, scenario reproducibility and unchanged baseline grader remain
+- [x] `make check`, platform/Cosmos, scenario reproducibility and unchanged baseline grader remain
   green; failing/malicious implementations покрыты regression tests.
 
 ## Risks and implementation sequence
@@ -159,3 +159,41 @@ executor, затем один минимальный live run выбранной
 Targeted unit/workflow/policy/adversarial tests; `make check`; `make mcp-smoke`;
 `make scenario-repro-test`; unchanged baseline grader; successful hidden grade only for agent output;
 `make platform-test`; secret/config scan; `git diff --check`.
+
+## Work log — 2026-09-12, GPT small-model evaluation
+
+- GateLLM catalog имеет категории CHAT/VISION/IMAGE_GENERATION, но не REASONING. Явно выбранные
+  VISION text routes теперь допускаются только через реальные schema/tool probes; автоматический
+  cost-first выбор остаётся CHAT-only. GPT-5.4 Nano и GPT-5.6 Luna прошли оба gate.
+- Nano корректно использовал tools и structured drafts, но несколько fresh candidates выявили
+  invalid singular-test syntax, 30k token pressure и semantic self-block. Эти failures не были
+  приняты control plane.
+- PRB-0031 закрыл потерю финальной dbt ошибки: repair получает bounded head+tail, root-cause target
+  и только соответствующий candidate file. Контекст фаз сокращён без повышения бюджета.
+- Fresh GPT-5.6 Luna run достиг `VALIDATED` без repair: 3 model calls, 3 tool calls, 17 370 tokens,
+  34 209 ms и 1.946100 ₽. Validator прошёл integrity/public build/independent SQL/policy; isolated
+  hidden grader прошёл boundary/read-only/schema/invariants/business correctness.
+- Во время прогона PRB-0032 локализовал corrupted `system.metric_log` part; удалена только system
+  telemetry part, volumes и business data сохранены. Следующий gate — 10-run reliability sample.
+
+## Work log — 2026-09-12, 10-run reliability sample
+
+- Fixed-configuration Luna sample завершён: public validator 8/10, hidden end-to-end 7/10. Пять
+  runs прошли без repair, три использовали один, два достигли второго repair; policy violations и
+  protected-path changes отсутствовали. Полная таблица: `plan/evidence/STEP-0009-reliability-sample.md`.
+- Для восьми public-pass runs median составил 17 330.5 tokens, 34 843 ms и 1.940130 ₽. Один
+  public-pass candidate был отклонён hidden business oracle; результат сохранён, grader не менялся.
+- PRB-0033 устранил противоречие budget policy: два разрешённых repair требуют до ~38k tokens,
+  поэтому bounded ceiling стал 42k. Future budget failure сохраняет usage/cost/hashes завершённых
+  calls вместо `null`. Следующий gate — post-fix live verification и полный repository/platform check.
+
+## Completion — 2026-09-12
+
+- Post-fix Luna run `3b0b2556cfdf` достиг `VALIDATED` после одного repair: 4 model/tool calls,
+  27 768 tokens, 40 699 ms и 2.756280 ₽. Все пять hidden-grader checks прошли.
+- Конфигурационный fingerprint включает prompts/instructions, model/profile, scenario, budgets,
+  phase protocol, output cap и retry count; изменение budget теперь меняет fingerprint.
+- `make check`, `make mcp-smoke`, `make scenario-repro-test`, `make platform-test`, secret scan и
+  `git diff --check` завершились с exit `0`. Итог: 252 pytest checks, Cosmos 11/11, dbt 68/68.
+- Итоговое evidence: `plan/evidence/STEP-0009-autonomous-data-engineer.md`. Следующий milestone —
+  Phase G, отдельный read-only QA Agent и измеряемый quality/rework loop.

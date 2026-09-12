@@ -168,7 +168,7 @@ Gate: каждая практическая глава ссылается на �
 
 ## 7. Текущая итерация
 
-`STEP-0001…0007` завершены: governance, golden ClickHouse/dbt/Airflow+Cosmos, reproducible scenario
-harness, contracts/workflow и controlled GateLLM/MAF PM runtime проверены; evidence сохранено в
-`plan/evidence/`. Активный `STEP-0008` строит typed MCP/tool boundary и deny-by-default profiles до
-того, как Data Engineer Agent получит возможность читать warehouse или менять dbt workspace.
+`STEP-0001…0009` завершены: governance, golden ClickHouse/dbt/Airflow+Cosmos, reproducible scenario
+harness, contracts/workflow, controlled GateLLM runtime, deny-by-default tools и autonomous Data
+Engineer milestone проверены; evidence сохранено в `plan/evidence/`. Следующая итерация — Phase G:
+read-only QA Agent, mutation fixtures и измеряемый `DE → QA → bounded rework` quality loop.

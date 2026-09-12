@@ -136,6 +136,12 @@ class ModelCatalogSnapshot(FrozenModel):
     catalog: ModelsResponse
 
 
+def _is_chat_candidate(model: AvailableModel, requested_model: str | None) -> bool:
+    """Treat an explicitly requested VISION model as chat-capable after live probes."""
+
+    return model.category == "CHAT" or (requested_model == model.id and model.category == "VISION")
+
+
 class ModelUsage(FrozenModel):
     input_tokens: NonNegativeInt = 0
     output_tokens: NonNegativeInt = 0
@@ -251,18 +257,19 @@ def select_cheapest_chat_model(
     minimum_context_length: int = 1,
     requested_model: str | None = None,
 ) -> AvailableModel:
-    """Select a capable CHAT model using a deterministic cost-first ordering."""
+    """Select a chat-capable model using a deterministic cost-first ordering."""
 
     candidates = tuple(
         model
         for model in snapshot.catalog.data
-        if model.category == "CHAT" and model.context_length >= minimum_context_length
+        if _is_chat_candidate(model, requested_model)
+        and model.context_length >= minimum_context_length
     )
     if requested_model is not None:
         candidates = tuple(model for model in candidates if model.id == requested_model)
         if not candidates:
             raise ModelCatalogError(
-                "requested model is absent or does not satisfy CHAT/context gates"
+                "requested model is absent or does not satisfy chat/context gates"
             )
     if not candidates:
         raise ModelCatalogError("catalog has no CHAT model satisfying the context gate")
@@ -277,7 +284,7 @@ async def select_cheapest_available_chat_model(
     requested_model: str | None = None,
     transport: httpx.AsyncBaseTransport | None = None,
 ) -> tuple[AvailableModel, tuple[ModelCapabilityProbe, ...]]:
-    """Probe schema mode in cost order, or validate one configured CHAT model."""
+    """Probe schema mode in cost order, or validate one requested chat-capable model."""
 
     if isinstance(max_candidates, bool) or not 1 <= max_candidates <= 20:
         raise ModelCatalogError("max_candidates must be an integer between 1 and 20")
@@ -285,13 +292,14 @@ async def select_cheapest_available_chat_model(
         (
             model
             for model in snapshot.catalog.data
-            if model.category == "CHAT" and (requested_model is None or model.id == requested_model)
+            if _is_chat_candidate(model, requested_model)
+            and (requested_model is None or model.id == requested_model)
         ),
         key=lambda model: (model.pricing.cost_first_score, model.id),
     )[:max_candidates]
     if not candidates:
         qualifier = "requested " if requested_model is not None else ""
-        raise ModelCatalogError(f"catalog has no {qualifier}CHAT model to probe")
+        raise ModelCatalogError(f"catalog has no {qualifier}chat-capable model to probe")
     probes: list[ModelCapabilityProbe] = []
     try:
         async with httpx.AsyncClient(
@@ -484,7 +492,7 @@ async def select_cheapest_agent_model(
     tuple[ModelCapabilityProbe, ...],
     tuple[ModelCapabilityProbe, ...],
 ]:
-    """Select the cheapest CHAT model passing schema and tool-calling gates."""
+    """Select the cheapest chat-capable model passing schema and tool-calling gates."""
 
     if isinstance(max_candidates, bool) or not 1 <= max_candidates <= 20:
         raise ModelCatalogError("max_candidates must be an integer between 1 and 20")
@@ -492,12 +500,13 @@ async def select_cheapest_agent_model(
         (
             model
             for model in snapshot.catalog.data
-            if model.category == "CHAT" and (requested_model is None or model.id == requested_model)
+            if _is_chat_candidate(model, requested_model)
+            and (requested_model is None or model.id == requested_model)
         ),
         key=lambda model: (model.pricing.cost_first_score, model.id),
     )[:max_candidates]
     if not remaining:
-        raise ModelCatalogError("catalog has no requested CHAT model to probe")
+        raise ModelCatalogError("catalog has no requested chat-capable model to probe")
     schema_probes: list[ModelCapabilityProbe] = []
     tool_probes: list[ModelCapabilityProbe] = []
     while remaining:
@@ -508,6 +517,7 @@ async def select_cheapest_agent_model(
             settings,
             narrowed,
             max_candidates=len(remaining),
+            requested_model=requested_model,
             transport=transport,
         )
         schema_probes.extend(current_schema_probes)
@@ -523,7 +533,7 @@ async def select_cheapest_agent_model(
         if requested_model is not None:
             break
     outcomes = ",".join(f"{probe.model_id}=HTTP{probe.status_code}" for probe in tool_probes)
-    raise ModelCatalogError(f"no schema-capable CHAT model passed the tool gate; probes={outcomes}")
+    raise ModelCatalogError(f"no schema-capable chat model passed the tool gate; probes={outcomes}")
 
 
 class MAFModelProvider:

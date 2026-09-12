@@ -1,6 +1,6 @@
 # EXP-0002 — Autonomous Data Engineer live capability gates
 
-Status: active
+Status: complete
 
 Date: 2026-09-12
 
@@ -30,10 +30,24 @@ were not retained.
   `TASK.md` read. Provider schema mode on the final tool-history request caused HTTP 400 and was
   removed while preserving local Pydantic validation. The next exact-one-read attempt reached that
   final boundary but stopped on HTTP 429, so no blind retry was made.
+- The live catalog contained `CHAT`, `VISION`, and `IMAGE_GENERATION`, but no separate reasoning
+  category. Explicitly requested VISION routes were admitted only after schema and tool probes;
+  automatic cost-first selection remained CHAT-only. GPT-5.4 Nano and GPT-5.6 Luna passed both
+  gates. DeepSeek V4 Flash and several cheaper reasoning routes returned HTTP 200 but failed the
+  strict schema gate.
+- GPT-5.4 Nano attempts exposed a singular-test semicolon defect, repeated-context token pressure,
+  and one self-blocked semantically invalid candidate. Safe run records measured up to 29 455
+  tokens and `2.413050` ₽ without accepting a false success.
+- After bounded head+tail validator feedback, target-aware repair routing, and phase-specific
+  context reduction, GPT-5.6 Luna completed a fresh candidate without repair: 17 370 tokens,
+  `1.946100` ₽, 34 209 ms model latency, 3 model calls, and 3 tool calls. All four independent
+  validator gates and all five isolated hidden-grader checks passed.
 
 ## Conclusion and follow-up
 
 Schema, tool, policy, and full-dialogue reliability are distinct gates. The hypothesis is rejected
-for a monolithic conversation on the current cheapest capable route. Fresh-conversation phases now
-pass offline integration with cumulative evidence/usage. Resume the live candidate after rate-limit
-recovery and only afterward begin the planned 10-run reliability sample.
+for a monolithic conversation and for Llama 3.1 8B as the current DE route. GPT-5.6 Luna is the
+selected cost-effective DE model; GPT-5.4 Nano remains a compatible but less reliable fallback.
+The fixed sample produced 8/10 public and 7/10 end-to-end hidden passes. After raising the
+internally inconsistent 30k ceiling to 42k, a post-fix run passed public and hidden gates after one
+repair. Full measurements are retained in `plan/evidence/STEP-0009-reliability-sample.md`.

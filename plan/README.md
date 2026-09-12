@@ -23,9 +23,8 @@
 
 ## Текущий статус
 
-- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0007`](steps/STEP-0007-local-agent-runtime.md); persistent gate transcripts сохранены в `evidence/`.
-- Активный шаг: [`STEP-0009`](steps/STEP-0009-autonomous-data-engineer.md) — autonomous Data Engineer milestone.
-- Текущая фаза: Phase E — Tool and Policy Layer.
-- Ближайшая продуктовая цель: дать Data Engineer role проверяемые dbt/workspace и read-only
-  ClickHouse tools без grader, shell или production access.
-- Ближайший исследовательский milestone: один Data Engineer Agent реализует Net Revenue и проходит независимый hidden grader.
+- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0009`](steps/STEP-0009-autonomous-data-engineer.md); persistent gate summaries сохранены в `evidence/`.
+- Текущая фаза: Phase F завершена — autonomous Data Engineer реализует Net Revenue через bounded
+  phases и проходит independent validator и hidden grader.
+- Следующий milestone: Phase G — read-only QA Agent, доказанный defect и ограниченный
+  `QA FAIL → DE REWORK → QA PASS` quality loop на наборе намеренно ошибочных реализаций.

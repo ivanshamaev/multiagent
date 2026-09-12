@@ -167,3 +167,26 @@
 - Успешные schema/tool probes кешируются на час только при неизменном полном catalog fingerprint;
   cache имеет mode 0600 и сокращает repeat run на два provider requests. Последний uncached run
   создал cache, но был остановлен внешним HTTP 429; workspace остался baseline-clean.
+
+## 2026-09-12 — STEP-0009 в работе: первый live validated candidate
+
+- GPT-5.4 Nano и GPT-5.6 Luna прошли live schema/tool gates; дешёвые DeepSeek/Poolside/Nemotron
+  candidates не прошли строгую schema boundary. Явный VISION route поддержан без расширения
+  автоматического CHAT-only выбора.
+- Phase-specific context и bounded validator head+tail устранили token overflow и потерю root cause.
+  Regression suite — 12 tests. PRB-0031 фиксирует defect и repair routing.
+- Fresh GPT-5.6 Luna run: 3 calls/tools, 17 370 tokens, 34 209 ms, 1.946100 ₽; все public validator
+  gates и isolated hidden grader PASS. Модель provisional до завершения 10-run sample.
+- Повреждённая часть только `system.metric_log` точечно удалена после ClickHouse checksum failure;
+  volumes/raw/analytics сохранены, baseline снова green (PRB-0032).
+
+## 2026-09-12 — STEP-0009 завершён
+
+- Fixed Luna sample дал 8/10 public и 7/10 end-to-end hidden passes без policy violations или
+  protected-path changes; median успешных public runs — 17 330.5 tokens, 34 843 ms и 1.940130 ₽.
+- Два разрешённых repair приведены в соответствие с bounded budget: ceiling 42k. Post-fix run
+  `3b0b2556cfdf` прошёл public validator и все пять hidden checks после одного repair.
+- Финальные gates: `make check` — 252 tests; MCP smoke PASS с ожидаемым DDL denial; scenario
+  reproducibility PASS; Airflow/Cosmos 11/11, dbt 68/68 и platform SQL PASS; secret/diff scans PASS.
+- Evidence: `plan/evidence/STEP-0009-autonomous-data-engineer.md`. Следующий milestone — Phase G,
+  QA Agent и mutation-driven quality loop.

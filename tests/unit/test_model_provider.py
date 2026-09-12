@@ -116,6 +116,23 @@ def test_catalog_fetch_authenticates_and_selects_deterministically() -> None:
     )
 
 
+def test_explicit_vision_model_is_probe_eligible_but_not_auto_selected() -> None:
+    payload = catalog_payload()
+    requested = next(model for model in payload["data"] if model["id"] == "model/expensive")
+    requested["category"] = "VISION"
+    requested["pricing"] = {"prompt": 0, "completion": 0}
+    snapshot = ModelCatalogSnapshot(
+        retrieved_at=datetime(2026, 9, 6, tzinfo=UTC),
+        catalog=ModelsResponse.model_validate(payload),
+    )
+
+    assert select_cheapest_chat_model(snapshot).id == "model/cheap-a"
+    assert (
+        select_cheapest_chat_model(snapshot, requested_model="model/expensive").id
+        == "model/expensive"
+    )
+
+
 def test_catalog_rejects_http_and_schema_failures_without_leaking_token() -> None:
     for response in (
         httpx.Response(401, json={"error": "unauthorized"}),

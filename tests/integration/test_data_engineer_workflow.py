@@ -9,6 +9,8 @@ from policies import load_capability_profile
 from runtime.data_engineer import prepare_data_engineer_request
 from runtime.data_engineer_workflow import (
     AutonomousExecutionError,
+    _bounded_validator_excerpt,
+    _repair_target,
     build_data_engineer_workflow,
     build_phased_data_engineer_workflow,
 )
@@ -25,6 +27,26 @@ from runtime.validator import ValidationGate, ValidationGateOutcome, validation_
 
 REPOSITORY = Path(__file__).resolve().parents[2]
 PROFILE = REPOSITORY / "policies/profiles/data_engineer_v1.json"
+
+
+def test_validator_feedback_preserves_failure_tail_and_selects_repair_target() -> None:
+    feedback = _bounded_validator_excerpt(
+        b"command start\n"
+        + b"routine output\n" * 2_000
+        + b"Database Error in test assert_fct_net_revenue_contract\nsyntax error\n"
+    )
+
+    assert feedback.startswith("command start")
+    assert "VALIDATOR OUTPUT MIDDLE OMITTED" in feedback
+    assert feedback.endswith("syntax error\n")
+    assert _repair_target(feedback) == ("platform/dbt/tests/assert_fct_net_revenue_contract.sql")
+    assert _repair_target("Failure in model fct_net_revenue") == (
+        "platform/dbt/models/marts/fct_net_revenue.sql"
+    )
+    assert (
+        _repair_target("Failure in test assert_fct_net_revenue_contract\nGot 2 results")
+        == "platform/dbt/models/marts/fct_net_revenue.sql"
+    )
 
 
 class _UnusedMCP:

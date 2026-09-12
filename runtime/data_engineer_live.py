@@ -39,10 +39,19 @@ from runtime.tools import connect_data_engineer_tools
 
 
 def _configuration_fingerprint(
-    *, model_id: str, profile_payload: dict[str, object], scenario_id: str, scenario_version: str
+    *,
+    budget_limits: dict[str, object],
+    model_id: str,
+    profile_payload: dict[str, object],
+    scenario_id: str,
+    scenario_version: str,
 ) -> str:
     payload = {
+        "budget_limits": budget_limits,
+        "execution_protocol": "phased-data-engineer-v3",
         "instructions_sha256": sha256(data_engineer_system_prompt().encode()).hexdigest(),
+        "max_output_tokens": 2_048,
+        "max_provider_retries": 1,
         "model_id": model_id,
         "profile": profile_payload,
         "scenario_id": scenario_id,
@@ -267,6 +276,7 @@ async def run_live(scenario_id: str, *, requested_model: str | None) -> dict[str
                 "completed_at": datetime.now(UTC).isoformat(),
                 "capability_cache_hit": capability_cache_hit,
                 "configuration_fingerprint": _configuration_fingerprint(
+                    budget_limits=request.budget_limits.model_dump(mode="json"),
                     model_id=selected.id,
                     profile_payload=profile.model_dump(mode="json"),
                     scenario_id=scenario_id,
@@ -287,6 +297,7 @@ async def run_live(scenario_id: str, *, requested_model: str | None) -> dict[str
                 "model_response_sha256": response_fingerprint,
                 "scenario_id": scenario_id,
                 "started_at": timestamp.isoformat(),
+                "status": "FAIL",
                 "tool_calls": [
                     {
                         "duration_ms": item.duration_ms,
@@ -332,6 +343,7 @@ async def run_live(scenario_id: str, *, requested_model: str | None) -> dict[str
                 "completed_at": datetime.now(UTC).isoformat(),
                 "capability_cache_hit": capability_cache_hit,
                 "configuration_fingerprint": _configuration_fingerprint(
+                    budget_limits=request.budget_limits.model_dump(mode="json"),
                     model_id=selected.id,
                     profile_payload=profile.model_dump(mode="json"),
                     scenario_id=scenario_id,
@@ -348,6 +360,7 @@ async def run_live(scenario_id: str, *, requested_model: str | None) -> dict[str
                 "model_response_sha256": failed_response_hash,
                 "scenario_id": scenario_id,
                 "started_at": timestamp.isoformat(),
+                "status": "FAIL",
                 "tool_calls": [
                     {
                         "duration_ms": item.duration_ms,
@@ -380,6 +393,7 @@ async def run_live(scenario_id: str, *, requested_model: str | None) -> dict[str
         "completed_at": datetime.now(UTC).isoformat(),
         "capability_cache_hit": capability_cache_hit,
         "configuration_fingerprint": _configuration_fingerprint(
+            budget_limits=request.budget_limits.model_dump(mode="json"),
             model_id=selected.id,
             profile_payload=profile.model_dump(mode="json"),
             scenario_id=scenario_id,
@@ -422,6 +436,7 @@ async def run_live(scenario_id: str, *, requested_model: str | None) -> dict[str
         ],
         "scenario_id": scenario_id,
         "started_at": timestamp.isoformat(),
+        "status": "PASS" if result.state.stage.value == "validated" else "FAIL",
         "tool_calls": [
             {
                 "duration_ms": item.duration_ms,
