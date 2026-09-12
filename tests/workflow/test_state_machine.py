@@ -345,3 +345,22 @@ def test_qa_failure_cannot_exceed_shared_rework_budget() -> None:
     assert result.stage is Stage.FAILED
     assert result.budgets.used.rework_attempts == 1
     assert result.terminal_reason == "rework budget exhausted: deterministic gate decision"
+
+
+def test_review_changes_cannot_exceed_shared_rework_budget() -> None:
+    state = workflow_state_at(Stage.REVIEW, rework_used=1, rework_limit=1)
+
+    result = apply_transition(
+        state,
+        _command(
+            "command-review-rework-exhausted",
+            Stage.REWORK,
+            14,
+            actor="reviewer",
+            artifact=review_report(decision=ReviewDecision.REQUEST_CHANGES),
+        ),
+    )
+
+    assert result.stage is Stage.FAILED
+    assert result.budgets.used.rework_attempts == 1
+    assert result.terminal_reason == "rework budget exhausted: deterministic gate decision"

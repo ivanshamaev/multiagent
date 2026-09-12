@@ -38,3 +38,5 @@ phase и сужает live budget после фактического пакет
 schema-valid JSON object из model decoration и отклоняет ambiguous output.
 [`PRB-0030`](PRB-0030-capability-probe-rate-amplification.md) добавляет catalog-bound TTL cache
 для успешных schema/tool probes и устраняет два лишних provider calls на каждый repeat run.
+[`PRB-0037`](PRB-0037-reviewer-canonical-false-rejection.md) сохраняет положительные observations
+между fresh Reviewer phases и фиксирует false rejection GPT-5.4 Nano без ослабления gates.

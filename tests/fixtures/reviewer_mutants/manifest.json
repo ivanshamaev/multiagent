@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "mutations": [
+    {
+      "id": "hardcoded-relation",
+      "target": "model",
+      "old": "from {{ source('raw', 'marketing_attribution') }}",
+      "new": "from raw.marketing_attribution",
+      "expected_finding": "raw relations must remain environment-portable through dbt source"
+    },
+    {
+      "id": "wildcard-dead-code",
+      "target": "model",
+      "old": "with deduplicated_attribution as (",
+      "new": "with unused_raw_snapshot as (\n    select * from {{ source('raw', 'orders') }} limit 1\n),\ndeduplicated_attribution as (",
+      "expected_finding": "wildcard and unused CTE add unjustified scan and maintenance risk"
+    },
+    {
+      "id": "nondeterministic-attribution",
+      "target": "model",
+      "old": "argMax(order_id, tuple(attributed_at, attribution_event_id)) as attributed_order_id",
+      "new": "argMax(order_id, attributed_at) as attributed_order_id",
+      "expected_finding": "attribution tie-breaking must be deterministic"
+    },
+    {
+      "id": "misleading-test-intent",
+      "target": "test",
+      "old": "-- qa-contract-test-v1",
+      "new": "-- qa-contract-test-v1\n-- Independently reconciles every raw payment and refund event.",
+      "expected_finding": "test comments must not claim source reconciliation absent from SQL"
+    }
+  ]
+}

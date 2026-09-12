@@ -153,6 +153,26 @@ def seed_mutation_candidate(
     """Install a fixture and enter IMPLEMENTED through ordinary artifact gates."""
 
     installed = install_qa_mutation(repository_root, scenario_id, mutation_id)
+    return seed_installed_candidate(
+        repository_root,
+        scenario_id,
+        installed,
+        workflow_id=workflow_id,
+        budget_limits=budget_limits,
+    )
+
+
+def seed_installed_candidate(
+    repository_root: Path,
+    scenario_id: str,
+    installed: InstalledMutation,
+    *,
+    workflow_id: str,
+    budget_limits: BudgetLimits | None = None,
+) -> MutationCandidateWorkflow:
+    """Enter IMPLEMENTED for an already installed content-addressed candidate."""
+
+    mutation_id = installed.mutation_id
     now = datetime.now(UTC)
     request = prepare_data_engineer_request(
         repository_root,

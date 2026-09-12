@@ -209,3 +209,22 @@
 - Финальные gates: `make check` 280 tests; MCP smoke, reproducibility, baseline grader,
   Airflow/Cosmos 11/11, dbt 68/68, canonical dbt 78/78, public SQL и hidden grader PASS.
 - Evidence: `plan/evidence/STEP-0010-qa-quality-loop.md`. Следующий шаг — read-only Reviewer gate.
+
+## 2026-09-12 — STEP-0011 начат
+
+- Создан план завершения Phase G: отдельная Reviewer identity, exact acceptance coverage,
+  read-only evidence, false-approval mutations и обязательный возврат через validator и QA.
+- ADR-0021 закрепил, что только code-owned `ReviewReport` и reducer могут открыть `DONE`;
+  Reviewer не совмещается с DE/QA и не получает write, execution или hidden grader access.
+
+## 2026-09-13 — STEP-0011 завершён
+
+- Reviewer реализован двумя fresh read-only phases с exact acceptance coverage и code-owned
+  evidence/identity/budget/transitions; invalid output и shared rework exhaustion закрываются.
+- Offline полный цикл доказывает `QA PASS → review fail → DE repair → validator → QA → review PASS`.
+- GPT-5.6 Luna одобрил canonical и отклонил 4/4 maintainability mutations: false approval 0/4.
+  GPT-5.4 Nano false-rejected canonical и исключён для этой роли по PRB-0037.
+- Финальные gates: `make check` 305 tests; MCP, reproducibility, baseline grader, Airflow/Cosmos
+  11/11, dbt 68/68, canonical 78/78, public SQL и hidden grader PASS.
+- Evidence: `plan/evidence/STEP-0011-reviewer-approval-gate.md`. Phase G завершена; следующий этап —
+  Phase H, read-only Analyst и requirements pipeline.

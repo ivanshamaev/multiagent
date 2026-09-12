@@ -108,8 +108,11 @@ QA запускается только после `VALIDATED` под отдел�
 protocol использует свежую фазу чтения кандидата и свежую фазу immutable code-owned SQL probe;
 каждая вызывает ровно один tool. QA не генерирует исполняемый probe SQL и не видит hidden grader.
 После QA FAIL только Data Engineer получает публичный accepted defect, а прежний validator PASS
-аннулируется: обязательны полный validator rerun и новый QA-сеанс. Opt-in команды — `make qa-live`
-и `make quality-loop-live`; они расходуют GateLLM budget и не входят в обычный `make check`.
+аннулируется: обязательны полный validator rerun и новый QA-сеанс. Reviewer начинает только из
+`QA_PASSED`, независимо читает model/test и один владеет переходом в `DONE`; его замечания ведут
+через полный повтор DE → validator → QA → Reviewer. Opt-in команды — `make qa-live`,
+`make reviewer-live` и `make quality-loop-live`; они расходуют GateLLM budget и не входят в
+обычный `make check`.
 
 Никогда не подключай production credentials и не выполняй production write/deploy. Исключение текущего local development — только `API_TOKEN` для явно разрешённого GateLLM gateway. Расширение file/network scope, secret access и необратимые действия требуют явного human approval. Не удаляй Docker volumes и не выполняй `docker system prune` без явного запроса.
 

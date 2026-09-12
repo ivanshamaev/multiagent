@@ -23,7 +23,7 @@
 
 ## Текущий статус
 
-- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0010`](steps/STEP-0010-qa-quality-loop.md); persistent gate summaries сохранены в `evidence/`.
-- Текущая фаза: первая половина Phase G завершена — read-only QA Agent обнаруживает semantic
-  defects и запускает ограниченный `QA FAIL → DE REWORK → validator → QA PASS`.
-- Следующий шаг: отдельный read-only Reviewer gate, approval separation и false-approval eval.
+- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0011`](steps/STEP-0011-reviewer-approval-gate.md); persistent gate summaries сохранены в `evidence/`.
+- Phase G завершена: QA и Reviewer разделены, bounded rework повторяет validator/QA/Reviewer, а
+  false pass/approval измерены на независимых мутациях.
+- Следующий этап: Phase H — read-only Analyst и requirements pipeline.

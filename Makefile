@@ -26,6 +26,8 @@ SCENARIO ?= net-revenue
 LLM_DEFAULT_MODEL ?= meta-llama/llama-3.1-8b-instruct
 QA_MODEL ?= openai/gpt-5.6-luna
 QA_MUTATION ?= canonical
+REVIEW_MODEL ?= openai/gpt-5.6-luna
+REVIEW_MUTATION ?= canonical
 export LLM_DEFAULT_MODEL
 SCENARIO_HARNESS = $(UV) run python -m runtime.scenario_harness
 SCENARIO_WORKSPACE = $(abspath .scenario-state/workspaces/$(SCENARIO))
@@ -41,7 +43,7 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	scenario-init scenario-reset scenario-status scenario-verify scenario-fingerprint \
 	scenario-baseline-build scenario-run scenario-contract-test scenario-grader-image scenario-grade \
 	scenario-grade-baseline-test scenario-repro-test scenario-test llm-catalog llm-smoke \
-	mcp-images mcp-users mcp-smoke data-engineer-live qa-live quality-loop-live
+	mcp-images mcp-users mcp-smoke data-engineer-live qa-live reviewer-live quality-loop-live
 
 bootstrap:
 	$(UV) sync --frozen
@@ -238,6 +240,10 @@ data-engineer-live: mcp-images
 qa-live: mcp-images
 	$(MAKE) --no-print-directory mcp-users
 	$(UV) run python -m runtime.qa_live --mutation "$(QA_MUTATION)" $(if $(QA_MODEL),--model "$(QA_MODEL)")
+
+reviewer-live: mcp-images
+	$(MAKE) --no-print-directory mcp-users
+	$(UV) run python -m runtime.reviewer_live --mutation "$(REVIEW_MUTATION)" $(if $(REVIEW_MODEL),--model "$(REVIEW_MODEL)")
 
 quality-loop-live: mcp-images
 	$(MAKE) --no-print-directory mcp-users
