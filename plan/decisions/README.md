@@ -22,3 +22,4 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0016](ADR-0016-isolated-official-mcp-servers.md) | Official MCP servers in isolated stdio processes behind local policy | accepted |
 | [ADR-0017](ADR-0017-clickhouse-query-ast-gate.md) | Strict SQL AST preflight as defense in depth | accepted |
 | [ADR-0018](ADR-0018-autonomous-de-control-plane-ownership.md) | Human spec, unified tool ledger and independent validator ownership | accepted |
+| [ADR-0019](ADR-0019-phased-agent-conversations.md) | Fresh least-privilege phases with cumulative evidence and usage | accepted |

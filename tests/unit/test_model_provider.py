@@ -14,8 +14,12 @@ from runtime.model_provider import (
     ModelCatalogError,
     ModelCatalogSnapshot,
     ModelInvocationError,
+    ModelOutputValidationError,
     ModelsResponse,
+    _validate_structured_text,
     fetch_model_catalog,
+    probe_model_tool_calling,
+    select_cheapest_agent_model,
     select_cheapest_available_chat_model,
     select_cheapest_chat_model,
 )
@@ -27,6 +31,18 @@ class SyntheticResult(BaseModel):
 
     task_id: str
     summary: str
+
+
+def test_structured_text_accepts_one_decorated_object_and_rejects_ambiguity() -> None:
+    decorated = 'Result:\n```json\n{"task_id":"TASK-001","summary":"done"}\n```'
+    parsed = _validate_structured_text(SyntheticResult, decorated)
+
+    assert parsed.summary == "done"
+    with pytest.raises(ValueError):
+        _validate_structured_text(
+            SyntheticResult,
+            ('{"task_id":"TASK-001","summary":"first"}\n{"task_id":"TASK-001","summary":"second"}'),
+        )
 
 
 def catalog_payload() -> dict:
@@ -169,6 +185,178 @@ def test_live_capability_gate_skips_unroutable_cheapest_model() -> None:
     assert probes[-1].usage.total_tokens == 7
 
 
+def test_live_capability_gate_skips_schema_invalid_200_and_records_usage() -> None:
+    attempts: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        model_id = json.loads(request.read())["model"]
+        attempts.append(model_id)
+        if model_id == "model/cheap-a":
+            return httpx.Response(
+                200,
+                json={
+                    "choices": [{"message": {"content": "not-json"}}],
+                    "usage": {"prompt_tokens": 6, "completion_tokens": 2, "total_tokens": 8},
+                },
+            )
+        return httpx.Response(
+            200,
+            json={
+                "choices": [{"message": {"content": '{"ok":true}'}}],
+                "usage": {"prompt_tokens": 6, "completion_tokens": 1, "total_tokens": 7},
+            },
+        )
+
+    snapshot = ModelCatalogSnapshot(
+        retrieved_at=datetime(2026, 9, 6, tzinfo=UTC),
+        catalog=ModelsResponse.model_validate(catalog_payload()),
+    )
+    selected, probes = asyncio.run(
+        select_cheapest_available_chat_model(
+            gate_settings(),
+            snapshot,
+            max_candidates=2,
+            transport=httpx.MockTransport(handler),
+        )
+    )
+
+    assert selected.id == "model/cheap-b"
+    assert attempts == ["model/cheap-a", "model/cheap-b"]
+    assert [probe.available for probe in probes] == [False, True]
+    assert probes[0].usage.total_tokens == 8
+
+
+def test_agent_model_selection_continues_after_tool_gate_failure() -> None:
+    attempts: list[tuple[str, str]] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.read())
+        model_id = payload["model"]
+        if "tools" not in payload:
+            attempts.append((model_id, "schema"))
+            return httpx.Response(
+                200,
+                json={
+                    "choices": [{"message": {"content": '{"ok":true}'}}],
+                    "usage": {"total_tokens": 2},
+                },
+            )
+        attempts.append((model_id, "tools"))
+        if model_id == "model/cheap-a":
+            return httpx.Response(404, json={"error": {"message": "tools unavailable"}})
+        return httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "message": {
+                            "tool_calls": [
+                                {
+                                    "function": {
+                                        "name": "ping",
+                                        "arguments": '{"value":"ok"}',
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "usage": {"total_tokens": 3},
+            },
+        )
+
+    snapshot = ModelCatalogSnapshot(
+        retrieved_at=datetime(2026, 9, 6, tzinfo=UTC),
+        catalog=ModelsResponse.model_validate(catalog_payload()),
+    )
+    selected, schema_probes, tool_probes = asyncio.run(
+        select_cheapest_agent_model(
+            gate_settings(),
+            snapshot,
+            transport=httpx.MockTransport(handler),
+        )
+    )
+
+    assert selected.id == "model/cheap-b"
+    assert attempts == [
+        ("model/cheap-a", "schema"),
+        ("model/cheap-a", "tools"),
+        ("model/cheap-b", "schema"),
+        ("model/cheap-b", "tools"),
+    ]
+    assert [probe.available for probe in schema_probes] == [True, True]
+    assert [probe.available for probe in tool_probes] == [False, True]
+
+
+def test_tool_capability_probe_requires_valid_forced_function_call() -> None:
+    def valid_handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.read())
+        assert payload["tool_choice"] == "required"
+        assert payload["max_tokens"] == 64
+        return httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "message": {
+                            "tool_calls": [
+                                {
+                                    "function": {
+                                        "name": "ping",
+                                        "arguments": '{"value":"ok"}',
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "usage": {"prompt_tokens": 9, "completion_tokens": 3, "total_tokens": 12},
+            },
+        )
+
+    valid = asyncio.run(
+        probe_model_tool_calling(
+            gate_settings(),
+            "model/cheap-a",
+            transport=httpx.MockTransport(valid_handler),
+        )
+    )
+    unavailable = asyncio.run(
+        probe_model_tool_calling(
+            gate_settings(),
+            "model/cheap-a",
+            transport=httpx.MockTransport(lambda request: httpx.Response(404)),
+        )
+    )
+    malformed = asyncio.run(
+        probe_model_tool_calling(
+            gate_settings(),
+            "model/cheap-a",
+            transport=httpx.MockTransport(
+                lambda request: httpx.Response(200, json={"choices": [{"message": {}}]})
+            ),
+        )
+    )
+
+    assert valid.available and valid.usage.total_tokens == 12
+    assert not unavailable.available and unavailable.status_code == 404
+    assert not malformed.available and malformed.status_code == 200
+
+
+def test_tool_capability_probe_aborts_on_account_or_transient_failure() -> None:
+    for status_code in (401, 402, 429, 500):
+        with pytest.raises(ModelCatalogError, match=str(status_code)):
+            asyncio.run(
+                probe_model_tool_calling(
+                    gate_settings(),
+                    "model/cheap-a",
+                    transport=httpx.MockTransport(
+                        lambda request, status_code=status_code: httpx.Response(status_code)
+                    ),
+                )
+            )
+
+
 def test_live_capability_gate_validates_configured_model_only() -> None:
     attempts: list[str] = []
 
@@ -290,7 +478,37 @@ def test_maf_provider_exposes_only_explicit_tools_for_bounded_generation() -> No
 
     assert invocation.value.summary == "done"
     assert [item.name for item in client.options["tools"]] == ["safe_read"]
+    assert "response_format" not in client.options
+    assert "matching this schema" in client.messages[0].text
     assert len(invocation.request_sha256) == 64
+
+
+def test_phased_provider_requires_one_initial_tool_without_provider_schema_mode() -> None:
+    @tool(name="safe_read", approval_mode="never_require")
+    async def safe_read(path: str) -> str:
+        return path
+
+    client = StaticChatClient('{"task_id":"TASK-001","summary":"done"}')
+    provider = MAFModelProvider(
+        gate_settings(),
+        client=client,
+        max_tool_iterations=1,
+        require_initial_tool_call=True,
+    )
+
+    asyncio.run(
+        provider.generate_with_tools(
+            SyntheticResult,
+            system_prompt="Use the tool, then return strict JSON.",
+            user_prompt="Inspect the task.",
+            tools=(safe_read,),
+        )
+    )
+
+    assert client.options["tool_choice"] == "required"
+    assert client.options["parallel_tool_calls"] is False
+    assert "response_format" not in client.options
+    assert "matching this schema" in client.messages[0].text
 
 
 @pytest.mark.parametrize(
@@ -313,7 +531,7 @@ def test_maf_provider_rejects_malformed_or_extra_structured_output() -> None:
         '{"task_id":"TASK-001","summary":"done","unexpected":true}',
     ):
         provider = MAFModelProvider(gate_settings(), client=StaticChatClient(payload))
-        with pytest.raises((ValidationError, ValueError)):
+        with pytest.raises(ModelOutputValidationError) as captured:
             asyncio.run(
                 provider.generate(
                     SyntheticResult,
@@ -321,6 +539,9 @@ def test_maf_provider_rejects_malformed_or_extra_structured_output() -> None:
                     user_prompt="Return the synthetic result.",
                 )
             )
+        assert captured.value.model_call.usage.total_tokens == 15
+        assert len(captured.value.model_call.response_sha256) == 64
+        assert payload not in str(captured.value)
 
 
 def test_openai_transport_retries_429_once_and_normalizes_response() -> None:
@@ -469,3 +690,15 @@ def test_provider_retries_timeout_within_bound_and_sanitizes_failure() -> None:
     assert calls == 2
     assert TEST_API_TOKEN not in str(captured.value)
     assert "APITimeoutError" in str(captured.value)
+
+
+def test_provider_allows_bounded_recovery_from_safe_tool_errors() -> None:
+    provider = MAFModelProvider(gate_settings(), model_id="fake/cheap-model")
+
+    assert provider._function_invocation_configuration == {
+        "max_iterations": 12,
+        "max_function_calls": 80,
+        "max_consecutive_errors_per_request": 3,
+        "terminate_on_unknown_calls": True,
+        "include_detailed_errors": True,
+    }

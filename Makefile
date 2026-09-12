@@ -39,7 +39,7 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	scenario-init scenario-reset scenario-status scenario-verify scenario-fingerprint \
 	scenario-baseline-build scenario-run scenario-contract-test scenario-grader-image scenario-grade \
 	scenario-grade-baseline-test scenario-repro-test scenario-test llm-catalog llm-smoke \
-	mcp-images mcp-users mcp-smoke
+	mcp-images mcp-users mcp-smoke data-engineer-live
 
 bootstrap:
 	$(UV) sync --frozen
@@ -227,3 +227,8 @@ llm-catalog:
 
 llm-smoke: scenario-verify
 	$(UV) run python -m runtime.live_smoke --scenario "$(SCENARIO)"
+
+data-engineer-live: mcp-images
+	$(MAKE) --no-print-directory scenario-reset SCENARIO="$(SCENARIO)"
+	$(MAKE) --no-print-directory mcp-users
+	$(UV) run python -m runtime.data_engineer_live --scenario "$(SCENARIO)" $(if $(DE_MODEL),--model "$(DE_MODEL)")

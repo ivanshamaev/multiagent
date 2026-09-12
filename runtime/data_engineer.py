@@ -24,6 +24,7 @@ from contracts import (
 from contracts.artifacts import RequiredTextTuple, TextTuple
 from contracts.common import FrozenModel, Identifier, NonEmptyText, UtcDateTime
 from orchestrator import (
+    BudgetCharge,
     BudgetLimits,
     Stage,
     TransitionCommand,
@@ -42,6 +43,25 @@ from runtime.specification import load_scenario_specification
 DATA_ENGINEER_INSTRUCTIONS_PATH = (
     Path(__file__).resolve().parents[1] / "agents/data_engineer/instructions.md"
 )
+DATA_ENGINEER_CONTEXT_PATHS = (
+    ".scenario/manifest.json",
+    "TASK.md",
+    "platform/dbt/models/intermediate/int_order_payments.sql",
+    "platform/dbt/models/intermediate/int_order_refunds.sql",
+    "platform/dbt/models/marts/fct_orders.sql",
+    "platform/dbt/models/models.yml",
+    "platform/dbt/models/staging/sources.yml",
+)
+DATA_ENGINEER_CONTEXT_PATHS = (
+    ".scenario/manifest.json",
+    "TASK.md",
+    "platform/dbt/dbt_project.yml",
+    "platform/dbt/models/intermediate/int_order_payments.sql",
+    "platform/dbt/models/intermediate/int_order_refunds.sql",
+    "platform/dbt/models/marts/fct_orders.sql",
+    "platform/dbt/models/models.yml",
+    "platform/dbt/models/staging/sources.yml",
+)
 
 
 class DataEngineerBoundaryError(RuntimeError):
@@ -57,6 +77,30 @@ class DataEngineerDraft(FrozenModel):
     status: ImplementationStatus
     summary: NonEmptyText
     semantic_risks: TextTuple = ()
+    known_issues: TextTuple = ()
+
+    @model_validator(mode="after")
+    def validate_outcome(self):
+        if self.status in {ImplementationStatus.BLOCKED, ImplementationStatus.FAILED}:
+            if not self.known_issues:
+                raise ValueError("blocked or failed draft requires known issues")
+        return self
+
+
+class DataEngineerInvestigationDraft(FrozenModel):
+    """Minimal untrusted output for the read-only investigation phase."""
+
+    relevant_sources: RequiredTextTuple
+    findings: RequiredTextTuple
+    recommended_approach: NonEmptyText
+    semantic_risks: TextTuple = ()
+
+
+class DataEngineerImplementationDraft(FrozenModel):
+    """Minimal untrusted output after one implementation or repair write."""
+
+    status: ImplementationStatus
+    summary: NonEmptyText
     known_issues: TextTuple = ()
 
     @model_validator(mode="after")
@@ -134,6 +178,7 @@ def prepare_data_engineer_request(
     context = build_scenario_context(
         repository_root,
         scenario_id,
+        relative_paths=DATA_ENGINEER_CONTEXT_PATHS,
         requested_state_root=requested_state_root,
     )
     return DataEngineerRunRequest(
@@ -340,3 +385,89 @@ def accept_data_engineer_draft(
     )
     verify_event_chain(events, expected_state=state)
     return analysis, implementation, state, events
+
+
+def accept_data_engineer_rework(
+    request: DataEngineerRunRequest,
+    state: WorkflowState,
+    events: tuple[WorkflowEvent, ...],
+    draft: DataEngineerDraft,
+    *,
+    tool_evidence: tuple[ToolCallEvidence, ...],
+    model_usage: ModelUsage,
+    model_latency_ms: int,
+    changed_files: tuple[str, ...],
+    completed_at: UtcDateTime,
+) -> tuple[ImplementationResult, WorkflowState, tuple[WorkflowEvent, ...]]:
+    """Accept one measured repair without recreating the original analysis artifact."""
+
+    if state.stage is not Stage.REWORK:
+        raise DataEngineerBoundaryError("Data Engineer repair requires rework state")
+    if any(item.task_id != state.task_id for item in tool_evidence):
+        raise DataEngineerBoundaryError("repair evidence belongs to another task")
+    measured = tuple(_domain_evidence(item) for item in tool_evidence)
+    if not measured or not any(
+        item.tool is ToolName.WORKSPACE_WRITE_FILE for item in tool_evidence
+    ):
+        raise DataEngineerBoundaryError("repair requires measured workspace write evidence")
+    normalized_changes = tuple(sorted(set(changed_files)))
+    effective_status = draft.status
+    known_issues = draft.known_issues
+    if effective_status is ImplementationStatus.COMPLETED and not normalized_changes:
+        effective_status = ImplementationStatus.FAILED
+        known_issues = (*known_issues, "control plane observed no changed dbt files")
+    implementation = ImplementationResult(
+        artifact_id=_identifier(
+            "implementation", request.workflow_id, str(state.revision), "rework"
+        ),
+        task_id=state.task_id,
+        producer_id=request.agent_id,
+        created_at=completed_at,
+        status=effective_status,
+        changed_files=normalized_changes,
+        summary=draft.summary,
+        known_issues=known_issues,
+        evidence=measured,
+    )
+    state, events = append_transition(
+        state,
+        TransitionCommand(
+            command_id=_identifier("cmd", request.workflow_id, str(state.revision), "rework-start"),
+            task_id=state.task_id,
+            actor_id=request.agent_id,
+            target_stage=Stage.IMPLEMENTING,
+            occurred_at=completed_at,
+        ),
+        events,
+    )
+    target = {
+        ImplementationStatus.COMPLETED: Stage.IMPLEMENTED,
+        ImplementationStatus.BLOCKED: Stage.BLOCKED,
+        ImplementationStatus.FAILED: Stage.FAILED,
+    }[implementation.status]
+    reason = None
+    if target in {Stage.BLOCKED, Stage.FAILED}:
+        reason = "; ".join(implementation.known_issues)
+    tool_duration_ms = sum(item.duration_ms for item in tool_evidence)
+    state, events = append_transition(
+        state,
+        TransitionCommand(
+            command_id=_identifier(
+                "cmd", request.workflow_id, str(state.revision), "rework-result"
+            ),
+            task_id=state.task_id,
+            actor_id=request.agent_id,
+            target_stage=target,
+            occurred_at=completed_at,
+            artifact=implementation,
+            charge=BudgetCharge(
+                tool_calls=len(tool_evidence),
+                model_tokens=model_usage.total_tokens,
+                wall_time_seconds=ceil(max(model_latency_ms, tool_duration_ms) / 1_000),
+            ),
+            reason=reason,
+        ),
+        events,
+    )
+    verify_event_chain(events, expected_state=state)
+    return implementation, state, events

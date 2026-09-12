@@ -2,8 +2,8 @@
 
 Status: active
 Owner: primary agent
-Updated: 2026-09-11
-Current step: связать MAF executor с tool facade, artifact assembly и validator в один offline run
+Updated: 2026-09-12
+Current step: разделить live execution на bounded fresh-conversation phases
 
 ## Goal
 
@@ -88,6 +88,71 @@ negative implementation fixtures и переходами `VALIDATING → VALIDAT
 
 Критерий validator остаётся открытым до positive candidate run. Следующий блок — единый MAF
 executor, затем один минимальный live run выбранной cost-first моделью.
+
+## Work log — 2026-09-12, offline end-to-end
+
+- MAF workflow связал frozen request, tool-enabled provider, unified gateway, workspace diff,
+  code-owned artifact assembly и independent validator. Validator запускается только после
+  reducer-accepted `IMPLEMENTED`; failed/blocked draft не может самостоятельно открыть validation.
+- Offline fake model через реальные MAF function tools прочитал `TASK.md` и атомарно записал model
+  только в disposable workspace. Два tool calls попали в общий ledger/evidence; main checkout и
+  official MCP процессы не затрагивались. Fake validator выполнил полный four-gate plan, итоговая
+  hash-chain достигла `VALIDATED`, после чего workspace был сброшен к baseline.
+- Первая попытка выявила PRB-0021: handler `execute` перекрыл framework dispatch method. Rename в
+  `run_attempt` и end-to-end regression test закрыли дефект; targeted suite — `35 passed`.
+
+Следующий gate: полный `make check`, затем opt-in live run с минимальным cost-first model budget.
+
+## Work log — 2026-09-12, live capability and failure taxonomy
+
+- Live runner получает актуальный GateLLM catalog, проверяет strict schema и forced tool calling,
+  запускает official ClickHouse/dbt MCP и сохраняет приватную redacted terminal run record.
+- Cost-first проверка разделила способности: Granite Micro принимает schema mode, но возвращает 404
+  для tools; Llama 3.1 8B прошла оба micro-gate. Prose-only результат Llama корректно отклонён с
+  measured usage `3821` tokens и стоимостью `0.058836` ₽ вместо ложного success.
+- Function errors получили bounded recovery (не более трёх подряд); provider/framework failure после
+  старта теперь всегда сохраняет tool metadata, а неизвестные usage/cost явно остаются `null`.
+- Реальные policy denials подтвердили allowlist `raw`/`analytics`. Следующий run выполнил успешные
+  `dbt.parse` и `dbt.compile`, после чего provider вернул HTTP 400.
+- Минимальный прямой `ping` воспроизвёл тот же предел независимо от MCP: два tool rounds успешны,
+  третий получает HTTP 400. Поиск следующей модели остановлен на HTTP 429 без обхода rate limit.
+- PRB-0022—0026 и EXP-0002 фиксируют результаты. Следующий implementation block — отдельные свежие
+  investigation/implementation conversations с единым code-owned budget/evidence, затем validator.
+- После инкремента `make check && git diff --check` завершились с exit `0`: Ruff/format, `243
+  passed` и Compose config valid.
+
+## Work log — 2026-09-12, phased conversation increment
+
+- Принят ADR-0019. Investigation, mart SQL и contract-test выполняются в трёх свежих диалогах с
+  одним общим gateway ledger. Каждая фаза получает ровно необходимый tool subset и обязана добавить
+  ровно один evidence record; usage/latency/hashes завершённых model calls агрегируются кодом.
+- Data Engineer context расширен существующими intermediate/mart/source SQL и models YAML, поэтому
+  implementation phases не требуют дополнительного history round. Offline vertical slice достиг
+  `VALIDATED`: 3 model calls, 3 tool calls, 2 изолированных changed files, 45 measured tokens.
+- Live run выявил parallel batch из 80 повторных calls (PRB-0027); `parallel_tool_calls=false` и
+  live limit 6 закрыли fan-out. Следующая попытка выполнила ровно один разрешённый read, но сочетание
+  tool history + provider schema mode дало 400 (PRB-0028); schema mode удалён только из tool phases,
+  closed local Pydantic validation сохранена.
+- После этого exact-one-read повтор дошёл до final boundary и остановился на HTTP 429. Новые платные
+  попытки остановлены до восстановления rate limit. Следующий gate — завершить phased live candidate,
+  затем independent validator/hidden grade и bounded rework.
+- Полный `make check && git diff --check` после phased increment — exit `0`: Ruff/format, `246
+  passed`, Compose config valid.
+
+## Work log — 2026-09-12, bounded rework and provider telemetry
+
+- Реализован полный `FAIL → REWORK → IMPLEMENTING → IMPLEMENTED → VALIDATING` loop. Repair получает
+  только content-addressed output публичного failing gate и текущие candidate SQL/test как явно
+  untrusted context, выполняет ровно один write и повторно проходит весь validator.
+- Offline regressions доказывают оба исхода: один repair достигает `VALIDATED`; три validation fail
+  расходуют ровно два разрешённых attempts и детерминированно завершаются `FAILED` без шестого model
+  call. Tool/model/wall usage каждого repair списываются reducer-ом отдельно.
+- Фазовые contracts разделены на минимальные investigation и implementation drafts. Invalid output
+  теперь сохраняет error codes, measured usage/cost/latency/hashes без raw response. Единственный
+  schema-valid JSON внутри model decoration принимается, ambiguous response отклоняется (PRB-0029).
+- Catalog-bound mode-0600 capability cache с TTL 1 час устранил два повторных probe calls на run;
+  любое изменение catalog/model/pricing или stale/malformed cache закрыто инвалидирует его
+  (PRB-0030). Первый run cache создал, но finalization всё ещё получил внешний HTTP 429.
 
 ## Planned verification
 

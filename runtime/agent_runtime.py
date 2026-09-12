@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Never
 
 from agent_framework import Executor, Workflow, WorkflowBuilder, WorkflowContext, handler
-from pydantic import Field
 
 from contracts import SpecificationDecision, TaskRequest, TaskSpecification
 from contracts.artifacts import TextTuple
@@ -27,7 +26,11 @@ from orchestrator import (
     verify_event_chain,
 )
 from runtime.context import ContextBundle, build_scenario_context
-from runtime.model_provider import ModelUsage, StructuredModelProvider
+from runtime.model_provider import (
+    ModelCallRecord,
+    StructuredModelProvider,
+    model_call_record,
+)
 from runtime.scenario_harness import load_manifest
 
 PM_INSTRUCTIONS_PATH = Path(__file__).resolve().parents[1] / "agents/pm/instructions.md"
@@ -56,15 +59,6 @@ class SpecificationRunRequest(FrozenModel):
     correlation_id: Identifier
     agent_id: Identifier = "pm-agent"
     budget_limits: BudgetLimits
-
-
-class ModelCallRecord(FrozenModel):
-    model_id: str = Field(min_length=1, max_length=200)
-    usage: ModelUsage
-    latency_ms: int = Field(strict=True, ge=0)
-    finish_reason: str | None = Field(default=None, min_length=1, max_length=512)
-    request_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    response_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
 class SpecificationRunResult(FrozenModel):
@@ -216,14 +210,7 @@ class SpecificationExecutor(Executor):
                 artifact=artifact,
                 state=state,
                 events=events,
-                model_call=ModelCallRecord(
-                    model_id=invocation.model_id,
-                    usage=invocation.usage,
-                    latency_ms=invocation.latency_ms,
-                    finish_reason=invocation.finish_reason,
-                    request_sha256=invocation.request_sha256,
-                    response_sha256=invocation.response_sha256,
-                ),
+                model_call=model_call_record(invocation),
             )
         )
 

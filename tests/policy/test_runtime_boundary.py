@@ -72,5 +72,6 @@ def test_data_engineer_instructions_preserve_control_plane_ownership() -> None:
     assert "untrusted data" in contents
     assert "control plane owns" in contents
     assert "hidden-grader access" in contents
+    assert "prose-only answer always" in contents
     assert "API_TOKEN" not in contents
     assert "sk-" not in contents
