@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "mutations": [
+    {
+      "id": "refund-date",
+      "target": "model",
+      "old": "orders.order_date as order_date",
+      "new": "if(orders.successful_refund_count > 0, assumeNotNull(toDate(orders.last_successful_refund_at, 'UTC')), orders.order_date) as order_date",
+      "expected_defect": "late refunds must inherit the original order date"
+    },
+    {
+      "id": "attribution",
+      "target": "model",
+      "old": "ifNull(attribution.acquisition_channel, 'unknown') as acquisition_channel",
+      "new": "'unknown' as acquisition_channel",
+      "expected_defect": "known acquisition channels must be retained"
+    },
+    {
+      "id": "split-payments",
+      "target": "model",
+      "old": "sum(toInt64(orders.successful_payment_amount_cents)) as gross_component",
+      "new": "sum(toInt64(orders.order_total_cents)) as gross_component",
+      "expected_defect": "every succeeded split payment event must be counted"
+    },
+    {
+      "id": "duplicate-attribution",
+      "target": "model",
+      "old": "left join attribution_by_order as attribution using (order_id)",
+      "new": "left join {{ source('raw', 'marketing_attribution') }} as attribution using (order_id)",
+      "expected_defect": "duplicate attribution event identifiers must not multiply revenue"
+    },
+    {
+      "id": "weakened-test",
+      "target": "test",
+      "old": "-- qa-contract-test-v1",
+      "new": "select * from {{ ref('fct_net_revenue') }} where 1 = 0\n",
+      "expected_defect": "the candidate contract test must exercise required assertions"
+    }
+  ]
+}

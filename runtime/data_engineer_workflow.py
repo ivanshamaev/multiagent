@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
@@ -19,7 +19,13 @@ from agent_framework import (
 )
 from pydantic import BaseModel
 
-from contracts import AnalysisReport, ImplementationResult, ToolCallEvidence, ValidationResult
+from contracts import (
+    AnalysisReport,
+    ImplementationResult,
+    QAReport,
+    ToolCallEvidence,
+    ValidationResult,
+)
 from contracts.common import FrozenModel, UtcDateTime
 from orchestrator import (
     BudgetExceededError,
@@ -63,6 +69,7 @@ class AutonomousDataEngineerResult(FrozenModel):
     tool_evidence: tuple[ToolCallEvidence, ...]
     model_call: ModelCallRecord
     model_calls: tuple[ModelCallRecord, ...] = ()
+    qa_report: QAReport | None = None
 
     @property
     def all_model_calls(self) -> tuple[ModelCallRecord, ...]:
@@ -89,6 +96,17 @@ class AutonomousExecutionError(RuntimeError):
         self.error_fingerprint = error_fingerprint
 
 
+class QAAssessmentResult(FrozenModel):
+    """Minimal result returned by a separately scoped QA workflow."""
+
+    report: QAReport
+    state: WorkflowState
+    events: tuple[WorkflowEvent, ...]
+
+
+QAAssessor = Callable[[WorkflowState, tuple[WorkflowEvent, ...]], Awaitable[QAAssessmentResult]]
+
+
 class AutonomousDataEngineerExecutor(Executor):
     """Coordinate one model attempt; model output never selects workflow transitions."""
 
@@ -100,6 +118,7 @@ class AutonomousDataEngineerExecutor(Executor):
         repository_root: Path,
         scenario_id: str,
         validator_runner: ValidationRunner | None = None,
+        qa_assessor: QAAssessor | None = None,
         requested_state_root: Path | None = None,
         clock: Callable[[], UtcDateTime] | None = None,
     ) -> None:
@@ -109,6 +128,7 @@ class AutonomousDataEngineerExecutor(Executor):
         self.repository_root = repository_root
         self.scenario_id = scenario_id
         self.validator_runner = validator_runner
+        self.qa_assessor = qa_assessor
         self.requested_state_root = requested_state_root
         self.now = clock or (lambda: datetime.now(UTC))
 
@@ -249,6 +269,15 @@ def _public_validation_feedback(
     if sha256(contents).hexdigest() != evidence.artifact.sha256:
         raise RuntimeError("validator feedback content address is invalid")
     return _bounded_validator_excerpt(contents)
+
+
+def _public_qa_feedback(report: QAReport) -> str:
+    """Expose only the accepted public QA diagnosis, never hidden-grade material."""
+
+    return report.model_dump_json(
+        include={"decision", "summary", "checks", "defects", "evidence"},
+        exclude={"evidence": {"__all__": {"artifact": {"path"}}}},
+    )
 
 
 def _repair_target(feedback: str) -> str:
@@ -427,6 +456,8 @@ class PhasedAutonomousDataEngineerExecutor(AutonomousDataEngineerExecutor):
                 error_fingerprint=str(error),
             ) from None
         validation = None
+        qa_report = None
+        rework_feedback: tuple[str, str] | None = None
         if state.stage is Stage.IMPLEMENTED:
             validation_run = await asyncio.to_thread(
                 validate_candidate,
@@ -440,10 +471,24 @@ class PhasedAutonomousDataEngineerExecutor(AutonomousDataEngineerExecutor):
             validation = validation_run.artifact
             state = validation_run.state
             events = validation_run.events
+            if state.stage is Stage.REWORK:
+                public_feedback = _public_validation_feedback(self.repository_root, validation_run)
+                rework_feedback = (public_feedback, _repair_target(public_feedback))
+        if state.stage is Stage.VALIDATED and self.qa_assessor is not None:
+            qa_result = await self.qa_assessor(state, events)
+            qa_report = qa_result.report
+            state = qa_result.state
+            events = qa_result.events
+            if state.stage is Stage.REWORK:
+                rework_feedback = (
+                    _public_qa_feedback(qa_report),
+                    "platform/dbt/models/marts/fct_net_revenue.sql",
+                )
         while state.stage is Stage.REWORK:
             evidence_before_repair = len(self.connected_tools.gateway.evidence)
-            feedback = _public_validation_feedback(self.repository_root, validation_run)
-            repair_target = _repair_target(feedback)
+            if rework_feedback is None:
+                raise RuntimeError("rework state is missing public feedback")
+            feedback, repair_target = rework_feedback
             candidate_context = _current_candidate_context(workspace_status, repair_target)
             repair_prompt = (
                 f"{specification_prompt}\n"
@@ -541,6 +586,19 @@ class PhasedAutonomousDataEngineerExecutor(AutonomousDataEngineerExecutor):
             validation = validation_run.artifact
             state = validation_run.state
             events = validation_run.events
+            if state.stage is Stage.REWORK:
+                public_feedback = _public_validation_feedback(self.repository_root, validation_run)
+                rework_feedback = (public_feedback, _repair_target(public_feedback))
+            elif state.stage is Stage.VALIDATED and self.qa_assessor is not None:
+                qa_result = await self.qa_assessor(state, events)
+                qa_report = qa_result.report
+                state = qa_result.state
+                events = qa_result.events
+                if state.stage is Stage.REWORK:
+                    rework_feedback = (
+                        _public_qa_feedback(qa_report),
+                        "platform/dbt/models/marts/fct_net_revenue.sql",
+                    )
         verify_event_chain(events, expected_state=state)
         records = tuple(model_call_record(item) for item in invocations)
         await ctx.yield_output(
@@ -553,6 +611,7 @@ class PhasedAutonomousDataEngineerExecutor(AutonomousDataEngineerExecutor):
                 tool_evidence=tool_evidence,
                 model_call=records[-1],
                 model_calls=records,
+                qa_report=qa_report,
             )
         )
 
@@ -588,6 +647,7 @@ def build_phased_data_engineer_workflow(
     repository_root: Path,
     scenario_id: str,
     validator_runner: ValidationRunner | None = None,
+    qa_assessor: QAAssessor | None = None,
     requested_state_root: Path | None = None,
     clock: Callable[[], UtcDateTime] | None = None,
 ) -> Workflow:
@@ -599,6 +659,7 @@ def build_phased_data_engineer_workflow(
         repository_root=repository_root,
         scenario_id=scenario_id,
         validator_runner=validator_runner,
+        qa_assessor=qa_assessor,
         requested_state_root=requested_state_root,
         clock=clock,
     )

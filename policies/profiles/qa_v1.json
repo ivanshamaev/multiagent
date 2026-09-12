@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "profile_id": "qa-v1",
+  "role": "qa",
+  "allowed_tools": [
+    "workspace.read_file",
+    "clickhouse.list_tables",
+    "clickhouse.run_query",
+    "dbt.show",
+    "dbt.list",
+    "dbt.get_lineage_dev",
+    "dbt.get_node_details_dev"
+  ],
+  "readable_paths": [
+    "TASK.md",
+    "platform/dbt/models/marts/fct_orders.sql",
+    "platform/dbt/models/marts/fct_net_revenue.sql",
+    "platform/dbt/models/staging/sources.yml",
+    "platform/dbt/tests/assert_fct_net_revenue_contract.sql"
+  ],
+  "writable_paths": [],
+  "allowed_databases": ["raw", "analytics"],
+  "max_query_rows": 100,
+  "max_query_chars": 20000,
+  "max_read_bytes": 100000,
+  "max_write_bytes": 1,
+  "max_tool_calls": 12,
+  "max_wall_time_seconds": 300,
+  "max_output_bytes": 500000
+}

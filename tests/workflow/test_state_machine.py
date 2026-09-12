@@ -326,3 +326,22 @@ def test_non_happy_gate_decisions_follow_the_declared_branch(
     assert result.stage is target
     if target is Stage.REWORK:
         assert result.budgets.used.rework_attempts == 1
+
+
+def test_qa_failure_cannot_exceed_shared_rework_budget() -> None:
+    state = workflow_state_at(Stage.QA, rework_used=1, rework_limit=1)
+
+    result = apply_transition(
+        state,
+        _command(
+            "command-qa-rework-exhausted",
+            Stage.REWORK,
+            13,
+            actor="qa",
+            artifact=qa_report(decision=QADecision.FAIL),
+        ),
+    )
+
+    assert result.stage is Stage.FAILED
+    assert result.budgets.used.rework_attempts == 1
+    assert result.terminal_reason == "rework budget exhausted: deterministic gate decision"

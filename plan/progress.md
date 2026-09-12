@@ -190,3 +190,22 @@
   reproducibility PASS; Airflow/Cosmos 11/11, dbt 68/68 и platform SQL PASS; secret/diff scans PASS.
 - Evidence: `plan/evidence/STEP-0009-autonomous-data-engineer.md`. Следующий milestone — Phase G,
   QA Agent и mutation-driven quality loop.
+
+## 2026-09-12 — STEP-0010 начат
+
+- Создан подробный план read-only QA quality loop: trust boundary, evidence ownership, mutation
+  corpus, обязательная повторная public validation после DE repair и fail-closed regression gates.
+- Reviewer отделён от этого шага, чтобы сначала независимо доказать цикл
+  `VALIDATED → QA FAIL → DE REWORK → validator → QA PASS`.
+
+## 2026-09-12 — STEP-0010 завершён
+
+- Независимый `qa_v1` работает в двух свежих read-only phases; code-owned probe, evidence и reducer
+  исключают model-owned SQL, transitions и self-approval.
+- GPT-5.6 Luna: canonical PASS, все 5/5 прошедших public validator mutations отклонены QA; false
+  pass 0/5. QA дополнительно нашёл реальный NULL/`argMax` defect canonical-кандидата.
+- Live workflow `quality-net-revenue-20260912161215` доказал одну DE-запись, два полных validator
+  run и конечный `QA_PASSED`; 39,466 tokens, rework 1/2.
+- Финальные gates: `make check` 280 tests; MCP smoke, reproducibility, baseline grader,
+  Airflow/Cosmos 11/11, dbt 68/68, canonical dbt 78/78, public SQL и hidden grader PASS.
+- Evidence: `plan/evidence/STEP-0010-qa-quality-loop.md`. Следующий шаг — read-only Reviewer gate.

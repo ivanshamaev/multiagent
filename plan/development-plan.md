@@ -168,7 +168,8 @@ Gate: каждая практическая глава ссылается на �
 
 ## 7. Текущая итерация
 
-`STEP-0001…0009` завершены: governance, golden ClickHouse/dbt/Airflow+Cosmos, reproducible scenario
+`STEP-0001…0010` завершены: governance, golden ClickHouse/dbt/Airflow+Cosmos, reproducible scenario
 harness, contracts/workflow, controlled GateLLM runtime, deny-by-default tools и autonomous Data
-Engineer milestone проверены; evidence сохранено в `plan/evidence/`. Следующая итерация — Phase G:
-read-only QA Agent, mutation fixtures и измеряемый `DE → QA → bounded rework` quality loop.
+Engineer milestone проверены. Первая половина Phase G завершена: независимый read-only QA Agent,
+5/5 mutation detection и live bounded `QA FAIL → DE REWORK → validator → QA PASS` сохранены в
+`plan/evidence/`. Следующая итерация продолжает Phase G отдельным read-only Reviewer gate.

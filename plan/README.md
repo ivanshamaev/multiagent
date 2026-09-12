@@ -23,8 +23,7 @@
 
 ## Текущий статус
 
-- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0009`](steps/STEP-0009-autonomous-data-engineer.md); persistent gate summaries сохранены в `evidence/`.
-- Текущая фаза: Phase F завершена — autonomous Data Engineer реализует Net Revenue через bounded
-  phases и проходит independent validator и hidden grader.
-- Следующий milestone: Phase G — read-only QA Agent, доказанный defect и ограниченный
-  `QA FAIL → DE REWORK → QA PASS` quality loop на наборе намеренно ошибочных реализаций.
+- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0010`](steps/STEP-0010-qa-quality-loop.md); persistent gate summaries сохранены в `evidence/`.
+- Текущая фаза: первая половина Phase G завершена — read-only QA Agent обнаруживает semantic
+  defects и запускает ограниченный `QA FAIL → DE REWORK → validator → QA PASS`.
+- Следующий шаг: отдельный read-only Reviewer gate, approval separation и false-approval eval.
