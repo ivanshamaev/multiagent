@@ -19,9 +19,15 @@ make airflow-up
 make airflow-validate
 make airflow-test
 make airflow-failure-test
+make airflow-mcp-smoke
 ```
 
 Authentication uses a local-development FAB user and JWT from `/auth/token`.
 Never print or persist the password or returned token. Configuration from
 `.env` is interpolated through an explicit Compose allowlist; `API_TOKEN` is not
 passed to any Data Platform container.
+
+The local MCP observer authenticates as the separately provisioned `airflow_observer` FAB Viewer.
+It exposes six fixed `GET /api/v2` operations for the three repository DAGs and projects responses
+onto safe DAG/run/task fields; one task-attempt log is byte-bounded. It has no trigger, pause, clear,
+retry, XCom, variable, connection, configuration, or metadata-database capability.

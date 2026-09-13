@@ -5,7 +5,8 @@
 ## Текущий статус
 
 Реализованы golden Data Platform, reproducible scenario harness, strict typed artifacts и
-детерминированный workflow с budgets и hash-chained events, read-only Analyst и tool-free PM gate.
+детерминированный workflow с budgets и hash-chained events, read-only Analyst, tool-free PM gate и
+GET-only Airflow MCP под отдельным Viewer.
 Runtime работает локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в
 Docker Compose. LLM-вызовы идут через OpenAI-совместимый GateLLM с токеном из локального `.env`.
 Работают ClickHouse,
@@ -31,6 +32,10 @@ make platform-test
 платный вертикальный smoke `Analyst → PM`; модели задаются `ANALYST_MODEL` и `PM_MODEL`. Команда не
 печатает prompt, model output или token, а сохраняет только sanitised metrics. `make llm-smoke`
 оставлен как совместимый alias этого pipeline.
+
+`make airflow-mcp-smoke` создаёт acceptance run детерминированным admin-клиентом, затем читает DAG,
+run, task instances и bounded log только через локальный MCP под `airflow_observer`. MCP не содержит
+trigger/pause/clear/retry, connection/variable/XCom или произвольных HTTP операций.
 
 ClickHouse публикуется только на loopback-интерфейсе. HTTP и native endpoints по умолчанию доступны на `127.0.0.1:8123` и `127.0.0.1:9000`.
 

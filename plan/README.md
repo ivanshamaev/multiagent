@@ -23,9 +23,11 @@
 
 ## Текущий статус
 
-- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0013`](steps/STEP-0013-pm-specification-gate.md); persistent gate summaries сохранены в `evidence/`.
+- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0014`](steps/STEP-0014-read-only-airflow-mcp.md); persistent gate summaries сохранены в `evidence/`.
 - Phase G завершена: QA и Reviewer разделены, bounded rework повторяет validator/QA/Reviewer, а
   false pass/approval измерены на независимых мутациях.
 - Phase H завершена: read-only Analyst discovery передаёт evidence-backed typed handoff tool-free
   PM, который выдаёт полный spec либо детерминированный `blocked / needs_user`.
-- Следующий этап roadmap — Phase I, read-only Airflow MCP поверх stable `/api/v2`.
+- Phase I начата: локальный Airflow MCP читает allowlisted DAG/run/task/log metadata через stable
+  `/api/v2` под отдельным Viewer и deny-by-default policy.
+- Следующий шаг Phase I — controlled trigger только для dev-DAG под отдельной write-capability.

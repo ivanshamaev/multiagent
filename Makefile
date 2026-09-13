@@ -14,13 +14,17 @@ AIRFLOW_API_PORT ?= 8080
 AIRFLOW_API_BASE_URL ?= http://127.0.0.1:$(AIRFLOW_API_PORT)
 AIRFLOW_ADMIN_USERNAME ?= airflow
 AIRFLOW_ADMIN_PASSWORD ?= airflow_dev_only
+AIRFLOW_MCP_USERNAME ?= airflow_observer
+AIRFLOW_MCP_PASSWORD ?= airflow_observer_dev_only
 AIRFLOW_API_REQUEST_TIMEOUT_SECONDS ?= 10
 AIRFLOW_API_POLL_TIMEOUT_SECONDS ?= 300
 AIRFLOW_API_POLL_INTERVAL_SECONDS ?= 2
 export AIRFLOW_API_BASE_URL AIRFLOW_ADMIN_USERNAME AIRFLOW_ADMIN_PASSWORD
+export AIRFLOW_MCP_USERNAME AIRFLOW_MCP_PASSWORD
 export AIRFLOW_API_REQUEST_TIMEOUT_SECONDS AIRFLOW_API_POLL_TIMEOUT_SECONDS
 export AIRFLOW_API_POLL_INTERVAL_SECONDS
 AIRFLOW = $(COMPOSE) exec -T airflow-scheduler airflow
+AIRFLOW_CHECK = bash platform/airflow/scripts/retry_on_sigsegv.sh $(AIRFLOW)
 AIRFLOW_VERSION = $(COMPOSE) run --rm --no-deps --entrypoint airflow airflow-init version
 SCENARIO ?= net-revenue
 LLM_DEFAULT_MODEL ?= meta-llama/llama-3.1-8b-instruct
@@ -46,7 +50,7 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	scenario-init scenario-reset scenario-status scenario-verify scenario-fingerprint \
 	scenario-baseline-build scenario-run scenario-contract-test scenario-grader-image scenario-grade \
 	scenario-grade-baseline-test scenario-repro-test scenario-test llm-catalog llm-smoke \
-	mcp-images mcp-users mcp-smoke data-engineer-live analyst-live requirements-live qa-live reviewer-live quality-loop-live
+	mcp-images mcp-users mcp-smoke airflow-mcp-smoke data-engineer-live analyst-live requirements-live qa-live reviewer-live quality-loop-live
 
 bootstrap:
 	$(UV) sync --frozen
@@ -141,18 +145,21 @@ airflow-up: airflow-image
 	$(COMPOSE) up -d --wait --wait-timeout 240 airflow-api-server airflow-scheduler airflow-dag-processor
 
 airflow-validate: airflow-up
-	@import_errors="$$( $(AIRFLOW) dags list-import-errors --output=json )" || exit "$$?"; \
+	@import_errors="$$( $(AIRFLOW_CHECK) dags list-import-errors --output=json )" || exit "$$?"; \
 		test "$${import_errors}" = "[]" || { \
 			printf '%s\n' "$${import_errors}"; \
 			exit 1; \
 		}
-	$(AIRFLOW) dags details ecommerce_hourly --output=json >/dev/null
-	$(AIRFLOW) dags details ecommerce_acceptance --output=json >/dev/null
-	$(AIRFLOW) dags details ecommerce_failure_probe --output=json >/dev/null
+	$(AIRFLOW_CHECK) dags details ecommerce_hourly --output=json >/dev/null
+	$(AIRFLOW_CHECK) dags details ecommerce_acceptance --output=json >/dev/null
+	$(AIRFLOW_CHECK) dags details ecommerce_failure_probe --output=json >/dev/null
 
 airflow-test: airflow-validate
 	$(UV) run python platform/airflow/scripts/api_smoke.py
 	$(CLICKHOUSE_CLIENT) --multiquery < platform/clickhouse/tests/002_dbt_baseline.sql
+
+airflow-mcp-smoke: airflow-test
+	$(UV) run python -m runtime.airflow_mcp_smoke
 
 airflow-failure-test: airflow-validate
 	$(UV) run python platform/airflow/scripts/api_smoke.py --expect-failure

@@ -46,6 +46,14 @@ _DBT_TOOLS = {
     ToolName.DBT_GET_LINEAGE_DEV,
     ToolName.DBT_GET_NODE_DETAILS_DEV,
 }
+_AIRFLOW_TOOLS = {
+    ToolName.AIRFLOW_LIST_DAGS,
+    ToolName.AIRFLOW_GET_DAG,
+    ToolName.AIRFLOW_LIST_DAG_RUNS,
+    ToolName.AIRFLOW_GET_DAG_RUN,
+    ToolName.AIRFLOW_LIST_TASK_INSTANCES,
+    ToolName.AIRFLOW_GET_TASK_LOG,
+}
 _DBT_FAILURE_PREFIXES = ("Timeout:", "Command failed", "--- stdout ---", "--- stderr ---")
 
 
@@ -75,16 +83,19 @@ class MCPToolGateway:
     def __init__(
         self,
         profile: CapabilityProfile,
-        clickhouse: MCPCaller,
-        dbt: MCPCaller,
+        clickhouse: MCPCaller | None,
+        dbt: MCPCaller | None,
         evidence_store: ToolEvidenceStore,
         workspace: WorkspaceToolAdapter | None = None,
+        *,
+        airflow: MCPCaller | None = None,
     ) -> None:
         self._profile = profile
         self._clickhouse = clickhouse
         self._dbt = dbt
         self._evidence_store = evidence_store
         self._workspace = workspace
+        self._airflow = airflow
         self._usage = ToolUsage()
         self._evidence: list[ToolCallEvidence] = []
         self._execution_lock = asyncio.Lock()
@@ -238,10 +249,12 @@ class MCPToolGateway:
                 raise MCPGatewayError("MCP call failed", evidence) from error
 
     def _route(self, tool: ToolName) -> tuple[MCPCaller, str]:
-        if tool in _CLICKHOUSE_TOOLS:
+        if tool in _CLICKHOUSE_TOOLS and self._clickhouse is not None:
             return self._clickhouse, tool.value.removeprefix("clickhouse.")
-        if tool in _DBT_TOOLS:
+        if tool in _DBT_TOOLS and self._dbt is not None:
             return self._dbt, tool.value.removeprefix("dbt.")
+        if tool in _AIRFLOW_TOOLS and self._airflow is not None:
+            return self._airflow, tool.value.removeprefix("airflow.")
         raise ValueError("MCP gateway received a non-MCP tool")
 
     def _execute_workspace(

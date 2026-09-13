@@ -27,3 +27,4 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0021](ADR-0021-independent-reviewer-gate.md) | Reviewer is the sole independent approval gate | accepted |
 | [ADR-0022](ADR-0022-pre-pm-requirements-discovery.md) | Analyst discovery precedes PM specification | accepted |
 | [ADR-0023](ADR-0023-pm-consumes-only-accepted-requirements.md) | PM consumes only accepted requirements handoff | accepted |
+| [ADR-0024](ADR-0024-local-read-only-airflow-mcp.md) | Local read-only Airflow MCP uses public API only | accepted |

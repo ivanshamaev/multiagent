@@ -1,8 +1,15 @@
 # STEP-0014 — Read-only Airflow MCP over `/api/v2`
 
-Status: in progress
+Status: complete
 
 Date: 2026-09-13
+
+Owner: repository maintainers
+
+Updated: 2026-09-13
+
+Current step: completed; next planned step is controlled local dev-DAG trigger under a separate
+write capability.
 
 ## Goal
 
@@ -84,3 +91,28 @@ git diff --check
 make platform-down
 ```
 
+## Actual result
+
+- Added six closed Airflow contracts, exact DAG allowlist policy, a GET-only API adapter, local
+  FastMCP stdio server, MAF facade, cumulative gateway budgets, and content-addressed evidence.
+- Compose idempotently provisions separate `Admin` and exact `Viewer` users. Credentials and JWTs
+  remain process-private; returned DAG/run/task data is projected onto an explicit safe field set.
+- Live smoke observed three allowed DAGs and a real `ecommerce_acceptance` run with 11/11 successful
+  tasks using eight Viewer calls; before/after DAG and latest-run metadata were identical.
+- `make check` passed with 350 tests after the provisioning regression was added. MCP, scenario,
+  baseline grader, and full platform gates passed. No GateLLM calls were made.
+
+## Decisions, problems, and work log
+
+- ADR-0024 owns the public-API-only, local stdio, dedicated-Viewer boundary.
+- PRB-0038 records duplicate FastMCP string/structured output and its regression.
+- PRB-0039 records intermittent Airflow CLI `SIGSEGV`; one secret-safe bootstrap now owns local user
+  creation and retries only that signal within a fixed budget.
+- 2026-09-13: inspected the served Airflow 3.3.1 OpenAPI document; implemented and tested the six
+  exact endpoints; completed live and repository-wide regressions.
+
+## Remaining risk
+
+The observer is local-development only and inherits the permissions of Airflow's built-in Viewer
+role. A future write capability must use another identity/profile, idempotency key, approval gate,
+and ADR; it must not expand this profile or server.

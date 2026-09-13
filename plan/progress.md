@@ -265,3 +265,15 @@
 - Airflow/Cosmos 11/11, dbt 68/68, ClickHouse, MCP, reproducibility и baseline hidden grader gates
   прошли. Evidence: `plan/evidence/STEP-0013-pm-specification-gate.md`. Phase H завершена;
   следующий этап — STEP-0014, read-only Airflow MCP поверх `/api/v2`.
+
+## 2026-09-13 — STEP-0014 завершён
+
+- Реализованы шесть closed read-only Airflow tools поверх фиксированных `GET /api/v2` endpoints:
+  DAG, run, task-instance и один bounded task-attempt log; произвольные URL/method/body отсутствуют.
+- `airflow-observer-v1` ограничен тремя локальными DAG, cumulative budgets и отдельным FAB Viewer;
+  credentials/JWT не попадают в tool arguments, output или evidence, sensitive API fields удалены.
+- Live smoke: три allowlisted DAG, восемь Viewer calls/evidence, реальный Cosmos run 11/11 success и
+  неизменные before/after metadata. PRB-0038 и PRB-0039 закрыты regression tests.
+- Финальные gates: `make check` 350 tests; ClickHouse/dbt MCP, scenario reproducibility, baseline
+  grader и `make platform-test` PASS. Evidence: `plan/evidence/STEP-0014-read-only-airflow-mcp.md`.
+- Phase I продолжается отдельным controlled dev-DAG trigger; текущий observer останется read-only.

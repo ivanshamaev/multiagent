@@ -216,13 +216,14 @@ services:
 
   airflow-init:
     <<: *airflow-common
-    command: version
+    command: python /opt/airflow/ensure_mcp_viewer.py
     environment:
       <<: *airflow-common-env
       _AIRFLOW_DB_MIGRATE: "true"
-      _AIRFLOW_WWW_USER_CREATE: "true"
-      _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_ADMIN_USERNAME:-airflow}
-      _AIRFLOW_WWW_USER_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD:-airflow_dev_only}
+      AIRFLOW_ADMIN_USERNAME: ${AIRFLOW_ADMIN_USERNAME:-airflow}
+      AIRFLOW_ADMIN_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD:-airflow_dev_only}
+      AIRFLOW_MCP_USERNAME: ${AIRFLOW_MCP_USERNAME:-airflow_observer}
+      AIRFLOW_MCP_PASSWORD: ${AIRFLOW_MCP_PASSWORD:-airflow_observer_dev_only}
     depends_on:
       airflow-postgres:
         condition: service_healthy

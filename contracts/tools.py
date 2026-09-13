@@ -47,6 +47,15 @@ OptionalPattern = Annotated[
     str,
     StringConstraints(strip_whitespace=True, min_length=1, max_length=256),
 ]
+AirflowObjectId = Annotated[
+    str,
+    StringConstraints(
+        strip_whitespace=True,
+        min_length=1,
+        max_length=250,
+        pattern=r"^[A-Za-z0-9][A-Za-z0-9._:+@=-]*$",
+    ),
+]
 
 
 class ToolName(StrEnum):
@@ -63,6 +72,12 @@ class ToolName(StrEnum):
     DBT_LIST = "dbt.list"
     DBT_GET_LINEAGE_DEV = "dbt.get_lineage_dev"
     DBT_GET_NODE_DETAILS_DEV = "dbt.get_node_details_dev"
+    AIRFLOW_LIST_DAGS = "airflow.list_dags"
+    AIRFLOW_GET_DAG = "airflow.get_dag"
+    AIRFLOW_LIST_DAG_RUNS = "airflow.list_dag_runs"
+    AIRFLOW_GET_DAG_RUN = "airflow.get_dag_run"
+    AIRFLOW_LIST_TASK_INSTANCES = "airflow.list_task_instances"
+    AIRFLOW_GET_TASK_LOG = "airflow.get_task_log"
 
 
 class DbtResourceType(StrEnum):
@@ -187,6 +202,47 @@ class DbtGetNodeDetailsCall(FrozenModel):
     node_id: Identifier
 
 
+class AirflowListDagsCall(FrozenModel):
+    tool: Literal[ToolName.AIRFLOW_LIST_DAGS] = ToolName.AIRFLOW_LIST_DAGS
+    limit: StrictInt = Field(default=50, ge=1, le=100)
+    offset: StrictInt = Field(default=0, ge=0, le=10_000)
+
+
+class AirflowGetDagCall(FrozenModel):
+    tool: Literal[ToolName.AIRFLOW_GET_DAG] = ToolName.AIRFLOW_GET_DAG
+    dag_id: AirflowObjectId
+
+
+class AirflowListDagRunsCall(FrozenModel):
+    tool: Literal[ToolName.AIRFLOW_LIST_DAG_RUNS] = ToolName.AIRFLOW_LIST_DAG_RUNS
+    dag_id: AirflowObjectId
+    limit: StrictInt = Field(default=20, ge=1, le=50)
+    offset: StrictInt = Field(default=0, ge=0, le=10_000)
+
+
+class AirflowGetDagRunCall(FrozenModel):
+    tool: Literal[ToolName.AIRFLOW_GET_DAG_RUN] = ToolName.AIRFLOW_GET_DAG_RUN
+    dag_id: AirflowObjectId
+    dag_run_id: AirflowObjectId
+
+
+class AirflowListTaskInstancesCall(FrozenModel):
+    tool: Literal[ToolName.AIRFLOW_LIST_TASK_INSTANCES] = ToolName.AIRFLOW_LIST_TASK_INSTANCES
+    dag_id: AirflowObjectId
+    dag_run_id: AirflowObjectId
+    limit: StrictInt = Field(default=100, ge=1, le=100)
+    offset: StrictInt = Field(default=0, ge=0, le=10_000)
+
+
+class AirflowGetTaskLogCall(FrozenModel):
+    tool: Literal[ToolName.AIRFLOW_GET_TASK_LOG] = ToolName.AIRFLOW_GET_TASK_LOG
+    dag_id: AirflowObjectId
+    dag_run_id: AirflowObjectId
+    task_id: AirflowObjectId
+    try_number: StrictInt = Field(ge=1, le=100)
+    map_index: StrictInt = Field(default=-1, ge=-1, le=1_000_000)
+
+
 ToolCall = Annotated[
     WorkspaceReadCall
     | WorkspaceWriteCall
@@ -200,7 +256,13 @@ ToolCall = Annotated[
     | DbtShowCall
     | DbtListCall
     | DbtGetLineageCall
-    | DbtGetNodeDetailsCall,
+    | DbtGetNodeDetailsCall
+    | AirflowListDagsCall
+    | AirflowGetDagCall
+    | AirflowListDagRunsCall
+    | AirflowGetDagRunCall
+    | AirflowListTaskInstancesCall
+    | AirflowGetTaskLogCall,
     Field(discriminator="tool"),
 ]
 

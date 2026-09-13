@@ -12,6 +12,12 @@ from pathlib import Path
 from agent_framework import FunctionTool, MiddlewareFailure, tool
 
 from contracts import (
+    AirflowGetDagCall,
+    AirflowGetDagRunCall,
+    AirflowGetTaskLogCall,
+    AirflowListDagRunsCall,
+    AirflowListDagsCall,
+    AirflowListTaskInstancesCall,
     ClickHouseListDatabasesCall,
     ClickHouseListTablesCall,
     ClickHouseRunQueryCall,
@@ -34,7 +40,11 @@ from policies import CapabilityProfile
 from runtime.scenario_harness import ScenarioManifest
 from runtime.tools.evidence_store import ToolEvidenceStore
 from runtime.tools.mcp_gateway import MCPGatewayError, MCPToolGateway
-from runtime.tools.mcp_stdio import create_clickhouse_mcp_tool, create_dbt_mcp_tool
+from runtime.tools.mcp_stdio import (
+    create_airflow_mcp_tool,
+    create_clickhouse_mcp_tool,
+    create_dbt_mcp_tool,
+)
 from runtime.tools.workspace import WorkspaceToolAdapter
 
 
@@ -44,6 +54,148 @@ class ConnectedDataEngineerMCPTools:
 
     tools: tuple[FunctionTool, ...]
     gateway: MCPToolGateway
+
+
+@dataclass(frozen=True)
+class ConnectedAirflowMCPTools:
+    tools: tuple[FunctionTool, ...]
+    gateway: MCPToolGateway
+
+
+class AirflowMCPTools:
+    """Bind observer identity to the six closed Airflow schemas."""
+
+    def __init__(
+        self,
+        gateway: MCPToolGateway,
+        *,
+        task_id: str,
+        actor_id: str,
+        role: str = "airflow-observer",
+    ) -> None:
+        self._gateway = gateway
+        self._task_id = task_id
+        self._actor_id = actor_id
+        self._role = role
+        self._sequence = count(1)
+        self.tools = tuple(
+            function
+            for canonical, function in self._build_candidates()
+            if canonical in gateway.allowed_tools
+        )
+
+    async def _execute(self, call: ToolCall) -> str:
+        sequence = next(self._sequence)
+        seed = f"{self._task_id}:{self._actor_id}:{sequence}"
+        request = ToolRequest(
+            request_id=f"tool-request-{sha256(seed.encode()).hexdigest()[:24]}",
+            task_id=self._task_id,
+            actor_id=self._actor_id,
+            role=self._role,
+            call=call,
+        )
+        try:
+            return (await self._gateway.execute(request)).content
+        except MCPGatewayError as error:
+            raise MiddlewareFailure(str(error)) from error
+
+    async def _validated(self, factory: Callable[..., ToolCall], **arguments: object) -> str:
+        try:
+            call = factory(**arguments)
+        except (TypeError, ValueError) as error:
+            raise MiddlewareFailure("tool arguments failed closed validation") from error
+        return await self._execute(call)
+
+    def _build_candidates(self) -> tuple[tuple[ToolName, FunctionTool], ...]:
+        @tool(
+            name="airflow_list_dags",
+            description="List allowlisted DAG metadata only.",
+            approval_mode="never_require",
+        )
+        async def list_dags(limit: int = 50, offset: int = 0) -> str:
+            return await self._validated(AirflowListDagsCall, limit=limit, offset=offset)
+
+        @tool(
+            name="airflow_get_dag",
+            description="Get one allowlisted DAG.",
+            approval_mode="never_require",
+        )
+        async def get_dag(dag_id: str) -> str:
+            return await self._validated(AirflowGetDagCall, dag_id=dag_id)
+
+        @tool(
+            name="airflow_list_dag_runs",
+            description="List bounded runs for one DAG.",
+            approval_mode="never_require",
+        )
+        async def list_dag_runs(dag_id: str, limit: int = 20, offset: int = 0) -> str:
+            return await self._validated(
+                AirflowListDagRunsCall,
+                dag_id=dag_id,
+                limit=limit,
+                offset=offset,
+            )
+
+        @tool(
+            name="airflow_get_dag_run",
+            description="Get one DAG run.",
+            approval_mode="never_require",
+        )
+        async def get_dag_run(dag_id: str, dag_run_id: str) -> str:
+            return await self._validated(
+                AirflowGetDagRunCall,
+                dag_id=dag_id,
+                dag_run_id=dag_run_id,
+            )
+
+        @tool(
+            name="airflow_list_task_instances",
+            description="List bounded task instances for one DAG run.",
+            approval_mode="never_require",
+        )
+        async def list_task_instances(
+            dag_id: str,
+            dag_run_id: str,
+            limit: int = 100,
+            offset: int = 0,
+        ) -> str:
+            return await self._validated(
+                AirflowListTaskInstancesCall,
+                dag_id=dag_id,
+                dag_run_id=dag_run_id,
+                limit=limit,
+                offset=offset,
+            )
+
+        @tool(
+            name="airflow_get_task_log",
+            description="Get one bounded task-attempt log.",
+            approval_mode="never_require",
+        )
+        async def get_task_log(
+            dag_id: str,
+            dag_run_id: str,
+            task_id: str,
+            try_number: int,
+            map_index: int = -1,
+        ) -> str:
+            return await self._validated(
+                AirflowGetTaskLogCall,
+                dag_id=dag_id,
+                dag_run_id=dag_run_id,
+                task_id=task_id,
+                try_number=try_number,
+                map_index=map_index,
+            )
+
+        return (
+            (ToolName.AIRFLOW_LIST_DAGS, list_dags),
+            (ToolName.AIRFLOW_GET_DAG, get_dag),
+            (ToolName.AIRFLOW_LIST_DAG_RUNS, list_dag_runs),
+            (ToolName.AIRFLOW_GET_DAG_RUN, get_dag_run),
+            (ToolName.AIRFLOW_LIST_TASK_INSTANCES, list_task_instances),
+            (ToolName.AIRFLOW_GET_TASK_LOG, get_task_log),
+        )
 
 
 class DataEngineerMCPTools:
@@ -319,3 +471,36 @@ async def connect_data_engineer_tools(
             role=role,
         )
         yield ConnectedDataEngineerMCPTools(tools=facade.tools, gateway=gateway)
+
+
+@asynccontextmanager
+async def connect_airflow_mcp_tools(
+    repository_root: Path,
+    profile: CapabilityProfile,
+    *,
+    task_id: str,
+    actor_id: str,
+    base_url: str,
+    username: str,
+    password: str,
+    role: str = "airflow-observer",
+) -> AsyncIterator[ConnectedAirflowMCPTools]:
+    """Connect only the repository-owned Airflow observer MCP process."""
+
+    airflow = create_airflow_mcp_tool(
+        repository_root,
+        base_url=base_url,
+        username=username,
+        password=password,
+        allowed_dags=profile.allowed_airflow_dags,
+    )
+    store = ToolEvidenceStore(repository_root, repository_root / ".scenario-state")
+    async with airflow:
+        gateway = MCPToolGateway(profile, None, None, store, airflow=airflow)
+        facade = AirflowMCPTools(
+            gateway,
+            task_id=task_id,
+            actor_id=actor_id,
+            role=role,
+        )
+        yield ConnectedAirflowMCPTools(tools=facade.tools, gateway=gateway)

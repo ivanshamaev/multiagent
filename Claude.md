@@ -103,6 +103,8 @@ Unit/integration tests используют fake transport и не расход�
 - QA выполняет независимые проверки и формирует defects, но не исправляет product code.
 - Reviewer работает read-only, не редактирует файлы и не approve собственную работу.
 - Analyst использует read-only metadata/SQL и не пишет production code/data.
+- Airflow Observer читает только allowlisted DAG/run/task/log metadata через repository-owned MCP и
+  stable `/api/v2`; Viewer credentials и JWT не попадают в prompt, arguments, output или evidence.
 - PM формирует specification/open questions и не реализует решение.
 - Workflow управляет gates, retries и approvals; эти решения не делегируются LLM.
 
@@ -123,6 +125,11 @@ assumptions и open questions не являются facts. `make analyst-live` �
 PM допускается только reducer-accepted typed `PMRequirementsHandoff`; raw `ContextBundle` PM не
 получает. При незакрытых Analyst questions код запрещает `ready` и требует exact
 `blocked / needs_user`. `make requirements-live` проверяет весь opt-in pipeline.
+
+Airflow Observer использует только `airflow-observer-v1`: шесть fixed GET operations, три локальных
+DAG ID, bounded pagination/log/output/call/time и отдельный FAB Viewer. Запрещены arbitrary URL,
+trigger, pause, clear, retry, XCom, config, variables, connections и metadata DB. `make
+airflow-mcp-smoke` — неплатный live gate; write-capability нельзя добавлять в этот profile/server.
 
 Никогда не подключай production credentials и не выполняй production write/deploy. Исключение текущего local development — только `API_TOKEN` для явно разрешённого GateLLM gateway. Расширение file/network scope, secret access и необратимые действия требуют явного human approval. Не удаляй Docker volumes и не выполняй `docker system prune` без явного запроса.
 

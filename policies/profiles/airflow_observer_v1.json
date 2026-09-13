@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "profile_id": "airflow-observer-v1",
+  "role": "airflow-observer",
+  "allowed_tools": [
+    "airflow.list_dags",
+    "airflow.get_dag",
+    "airflow.list_dag_runs",
+    "airflow.get_dag_run",
+    "airflow.list_task_instances",
+    "airflow.get_task_log"
+  ],
+  "readable_paths": [],
+  "writable_paths": [],
+  "allowed_databases": [],
+  "allowed_airflow_dags": [
+    "ecommerce_hourly",
+    "ecommerce_acceptance",
+    "ecommerce_failure_probe"
+  ],
+  "max_query_rows": 100,
+  "max_query_chars": 1000,
+  "max_read_bytes": 100000,
+  "max_write_bytes": 1,
+  "max_tool_calls": 12,
+  "max_wall_time_seconds": 60,
+  "max_output_bytes": 500000
+}

@@ -15,6 +15,11 @@ from sqlglot.errors import SqlglotError
 
 from contracts.common import FrozenModel, Identifier, NonNegativeInt, RelativePath, ShortText
 from contracts.tools import (
+    AirflowGetDagCall,
+    AirflowGetDagRunCall,
+    AirflowGetTaskLogCall,
+    AirflowListDagRunsCall,
+    AirflowListTaskInstancesCall,
     ClickHouseListTablesCall,
     ClickHouseRunQueryCall,
     DatabaseName,
@@ -67,6 +72,7 @@ MAX_PROFILE_BYTES = 32_000
 
 PathPattern = Annotated[str, Field(min_length=1, max_length=512)]
 DatabaseTuple = Annotated[tuple[DatabaseName, ...], Field(max_length=32)]
+AirflowDagTuple = Annotated[tuple[Identifier, ...], Field(max_length=64)]
 ToolTuple = Annotated[tuple[ToolName, ...], Field(min_length=1, max_length=64)]
 PatternTuple = Annotated[tuple[PathPattern, ...], Field(max_length=64)]
 
@@ -98,6 +104,7 @@ class CapabilityProfile(FrozenModel):
     readable_paths: PatternTuple = ()
     writable_paths: PatternTuple = ()
     allowed_databases: DatabaseTuple = ()
+    allowed_airflow_dags: AirflowDagTuple = ()
     max_query_rows: StrictInt = Field(ge=1, le=1_000)
     max_query_chars: StrictInt = Field(ge=1, le=20_000)
     max_read_bytes: StrictInt = Field(ge=1, le=100_000)
@@ -113,6 +120,7 @@ class CapabilityProfile(FrozenModel):
             "readable_paths",
             "writable_paths",
             "allowed_databases",
+            "allowed_airflow_dags",
         ):
             values = getattr(self, field_name)
             if len(values) != len(set(values)):
@@ -134,6 +142,7 @@ class PolicyCode(StrEnum):
     TOOL_DENIED = "tool_denied"
     PATH_DENIED = "path_denied"
     DATABASE_DENIED = "database_denied"
+    AIRFLOW_DAG_DENIED = "airflow_dag_denied"
     QUERY_DENIED = "query_denied"
     BUDGET_DENIED = "budget_denied"
 
@@ -290,4 +299,19 @@ def authorize_tool_call(
             require_literal_limit=False,
         ):
             return _deny(PolicyCode.QUERY_DENIED, reason)
+    elif isinstance(
+        call,
+        (
+            AirflowGetDagCall,
+            AirflowListDagRunsCall,
+            AirflowGetDagRunCall,
+            AirflowListTaskInstancesCall,
+            AirflowGetTaskLogCall,
+        ),
+    ):
+        if call.dag_id not in profile.allowed_airflow_dags:
+            return _deny(
+                PolicyCode.AIRFLOW_DAG_DENIED,
+                "Airflow DAG is not present in the allowlist",
+            )
     return ToolPolicyDecision(allowed=True, code=PolicyCode.ALLOWED, reason="allowed by profile")

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Literal
 
@@ -18,6 +19,16 @@ DBT_MCP_TOOLS = frozenset(
         "parse",
         "show",
         "test",
+    }
+)
+AIRFLOW_MCP_TOOLS = frozenset(
+    {
+        "get_dag",
+        "get_dag_run",
+        "get_task_log",
+        "list_dag_runs",
+        "list_dags",
+        "list_task_instances",
     }
 )
 ApprovalMode = Literal["always_require", "never_require"]
@@ -118,4 +129,41 @@ def create_dbt_mcp_tool(
         load_prompts=False,
         approval_mode=approval_mode,
         request_timeout=130,
+    )
+
+
+def create_airflow_mcp_tool(
+    repository_root: Path,
+    *,
+    base_url: str,
+    username: str,
+    password: str,
+    allowed_dags: tuple[str, ...],
+    request_timeout: int = 15,
+    approval_mode: ApprovalMode = "always_require",
+) -> MCPStdioTool:
+    """Create the repository-owned GET-only Airflow MCP subprocess."""
+
+    root = _repository_root(repository_root)
+    if not username or not password or not allowed_dags:
+        raise MCPConfigurationError("Airflow MCP requires credentials and allowed DAGs")
+    return MCPStdioTool(
+        name="airflow-mcp",
+        description="Read-only Airflow DAG, run, task-instance, and bounded log metadata",
+        command=sys.executable,
+        args=["-m", "runtime.airflow_mcp_server"],
+        env={
+            "AIRFLOW_API_BASE_URL": base_url,
+            "AIRFLOW_API_REQUEST_TIMEOUT_SECONDS": str(request_timeout),
+            "AIRFLOW_MCP_ALLOWED_DAGS": ",".join(allowed_dags),
+            "AIRFLOW_MCP_MAX_RESPONSE_BYTES": "250000",
+            "AIRFLOW_MCP_PASSWORD": password,
+            "AIRFLOW_MCP_USERNAME": username,
+        },
+        cwd=str(root),
+        tool_name_prefix="airflow",
+        allowed_tools=AIRFLOW_MCP_TOOLS,
+        load_prompts=False,
+        approval_mode=approval_mode,
+        request_timeout=request_timeout,
     )

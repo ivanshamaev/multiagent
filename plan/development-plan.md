@@ -168,10 +168,12 @@ Gate: каждая практическая глава ссылается на �
 
 ## 7. Текущая итерация
 
-`STEP-0001…0013` завершены: governance, golden ClickHouse/dbt/Airflow+Cosmos, reproducible scenario
+`STEP-0001…0014` завершены: governance, golden ClickHouse/dbt/Airflow+Cosmos, reproducible scenario
 harness, contracts/workflow, controlled GateLLM runtime, deny-by-default tools и autonomous Data
 Engineer milestone проверены. Phase G завершена: независимые QA и Reviewer, обязательный bounded
 rework через повторные validator/QA gates, QA mutation detection 5/5 и Reviewer false approval 0/4
 сохранены в `plan/evidence/`. Phase H завершена: read-only Analyst формирует evidence-backed handoff,
 а tool-free PM принимает только этот artifact и детерминированно выбирает полный spec или
-`blocked / needs_user`. Следующая итерация начинает Phase I: Airflow MCP поверх `/api/v2`.
+`blocked / needs_user`. Phase I начата: GET-only Airflow MCP поверх `/api/v2` предоставляет
+allowlisted DAG/run/task/log metadata под отдельным Viewer с typed evidence. Следующая итерация —
+controlled local dev-DAG trigger под отдельной identity, policy и approval gate.

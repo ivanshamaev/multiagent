@@ -12,3 +12,4 @@ COPY platform/airflow/requirements.lock /tmp/airflow-requirements.lock
 RUN python -m pip install --no-cache-dir --no-deps --require-hashes \
        -r /tmp/airflow-requirements.lock \
     && python -m pip check
+COPY --chmod=0555 platform/airflow/scripts/ensure_mcp_viewer.py /opt/airflow/ensure_mcp_viewer.py

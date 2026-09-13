@@ -30,6 +30,12 @@ from contracts.artifacts import (
 from contracts.evidence import ArtifactReference, Evidence, EvidenceKind
 from contracts.scenario_specification import ScenarioSpecification
 from contracts.tools import (
+    AirflowGetDagCall,
+    AirflowGetDagRunCall,
+    AirflowGetTaskLogCall,
+    AirflowListDagRunsCall,
+    AirflowListDagsCall,
+    AirflowListTaskInstancesCall,
     ClickHouseListDatabasesCall,
     ClickHouseListTablesCall,
     ClickHouseRunQueryCall,
@@ -55,6 +61,12 @@ from contracts.tools import (
 )
 
 __all__ = [
+    "AirflowGetDagCall",
+    "AirflowGetDagRunCall",
+    "AirflowGetTaskLogCall",
+    "AirflowListDagRunsCall",
+    "AirflowListDagsCall",
+    "AirflowListTaskInstancesCall",
     "AnalysisFact",
     "AnalysisFactKind",
     "AnalysisReport",
