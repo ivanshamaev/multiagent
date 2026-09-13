@@ -316,3 +316,17 @@
   message и ровно один вызов каждой стадии; committed stage не началась с task zero.
 - Финальные gates: `make check` 381 tests; scenario/grader и Airflow/Cosmos/dbt/SQL platform PASS.
   Следующий Phase J slice — декомпозиция реального role pipeline по checkpointable typed handoffs.
+
+## 2026-09-13 — STEP-0019 завершён
+
+- Happy-path `Analyst → PM → DE → Validator → QA → Reviewer` разложен на шесть stable MAF
+  executors; entry и каждая завершённая роль создают checkpoint iterations 0…6.
+- Typed immutable snapshot пересекает checkpoint boundary только как canonical JSON. На каждом hop
+  заново проверяются stage, task/workflow identity, reducer event hash-chain, artifact order и
+  неизменность принятой истории; application pickle types не разрешались.
+- Реальный `SIGKILL` при входе Validator и resume iteration 3 в новом процессе завершились `DONE`;
+  счётчики всех шести ролей равны 1, поэтому Analyst/PM/DE не стартовали повторно.
+- Финальные gates: `make role-pipeline-test` — 4 passed; `make check` — 386 tests; Docker Compose
+  контейнеры не запускались и остаются остановленными. Evidence:
+  `plan/evidence/STEP-0019-checkpointable-role-pipeline.md`.
+- Следующий Phase J slice — branching/rework с idempotency незавершённой роли, затем OTel tracing.

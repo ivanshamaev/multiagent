@@ -31,3 +31,4 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0025](ADR-0025-separate-approved-idempotent-airflow-trigger.md) | Separate approved and idempotent dev-DAG trigger | accepted |
 | [ADR-0026](ADR-0026-accept-upstream-httpx2.md) | Accept pinned upstream HTTPX2 dependency | accepted |
 | [ADR-0027](ADR-0027-maf-native-hardened-checkpoints.md) | MAF-native checkpoints behind hardened local storage | accepted |
+| [ADR-0028](ADR-0028-typed-json-role-checkpoint-boundaries.md) | Typed JSON boundaries between checkpointable role executors | accepted |

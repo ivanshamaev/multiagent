@@ -177,5 +177,7 @@ rework через повторные validator/QA gates, QA mutation detection 5
 `blocked / needs_user`. Phase I завершена: GET-only observer и отдельный controlled trigger работают
 поверх `/api/v2`; trigger требует одноразовый approval, использует детерминированный run ID и
 отдельную least-privilege identity. STEP-0018 завершил MAF-native hardened checkpoint storage и
-process-kill/resume proof. Следующий Phase J slice декомпозирует реальный role pipeline по typed
-checkpoint boundaries; затем следуют OTel и runner isolation.
+process-kill/resume proof. STEP-0019 разложил happy-path `Analyst → PM → DE → Validator → QA →
+Reviewer` на шесть MAF executors с typed JSON boundaries и доказал restart после DE без повторного
+запуска завершённых ролей. Следующий Phase J slice добавляет branching/rework и idempotency текущей
+роли; затем следуют OTel и runner isolation.
