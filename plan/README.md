@@ -23,11 +23,11 @@
 
 ## Текущий статус
 
-- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0014`](steps/STEP-0014-read-only-airflow-mcp.md); persistent gate summaries сохранены в `evidence/`.
+- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0015`](steps/STEP-0015-controlled-dev-dag-trigger.md) и audit-remediation [`STEP-0017`](steps/STEP-0017-kimi-audit-remediation.md); summaries сохранены в `evidence/`.
 - Phase G завершена: QA и Reviewer разделены, bounded rework повторяет validator/QA/Reviewer, а
   false pass/approval измерены на независимых мутациях.
 - Phase H завершена: read-only Analyst discovery передаёт evidence-backed typed handoff tool-free
   PM, который выдаёт полный spec либо детерминированный `blocked / needs_user`.
-- Phase I начата: локальный Airflow MCP читает allowlisted DAG/run/task/log metadata через stable
-  `/api/v2` под отдельным Viewer и deny-by-default policy.
-- Следующий шаг Phase I — controlled trigger только для dev-DAG под отдельной write-capability.
+- Phase I завершена: read-only observer отделён от approved/idempotent trigger единственного
+  dev-DAG; identities, profiles и MCP processes не пересекаются.
+- Следующий шаг — Phase J: reliability, observability и isolation.

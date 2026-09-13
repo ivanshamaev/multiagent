@@ -1,42 +1,21 @@
 # Каталог проблем
 
-Для системной или нетривиальной проблемы создаётся `PRB-NNNN-short-name.md` со статусом, symptom, reproduction, evidence, root cause, attempted fixes, accepted fix, regression check и follow-up. Секреты и полный model output не записываются.
+Системная проблема использует уникальный `PRB-NNNN-short-name.md` и содержит cause, fix и
+regression check. Полноту индекса проверяет `make plan-check`.
 
-Последние записи: [PRB-0010](PRB-0010-custom-dbt-runner.md) заменяет custom dbt runner на Cosmos;
-[PRB-0011](PRB-0011-cosmos-runtime-dependencies.md) фиксирует hash-locked runtime dependencies
-Cosmos; [PRB-0012](PRB-0012-grader-workspace-permissions.md) исправляет read boundary non-root
-grader; [PRB-0013](PRB-0013-openai3-httpx2-import.md) фиксирует смену HTTP package в OpenAI 3.
-[`PRB-0014`](PRB-0014-gatellm-virtual-model-ids.md) документирует `~`-prefixed virtual model IDs.
-[`PRB-0015`](PRB-0015-catalog-model-not-routable.md) добавляет live capability gate после catalog.
-[`PRB-0016`](PRB-0016-schema-probe-and-model-reliability.md) заменяет text probe строгой schema
-проверкой и фиксирует измеренный PM model override.
-[`PRB-0017`](PRB-0017-fastmcp-update-egress.md) закрывает обнаруженный FastMCP update-check egress
-через disabled update check и отдельную internal-only MCP network.
-[`PRB-0018`](PRB-0018-dbt-mcp-schema-drift.md) синхронизирует локальные typed contracts с живыми
-схемами pinned dbt MCP и добавляет регрессионную проверку сериализации gateway.
-[`PRB-0019`](PRB-0019-docker-registry-dns.md) документирует восстановленный отказ
-системного/VPN DNS, временно блокировавший повторную загрузку platform images.
-[`PRB-0020`](PRB-0020-scenario-repro-false-green.md) исправляет ложный green reproducibility gate,
-который ранее проглатывал ошибку `scenario-reset` и сравнивал две пустые строки.
-[`PRB-0021`](PRB-0021-maf-handler-name-collision.md) фиксирует конфликт имени role handler с
-framework-owned `Executor.execute`, обнаруженный offline end-to-end workflow test.
-[`PRB-0022`](PRB-0022-capability-probe-premature-abort.md) разрешает cost-first selector
-продолжить bounded поиск после schema-invalid HTTP 200 с сохранением usage.
-[`PRB-0023`](PRB-0023-agent-model-tool-capability.md) добавляет отдельный function-calling gate:
-strict schema support не гарантирует поддержку OpenAI-compatible tools.
-[`PRB-0024`](PRB-0024-zero-tool-completion.md) классифицирует model completion без единого tool
-evidence и сохраняет usage вместо неинформативного runtime `TypeError`.
-[`PRB-0025`](PRB-0025-tool-argument-recovery-and-run-retention.md) даёт модели bounded recovery
-после ошибочных tool arguments и гарантирует terminal run record для framework/provider failure.
-[`PRB-0026`](PRB-0026-gatellm-tool-history-limit.md) фиксирует воспроизводимый HTTP 400 на третьем
-tool-dialogue round текущего GateLLM/Llama route и требует phased fresh-conversation execution.
-[`PRB-0027`](PRB-0027-parallel-tool-call-fanout.md) запрещает parallel tool fan-out в required
-phase и сужает live budget после фактического пакета из 80 повторяющихся вызовов.
-[`PRB-0028`](PRB-0028-tool-history-response-format.md) отделяет local Pydantic validation от
-несовместимого provider schema mode при финализации tool-history.
-[`PRB-0029`](PRB-0029-decorated-structured-output.md) извлекает только один однозначный
-schema-valid JSON object из model decoration и отклоняет ambiguous output.
-[`PRB-0030`](PRB-0030-capability-probe-rate-amplification.md) добавляет catalog-bound TTL cache
-для успешных schema/tool probes и устраняет два лишних provider calls на каждый repeat run.
-[`PRB-0037`](PRB-0037-reviewer-canonical-false-rejection.md) сохраняет положительные observations
-между fresh Reviewer phases и фиксирует false rejection GPT-5.4 Nano без ослабления gates.
+| Records | Records | Records |
+| --- | --- | --- |
+| [PRB-0001](PRB-0001-uv-install-path.md) | [PRB-0002](PRB-0002-clickhouse-join-alias.md) | [PRB-0003](PRB-0003-clickhouse-numeric-supertype.md) |
+| [PRB-0004](PRB-0004-dbt-debug-missing-git.md) | [PRB-0005](PRB-0005-dbt-cli-option-scope.md) | [PRB-0006](PRB-0006-dbt-project-flags-deprecation.md) |
+| [PRB-0007](PRB-0007-deprecated-dbt-core-baseline.md) | [PRB-0008](PRB-0008-dbt-user-id-artifact.md) | [PRB-0009](PRB-0009-airflow-smoke-boundaries.md) |
+| [PRB-0010](PRB-0010-custom-dbt-runner.md) | [PRB-0011](PRB-0011-cosmos-runtime-dependencies.md) | [PRB-0012](PRB-0012-grader-workspace-permissions.md) |
+| [PRB-0013](PRB-0013-openai3-httpx2-import.md) | [PRB-0014](PRB-0014-gatellm-virtual-model-ids.md) | [PRB-0015](PRB-0015-catalog-model-not-routable.md) |
+| [PRB-0016](PRB-0016-schema-probe-and-model-reliability.md) | [PRB-0017](PRB-0017-fastmcp-update-egress.md) | [PRB-0018](PRB-0018-dbt-mcp-schema-drift.md) |
+| [PRB-0019](PRB-0019-docker-registry-dns.md) | [PRB-0020](PRB-0020-scenario-repro-false-green.md) | [PRB-0021](PRB-0021-maf-handler-name-collision.md) |
+| [PRB-0022](PRB-0022-capability-probe-premature-abort.md) | [PRB-0023](PRB-0023-agent-model-tool-capability.md) | [PRB-0024](PRB-0024-zero-tool-completion.md) |
+| [PRB-0025](PRB-0025-tool-argument-recovery-and-run-retention.md) | [PRB-0026](PRB-0026-gatellm-tool-history-limit.md) | [PRB-0027](PRB-0027-parallel-tool-call-fanout.md) |
+| [PRB-0028](PRB-0028-tool-history-response-format.md) | [PRB-0029](PRB-0029-decorated-structured-output.md) | [PRB-0030](PRB-0030-capability-probe-rate-amplification.md) |
+| [PRB-0031](PRB-0031-truncated-validator-feedback.md) | [PRB-0032](PRB-0032-clickhouse-metric-log-corruption.md) | [PRB-0033](PRB-0033-rework-token-envelope.md) |
+| [PRB-0034](PRB-0034-qa-probe-output-truncation.md) | [PRB-0035](PRB-0035-null-attribution-argmax.md) | [PRB-0036](PRB-0036-de-qa-repair-overreach.md) |
+| [PRB-0037](PRB-0037-reviewer-canonical-false-rejection.md) | [PRB-0038](PRB-0038-fastmcp-duplicate-structured-text.md) | [PRB-0039](PRB-0039-airflow-cli-intermittent-sigsegv.md) |
+| [PRB-0040](PRB-0040-fab-custom-role-default-permission.md) | [PRB-0041](PRB-0041-paused-dag-trigger-smoke.md) | [PRB-0042](PRB-0042-analyst-probe-raw-timestamp.md) |

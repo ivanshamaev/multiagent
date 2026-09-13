@@ -3,6 +3,8 @@
 Status: accepted  
 Date: 2026-09-05
 
+Superseded by: ADR-0010 only for the deferred dbt execution boundary; topology/auth/API remain.
+
 ## Context
 
 Golden Data Platform требует исполняемый Airflow 3 baseline, но официальный Compose quick-start с Celery/Redis избыточен для одного Ubuntu host. Будущий agent interface должен опираться на стабильный public API, не на UI или metadata DB. Airflow не должен получать GateLLM secret или небезопасный Docker socket.

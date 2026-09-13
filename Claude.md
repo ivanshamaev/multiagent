@@ -39,7 +39,7 @@ workflow/control plane → agents/reasoning → MCP/tools → Data Platform
 
 ## Runtime и зависимости
 
-Agent control plane работает на Ubuntu локально: Python 3.12, `uv`, `.venv`, Microsoft Agent Framework, Pydantic и pytest. Data Platform работает в Docker Compose: ClickHouse, dbt, Airflow 3 + Astronomer Cosmos, PostgreSQL и observability. Не устанавливай project dependencies глобально. `uv.lock` обязателен; floating dependencies и Docker tag `latest` запрещены.
+Agent control plane работает на Ubuntu локально: Python 3.12, `uv`, `.venv`, Microsoft Agent Framework, Pydantic и pytest. Текущая Data Platform в Docker Compose содержит ClickHouse, dbt, Airflow 3 + Astronomer Cosmos и PostgreSQL; observability относится к будущей Phase J. Не устанавливай project dependencies глобально. `uv.lock` обязателен; floating dependencies и Docker tag `latest` запрещены.
 
 Make targets — стабильный пользовательский интерфейс. Детали `docker compose` и service networking остаются внутри Make/config. Добавляй healthchecks, детерминированный seed и идемпотентные операции. Не заявляй, что target работает, пока он не выполнен с exit code `0`.
 
@@ -130,6 +130,11 @@ Airflow Observer использует только `airflow-observer-v1`: шес
 DAG ID, bounded pagination/log/output/call/time и отдельный FAB Viewer. Запрещены arbitrary URL,
 trigger, pause, clear, retry, XCom, config, variables, connections и metadata DB. `make
 airflow-mcp-smoke` — неплатный live gate; write-capability нельзя добавлять в этот profile/server.
+
+Airflow trigger изолирован в отдельном profile/process/identity и разрешает только создание run
+`ecommerce_acceptance`. Он требует code-owned одноразовый approval, связывающий task/DAG/key,
+выводит run ID из idempotency key и не принимает `conf`, URL, method или credentials. Observer
+остаётся read-only; pause/unpause доступны только административной live-test fixture.
 
 Никогда не подключай production credentials и не выполняй production write/deploy. Исключение текущего local development — только `API_TOKEN` для явно разрешённого GateLLM gateway. Расширение file/network scope, secret access и необратимые действия требуют явного human approval. Не удаляй Docker volumes и не выполняй `docker system prune` без явного запроса.
 

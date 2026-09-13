@@ -1,6 +1,6 @@
 # PRB-0026 — GateLLM route rejects the third tool-dialogue round
 
-- Status: open; phased execution required
+- Status: closed; accepted upstream limitation with phased execution implemented
 - Detected: 2026-09-12
 - Scope: `meta-llama/llama-3.1-8b-instruct` through GateLLM Chat Completions
 

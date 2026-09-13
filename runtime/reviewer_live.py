@@ -68,7 +68,7 @@ async def _prequalify_qa(
     manifest = load_manifest(REPOSITORY_ROOT, "net-revenue")
     profile = load_capability_profile(QA_PROFILE_PATH).model_copy(
         update={
-            "allowed_tools": frozenset({ToolName.CLICKHOUSE_RUN_QUERY}),
+            "allowed_tools": (ToolName.CLICKHOUSE_RUN_QUERY,),
             "max_tool_calls": 1,
         }
     )

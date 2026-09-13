@@ -20,7 +20,7 @@ Ubuntu host                         Docker Compose
 uv + .venv                         ClickHouse
 Microsoft Agent Framework          dbt runner
 orchestrator/runtime/agents         Airflow + PostgreSQL
-Pydantic contracts                 OTel Collector + Jaeger
+Pydantic contracts                 OTel Collector + Jaeger (Phase J target)
 pytest/evals/scenario harness       изолированная сеть и volumes
 ```
 
@@ -174,6 +174,7 @@ Engineer milestone проверены. Phase G завершена: незави�
 rework через повторные validator/QA gates, QA mutation detection 5/5 и Reviewer false approval 0/4
 сохранены в `plan/evidence/`. Phase H завершена: read-only Analyst формирует evidence-backed handoff,
 а tool-free PM принимает только этот artifact и детерминированно выбирает полный spec или
-`blocked / needs_user`. Phase I начата: GET-only Airflow MCP поверх `/api/v2` предоставляет
-allowlisted DAG/run/task/log metadata под отдельным Viewer с typed evidence. Следующая итерация —
-controlled local dev-DAG trigger под отдельной identity, policy и approval gate.
+`blocked / needs_user`. Phase I завершена: GET-only observer и отдельный controlled trigger работают
+поверх `/api/v2`; trigger требует одноразовый approval, использует детерминированный run ID и
+отдельную least-privilege identity. Следующая итерация — планирование Phase J reliability,
+observability и isolation.

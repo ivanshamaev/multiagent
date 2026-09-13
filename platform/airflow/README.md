@@ -20,6 +20,7 @@ make airflow-validate
 make airflow-test
 make airflow-failure-test
 make airflow-mcp-smoke
+make airflow-trigger-smoke
 ```
 
 Authentication uses a local-development FAB user and JWT from `/auth/token`.
@@ -31,3 +32,8 @@ The local MCP observer authenticates as the separately provisioned `airflow_obse
 It exposes six fixed `GET /api/v2` operations for the three repository DAGs and projects responses
 onto safe DAG/run/task fields; one task-attempt log is byte-bounded. It has no trigger, pause, clear,
 retry, XCom, variable, connection, configuration, or metadata-database capability.
+
+The write path is a separate MCP process and `airflow_trigger` FAB identity. It can only reconcile
+and create a deterministic run of `ecommerce_acceptance`, requires a matching unexpired one-time
+approval, and cannot accept arbitrary config, run IDs, methods, URLs, or headers. The smoke harness
+uses the admin fixture only to unpause/restore the manual DAG; the trigger identity cannot do so.

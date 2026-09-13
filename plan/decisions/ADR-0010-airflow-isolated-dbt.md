@@ -6,6 +6,8 @@ Date: 2026-09-05
 
 Supersedes: ADR-0009 only for its deferred dbt execution boundary; topology/auth/API rules remain.
 
+Superseded by: ADR-0011 for graph construction/execution; the isolated dbt virtualenv remains.
+
 ## Context
 
 STEP-0003 доказал Airflow scheduling/API с marker tasks. Для завершения Golden Data Platform DAG должен исполнять реальные transformations/tests. Airflow image и dbt lock закрепляют разные версии общих зависимостей, поэтому установка в один environment нарушает воспроизводимость.

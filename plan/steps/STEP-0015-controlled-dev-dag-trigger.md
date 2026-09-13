@@ -1,6 +1,6 @@
 # STEP-0015 — Controlled dev-DAG trigger
 
-Status: in progress
+Status: complete
 
 Date: 2026-09-13
 
@@ -8,7 +8,7 @@ Owner: repository maintainers
 
 Updated: 2026-09-13
 
-Current step: inspect Airflow 3.3.1 trigger schema and FAB permissions before implementation.
+Current step: complete; proceed to Phase J planning.
 
 ## Goal
 
@@ -67,6 +67,8 @@ explicit short-lived human approval, derive an idempotent run ID in code, and re
 - **Secret leakage:** credentials stay in explicit subprocess env and errors never include request
   bodies, tokens, credentials, or approval contents.
 - **Unsafe config injection:** request schema has no `conf`; adapter always sends `{}`.
+- **Paused manual DAG:** the live fixture temporarily unpauses only `ecommerce_acceptance` and an
+  `EXIT` trap restores it; the trigger identity has no pause/unpause operation.
 
 ## Planned verification
 
@@ -84,3 +86,14 @@ git diff --check
 make platform-down
 ```
 
+## Actual result and work log
+
+- Implemented the closed trigger contract, policy, approval store, fixed API adapter, standalone
+  MCP/MAF facade, dedicated FAB identity, CLI and live gate.
+- Live permissions were reduced to the exact custom-role set recorded in ADR-0025. PRB-0040 fixed
+  Airflow CLI ordering and documented FAB's mandatory `can_read Website` permission.
+- The first live run exposed the paused-DAG precondition. PRB-0041 added an admin-owned fixture
+  unpause with an `EXIT` restore; the trigger identity gained no pause permission.
+- `make airflow-trigger-smoke` proved `created → existing`, one run ID and 11/11 successful tasks.
+  `make check` passed 371 tests; all planned MCP, scenario, grader and platform gates exited 0.
+- Persistent evidence: `plan/evidence/STEP-0015-controlled-dev-dag-trigger.md`.

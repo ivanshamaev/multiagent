@@ -1,4 +1,4 @@
-# PROBLEM-0011 — Analyst probe used a mart timestamp name
+# PRB-0042 — Analyst probe used a mart timestamp name
 
 Status: resolved
 
@@ -19,4 +19,5 @@ retained by the MCP gateway and no `RequirementsAnalysisReport` crossed the redu
 ## Regression check
 
 The Analyst policy test asserts that the immutable query contains `ordered_at` and not `order_date`.
-The live command is rerun after unit and policy checks.
+The live command passed after unit and policy checks. This record replaces the colliding historical
+name `PROBLEM-0011-analyst-probe-raw-timestamp.md` without changing the finding.

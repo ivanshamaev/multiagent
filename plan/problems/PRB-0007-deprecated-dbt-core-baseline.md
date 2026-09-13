@@ -1,6 +1,6 @@
 # PRB-0007 — Первоначальный dbt Core baseline уже deprecated
 
-Status: validating
+Status: resolved
 Detected: 2026-09-04
 
 ## Symptom

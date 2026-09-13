@@ -45,7 +45,7 @@ SCENARIO_DBT_PROJECT = $(SCENARIO_WORKSPACE)/platform/dbt
 SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	$(COMPOSE) run --rm --no-deps scenario-grader
 
-.PHONY: bootstrap lint format-check test check compose-validate \
+.PHONY: secure-env bootstrap lint format-check test plan-check check compose-validate \
 	clickhouse-up platform-up platform-status platform-down seed platform-test \
 	clickhouse-test dbt-baseline-test dbt-image dbt-version dbt-debug \
 	dbt-parse dbt-compile dbt-build dbt-test airflow-version airflow-init \
@@ -56,7 +56,10 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	mcp-images mcp-users mcp-smoke airflow-mcp-smoke airflow-trigger-approve airflow-trigger-smoke \
 	data-engineer-live analyst-live requirements-live qa-live reviewer-live quality-loop-live
 
-bootstrap:
+secure-env:
+	@if test -f .env; then chmod 600 .env; test "$$(stat -c '%a' .env)" = 600; fi
+
+bootstrap: secure-env
 	$(UV) sync --frozen
 
 lint:
@@ -68,10 +71,13 @@ format-check:
 test:
 	$(UV) run pytest
 
+plan-check:
+	$(UV) run python -m policies.plan_governance
+
 compose-validate:
 	$(COMPOSE) config --quiet
 
-check: lint format-check test compose-validate
+check: lint format-check test plan-check compose-validate
 
 clickhouse-up:
 	$(COMPOSE) up -d --wait clickhouse
@@ -173,7 +179,10 @@ airflow-trigger-approve:
 		--idempotency-key "$(IDEMPOTENCY_KEY)" --approved-by "$(APPROVED_BY)"
 
 airflow-trigger-smoke: seed airflow-validate
-	$(UV) run python -m runtime.airflow_trigger_smoke
+	@set -e; \
+		$(AIRFLOW_CHECK) dags unpause ecommerce_acceptance >/dev/null; \
+		trap '$(AIRFLOW_CHECK) dags pause ecommerce_acceptance >/dev/null' EXIT; \
+		$(UV) run python -m runtime.airflow_trigger_smoke
 
 airflow-failure-test: airflow-validate
 	$(UV) run python platform/airflow/scripts/api_smoke.py --expect-failure

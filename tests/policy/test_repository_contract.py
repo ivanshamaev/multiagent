@@ -17,6 +17,16 @@ def test_required_governance_documents_exist() -> None:
     assert all((ROOT / path).is_file() for path in required_paths)
 
 
+def test_bootstrap_enforces_owner_only_env_permissions() -> None:
+    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
+
+    assert "secure-env:" in makefile
+    assert "bootstrap: secure-env" in makefile
+    assert "chmod 600 .env" in makefile
+    if (ROOT / ".env").exists():
+        assert (ROOT / ".env").stat().st_mode & 0o077 == 0
+
+
 def test_python_version_is_pinned_to_312() -> None:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
 
@@ -29,7 +39,10 @@ def test_compose_uses_pinned_image_and_loopback_ports() -> None:
     airflow_image = (ROOT / "platform/airflow/Dockerfile").read_text(encoding="utf-8")
 
     assert ":latest" not in compose
-    assert "clickhouse/clickhouse-server:25.8.33.6" in compose
+    assert (
+        "clickhouse/clickhouse-server:25.8.33.6@sha256:"
+        "0152dd511befe6a2c2ef53e930726179669b08116da78500b37c51c96ff5ee77" in compose
+    )
     assert "agentic-data-platform-dbt:1.11.14-1.10.2" in compose
     assert (
         "apache/airflow:3.3.1-python3.12@sha256:"

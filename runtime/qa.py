@@ -291,9 +291,12 @@ def accept_qa_draft(
     }[draft.decision]
     defects: tuple[Defect, ...] = ()
     if draft.decision is QADecision.FAIL:
-        assert draft.severity is not None
-        assert draft.defect_description is not None
-        assert draft.acceptance_criterion is not None
+        if (
+            draft.severity is None
+            or draft.defect_description is None
+            or draft.acceptance_criterion is None
+        ):
+            raise QABoundaryError("QA FAIL requires a complete defect")
         defects = (
             Defect(
                 defect_id=_identifier("defect", request.workflow_id, str(state.revision)),

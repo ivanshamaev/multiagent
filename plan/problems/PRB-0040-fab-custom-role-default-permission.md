@@ -8,12 +8,13 @@ Date: 2026-09-13
 
 The first live `make airflow-init` after creating `AgenticDataTrigger` failed the exact-permission
 check. `airflow roles list --permission --output json` showed that FAB automatically attaches
-`can_read` on `Website` when an empty custom role is created. The repository had assumed no default
-permission.
+`can_read` on `Website` when an empty custom role is created. The next attempt also showed that the
+CLI's variable-length `-r` option consumes a trailing positional role, so the role must precede
+`-a/-r`. The repository had assumed an empty role and order-independent CLI arguments.
 
 ## Resolution and regression
 
 The exact role manifest explicitly includes this FAB-required base permission alongside the four
 operation permissions: create/read `DAG Runs` and edit/read only
-`DAG:ecommerce_acceptance`. Any other permission still fails bootstrap. Unit policy checks assert
+`DAG:ecommerce_acceptance`. Provisioning passes the positional role first. Any other permission still fails bootstrap. Unit policy checks assert
 that broad `can_edit` on `DAGs` is absent; live bootstrap and API tests verify the effective role.

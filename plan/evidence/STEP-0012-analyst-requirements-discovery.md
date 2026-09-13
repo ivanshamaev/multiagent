@@ -36,7 +36,7 @@ Status: PASS
 
 ## Problems and residual risk
 
-PROBLEM-0011 records the initial raw timestamp mismatch and regression. Two live cases do not
+PRB-0042 records the initial raw timestamp mismatch and regression. Two live cases do not
 establish statistical reliability. The profile currently covers orders only; the report correctly
 keeps payment/refund/attribution schema questions unresolved. The legacy standalone PM adapter
 temporarily creates labelled compatibility discovery from verified context; STEP-0013 must remove

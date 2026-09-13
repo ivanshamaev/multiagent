@@ -245,7 +245,7 @@
 - `analyst_v1` выполняет три fresh read-only MCP phase и tool-free synthesis. Facts принимаются
   только как точные excerpts успешного same-task evidence; typed handoff сохраняет unknowns.
 - GPT-5.6 Luna прошёл canonical и ambiguous-metric: 25 facts в каждом, 9 open questions во втором,
-  суммарно 6 tools/8 model calls без write/policy violation. PROBLEM-0011 исправил `ordered_at` probe.
+  суммарно 6 tools/8 model calls без write/policy violation. PRB-0042 исправил `ordered_at` probe.
 - Финальные gates: `make check` 322 tests; MCP smoke, reproducibility, baseline grader,
   Airflow/Cosmos 11/11, ClickHouse и dbt 68/68 — PASS.
 - Evidence: `plan/evidence/STEP-0012-analyst-requirements-discovery.md`. Следующий шаг — STEP-0013,
@@ -277,3 +277,24 @@
 - Финальные gates: `make check` 350 tests; ClickHouse/dbt MCP, scenario reproducibility, baseline
   grader и `make platform-test` PASS. Evidence: `plan/evidence/STEP-0014-read-only-airflow-mcp.md`.
 - Phase I продолжается отдельным controlled dev-DAG trigger; текущий observer останется read-only.
+
+## 2026-09-13 — STEP-0015 завершён
+
+- Отдельный trigger MCP/profile/FAB user разрешает только approved запуск `ecommerce_acceptance`;
+  observer не получил write-функций, а credentials и JWT не входят в аргументы или evidence.
+- Одноразовый mode-0600 approval связывает task/DAG/idempotency key/approver/expiry. Стабильный
+  code-owned run ID, preflight GET и reconciliation исключают дубликат при retry/timeout.
+- Live gate доказал `created → existing` для одного run и 11/11 success; paused-состояние manual DAG
+  восстановлено. PRB-0040/0041 фиксируют реальные особенности FAB CLI и paused DAG.
+- Финальные gates: `make check` 371 tests; observer/MCP, scenario, grader и platform PASS. Evidence:
+  `plan/evidence/STEP-0015-controlled-dev-dag-trigger.md`. Phase I завершена; далее Phase J.
+
+## 2026-09-13 — STEP-0017 Kimi audit завершён
+
+- Все F-01…F-22 внешнего аудита сверены с post-STEP-0015 кодом и получили явную диспозицию.
+- `.env` теперь 0600 и защищён bootstrap gate; ClickHouse закреплён digest. Исправлены PRB/ADR
+  индексы, статусы, коллизия имени, STEP-0001 evidence и фактические runbooks.
+- ADR-0026 подтвердил происхождение HTTPX2 из Pydantic/OpenAI stack. `make plan-check` автоматически
+  проверяет ключевые инварианты planning ledger; QA assert и Reviewer tuple mismatch исправлены.
+- `make check` — 374 tests; scenario, grader и полный platform gate PASS. Крупная герметизация
+  tests/identities/runtime helpers явно перенесена в Phase J, coverage — в Phase K.

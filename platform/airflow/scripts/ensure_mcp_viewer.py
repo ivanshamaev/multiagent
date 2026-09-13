@@ -74,11 +74,11 @@ def _ensure_trigger_role() -> None:
                 "airflow",
                 "roles",
                 "add-perms",
+                TRIGGER_ROLE,
                 "-a",
                 action,
                 "-r",
                 resource,
-                TRIGGER_ROLE,
             ]
         )
 

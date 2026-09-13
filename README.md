@@ -6,7 +6,7 @@
 
 Реализованы golden Data Platform, reproducible scenario harness, strict typed artifacts и
 детерминированный workflow с budgets и hash-chained events, read-only Analyst, tool-free PM gate и
-GET-only Airflow MCP под отдельным Viewer.
+GET-only Airflow MCP под отдельным Viewer и controlled trigger одного dev-DAG под отдельной identity.
 Runtime работает локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в
 Docker Compose. LLM-вызовы идут через OpenAI-совместимый GateLLM с токеном из локального `.env`.
 Работают ClickHouse,
@@ -36,6 +36,12 @@ make platform-test
 `make airflow-mcp-smoke` создаёт acceptance run детерминированным admin-клиентом, затем читает DAG,
 run, task instances и bounded log только через локальный MCP под `airflow_observer`. MCP не содержит
 trigger/pause/clear/retry, connection/variable/XCom или произвольных HTTP операций.
+
+`make airflow-trigger-approve TASK_ID=<task> IDEMPOTENCY_KEY=<key> APPROVED_BY=<person>` создаёт
+короткоживущий одноразовый approval. Отдельный trigger MCP принимает только
+`ecommerce_acceptance`, сам выводит стабильный run ID и всегда отправляет пустой `conf`.
+`make airflow-trigger-smoke` временно unpause-ит manual DAG test-fixture, доказывает повтор без
+дубликата и гарантированно возвращает paused-состояние.
 
 ClickHouse публикуется только на loopback-интерфейсе. HTTP и native endpoints по умолчанию доступны на `127.0.0.1:8123` и `127.0.0.1:9000`.
 
