@@ -8,6 +8,17 @@ import os
 import signal
 import subprocess
 
+TRIGGER_ROLE = "AgenticDataTrigger"
+TRIGGER_PERMISSIONS = frozenset(
+    {
+        ("can_create", "DAG Runs"),
+        ("can_read", "DAG Runs"),
+        ("can_edit", "DAG:ecommerce_acceptance"),
+        ("can_read", "DAG:ecommerce_acceptance"),
+        ("can_read", "Website"),
+    }
+)
+
 
 def _required(name: str) -> str:
     value = os.environ.get(name, "").strip()
@@ -34,6 +45,55 @@ def _users() -> list[dict[str, object]]:
     if not isinstance(payload, list) or not all(isinstance(item, dict) for item in payload):
         raise RuntimeError("Airflow user listing returned an invalid response")
     return payload
+
+
+def _ensure_trigger_role() -> None:
+    _run(["airflow", "sync-perm", "--include-dags"])
+    roles = json.loads(_run(["airflow", "roles", "list", "--output", "json"]).stdout)
+    if not isinstance(roles, list) or not all(isinstance(item, dict) for item in roles):
+        raise RuntimeError("Airflow role listing returned an invalid response")
+    if TRIGGER_ROLE not in {item.get("name") for item in roles}:
+        _run(["airflow", "roles", "create", TRIGGER_ROLE])
+
+    rows = json.loads(_run(["airflow", "roles", "list", "--permission", "--output", "json"]).stdout)
+    if not isinstance(rows, list) or not all(isinstance(item, dict) for item in rows):
+        raise RuntimeError("Airflow permission listing returned an invalid response")
+    actual = {
+        (action, str(item.get("resource")))
+        for item in rows
+        if item.get("name") == TRIGGER_ROLE
+        for action in str(item.get("action", "")).split(",")
+        if action
+    }
+    unexpected = actual - TRIGGER_PERMISSIONS
+    if unexpected:
+        raise RuntimeError("Airflow trigger role has unexpected permissions")
+    for action, resource in sorted(TRIGGER_PERMISSIONS - actual):
+        _run(
+            [
+                "airflow",
+                "roles",
+                "add-perms",
+                "-a",
+                action,
+                "-r",
+                resource,
+                TRIGGER_ROLE,
+            ]
+        )
+
+    verified_rows = json.loads(
+        _run(["airflow", "roles", "list", "--permission", "--output", "json"]).stdout
+    )
+    verified = {
+        (action, str(item.get("resource")))
+        for item in verified_rows
+        if item.get("name") == TRIGGER_ROLE
+        for action in str(item.get("action", "")).split(",")
+        if action
+    }
+    if verified != TRIGGER_PERMISSIONS:
+        raise RuntimeError("Airflow trigger role does not have the exact permission set")
 
 
 def _ensure_user(
@@ -72,6 +132,7 @@ def _ensure_user(
 
 
 def main() -> None:
+    _ensure_trigger_role()
     _ensure_user(
         username=_required("AIRFLOW_ADMIN_USERNAME"),
         password=_required("AIRFLOW_ADMIN_PASSWORD"),
@@ -87,6 +148,14 @@ def main() -> None:
         lastname="Observer",
         role="Viewer",
         email="airflow-observer@example.invalid",
+    )
+    _ensure_user(
+        username=_required("AIRFLOW_TRIGGER_USERNAME"),
+        password=_required("AIRFLOW_TRIGGER_PASSWORD"),
+        firstname="Airflow",
+        lastname="Trigger",
+        role=TRIGGER_ROLE,
+        email="airflow-trigger@example.invalid",
     )
     print("Airflow local users: ready")
 

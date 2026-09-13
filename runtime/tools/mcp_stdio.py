@@ -31,6 +31,7 @@ AIRFLOW_MCP_TOOLS = frozenset(
         "list_task_instances",
     }
 )
+AIRFLOW_TRIGGER_MCP_TOOLS = frozenset({"trigger_dag"})
 ApprovalMode = Literal["always_require", "never_require"]
 
 
@@ -163,6 +164,47 @@ def create_airflow_mcp_tool(
         cwd=str(root),
         tool_name_prefix="airflow",
         allowed_tools=AIRFLOW_MCP_TOOLS,
+        load_prompts=False,
+        approval_mode=approval_mode,
+        request_timeout=request_timeout,
+    )
+
+
+def create_airflow_trigger_mcp_tool(
+    repository_root: Path,
+    *,
+    base_url: str,
+    username: str,
+    password: str,
+    allowed_dag: str,
+    request_timeout: int = 20,
+    approval_mode: ApprovalMode = "always_require",
+) -> MCPStdioTool:
+    """Create the separate approved Airflow trigger MCP subprocess."""
+
+    root = _repository_root(repository_root)
+    if not username or not password or not allowed_dag:
+        raise MCPConfigurationError("Airflow trigger MCP requires credentials and one DAG")
+    return MCPStdioTool(
+        name="airflow-trigger-mcp",
+        description="Approved idempotent trigger for one local development DAG",
+        command=sys.executable,
+        args=["-m", "runtime.airflow_trigger_mcp_server"],
+        env={
+            "AIRFLOW_API_BASE_URL": base_url,
+            "AIRFLOW_API_REQUEST_TIMEOUT_SECONDS": str(request_timeout),
+            "AIRFLOW_TRIGGER_ALLOWED_DAG": allowed_dag,
+            "AIRFLOW_TRIGGER_APPROVAL_ROOT": str(
+                root / ".scenario-state/airflow-trigger-approvals"
+            ),
+            "AIRFLOW_TRIGGER_MAX_RESPONSE_BYTES": "50000",
+            "AIRFLOW_TRIGGER_PASSWORD": password,
+            "AIRFLOW_TRIGGER_REPOSITORY_ROOT": str(root),
+            "AIRFLOW_TRIGGER_USERNAME": username,
+        },
+        cwd=str(root),
+        tool_name_prefix="airflow",
+        allowed_tools=AIRFLOW_TRIGGER_MCP_TOOLS,
         load_prompts=False,
         approval_mode=approval_mode,
         request_timeout=request_timeout,

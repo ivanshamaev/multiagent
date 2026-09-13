@@ -16,11 +16,14 @@ AIRFLOW_ADMIN_USERNAME ?= airflow
 AIRFLOW_ADMIN_PASSWORD ?= airflow_dev_only
 AIRFLOW_MCP_USERNAME ?= airflow_observer
 AIRFLOW_MCP_PASSWORD ?= airflow_observer_dev_only
+AIRFLOW_TRIGGER_USERNAME ?= airflow_trigger
+AIRFLOW_TRIGGER_PASSWORD ?= airflow_trigger_dev_only
 AIRFLOW_API_REQUEST_TIMEOUT_SECONDS ?= 10
 AIRFLOW_API_POLL_TIMEOUT_SECONDS ?= 300
 AIRFLOW_API_POLL_INTERVAL_SECONDS ?= 2
 export AIRFLOW_API_BASE_URL AIRFLOW_ADMIN_USERNAME AIRFLOW_ADMIN_PASSWORD
 export AIRFLOW_MCP_USERNAME AIRFLOW_MCP_PASSWORD
+export AIRFLOW_TRIGGER_USERNAME AIRFLOW_TRIGGER_PASSWORD
 export AIRFLOW_API_REQUEST_TIMEOUT_SECONDS AIRFLOW_API_POLL_TIMEOUT_SECONDS
 export AIRFLOW_API_POLL_INTERVAL_SECONDS
 AIRFLOW = $(COMPOSE) exec -T airflow-scheduler airflow
@@ -50,7 +53,8 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	scenario-init scenario-reset scenario-status scenario-verify scenario-fingerprint \
 	scenario-baseline-build scenario-run scenario-contract-test scenario-grader-image scenario-grade \
 	scenario-grade-baseline-test scenario-repro-test scenario-test llm-catalog llm-smoke \
-	mcp-images mcp-users mcp-smoke airflow-mcp-smoke data-engineer-live analyst-live requirements-live qa-live reviewer-live quality-loop-live
+	mcp-images mcp-users mcp-smoke airflow-mcp-smoke airflow-trigger-approve airflow-trigger-smoke \
+	data-engineer-live analyst-live requirements-live qa-live reviewer-live quality-loop-live
 
 bootstrap:
 	$(UV) sync --frozen
@@ -160,6 +164,16 @@ airflow-test: airflow-validate
 
 airflow-mcp-smoke: airflow-test
 	$(UV) run python -m runtime.airflow_mcp_smoke
+
+airflow-trigger-approve:
+	@test -n "$(TASK_ID)" && test -n "$(IDEMPOTENCY_KEY)" && test -n "$(APPROVED_BY)" || { \
+		echo "TASK_ID, IDEMPOTENCY_KEY and APPROVED_BY are required" >&2; exit 2; \
+	}
+	$(UV) run python -m runtime.airflow_trigger_approval --task-id "$(TASK_ID)" \
+		--idempotency-key "$(IDEMPOTENCY_KEY)" --approved-by "$(APPROVED_BY)"
+
+airflow-trigger-smoke: seed airflow-validate
+	$(UV) run python -m runtime.airflow_trigger_smoke
 
 airflow-failure-test: airflow-validate
 	$(UV) run python platform/airflow/scripts/api_smoke.py --expect-failure

@@ -47,6 +47,15 @@ OptionalPattern = Annotated[
     str,
     StringConstraints(strip_whitespace=True, min_length=1, max_length=256),
 ]
+IdempotencyKey = Annotated[
+    str,
+    StringConstraints(
+        strip_whitespace=True,
+        min_length=8,
+        max_length=128,
+        pattern=r"^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+    ),
+]
 AirflowObjectId = Annotated[
     str,
     StringConstraints(
@@ -78,6 +87,7 @@ class ToolName(StrEnum):
     AIRFLOW_GET_DAG_RUN = "airflow.get_dag_run"
     AIRFLOW_LIST_TASK_INSTANCES = "airflow.list_task_instances"
     AIRFLOW_GET_TASK_LOG = "airflow.get_task_log"
+    AIRFLOW_TRIGGER_DAG = "airflow.trigger_dag"
 
 
 class DbtResourceType(StrEnum):
@@ -243,6 +253,14 @@ class AirflowGetTaskLogCall(FrozenModel):
     map_index: StrictInt = Field(default=-1, ge=-1, le=1_000_000)
 
 
+class AirflowTriggerDagCall(FrozenModel):
+    tool: Literal[ToolName.AIRFLOW_TRIGGER_DAG] = ToolName.AIRFLOW_TRIGGER_DAG
+    task_id: Identifier
+    dag_id: AirflowObjectId
+    idempotency_key: IdempotencyKey
+    approval_id: Identifier
+
+
 ToolCall = Annotated[
     WorkspaceReadCall
     | WorkspaceWriteCall
@@ -262,7 +280,8 @@ ToolCall = Annotated[
     | AirflowListDagRunsCall
     | AirflowGetDagRunCall
     | AirflowListTaskInstancesCall
-    | AirflowGetTaskLogCall,
+    | AirflowGetTaskLogCall
+    | AirflowTriggerDagCall,
     Field(discriminator="tool"),
 ]
 

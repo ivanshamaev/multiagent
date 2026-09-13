@@ -3,12 +3,32 @@ from pathlib import Path
 import pytest
 
 from runtime.tools import (
+    AIRFLOW_TRIGGER_MCP_TOOLS,
     CLICKHOUSE_MCP_TOOLS,
     DBT_MCP_TOOLS,
     MCPConfigurationError,
+    create_airflow_trigger_mcp_tool,
     create_clickhouse_mcp_tool,
     create_dbt_mcp_tool,
 )
+
+
+def test_airflow_trigger_mcp_is_separate_and_always_requires_approval(tmp_path: Path) -> None:
+    root, _ = _repository(tmp_path)
+
+    tool = create_airflow_trigger_mcp_tool(
+        root,
+        base_url="http://127.0.0.1:8080",
+        username="trigger-user",
+        password="trigger-password",
+        allowed_dag="ecommerce_acceptance",
+    )
+
+    assert tool.allowed_tools == AIRFLOW_TRIGGER_MCP_TOOLS
+    assert tool.approval_mode == "always_require"
+    assert tool.args == ["-m", "runtime.airflow_trigger_mcp_server"]
+    assert tool.env["AIRFLOW_TRIGGER_ALLOWED_DAG"] == "ecommerce_acceptance"
+    assert "AIRFLOW_MCP_USERNAME" not in tool.env
 
 
 def _repository(tmp_path: Path) -> tuple[Path, Path]:

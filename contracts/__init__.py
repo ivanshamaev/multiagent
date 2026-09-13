@@ -1,5 +1,6 @@
 """Versioned structured artifacts exchanged between workflow stages."""
 
+from contracts.airflow import AirflowTriggerApproval
 from contracts.artifacts import (
     AnalysisFact,
     AnalysisFactKind,
@@ -36,6 +37,7 @@ from contracts.tools import (
     AirflowListDagRunsCall,
     AirflowListDagsCall,
     AirflowListTaskInstancesCall,
+    AirflowTriggerDagCall,
     ClickHouseListDatabasesCall,
     ClickHouseListTablesCall,
     ClickHouseRunQueryCall,
@@ -67,6 +69,8 @@ __all__ = [
     "AirflowListDagRunsCall",
     "AirflowListDagsCall",
     "AirflowListTaskInstancesCall",
+    "AirflowTriggerApproval",
+    "AirflowTriggerDagCall",
     "AnalysisFact",
     "AnalysisFactKind",
     "AnalysisReport",

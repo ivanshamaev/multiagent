@@ -53,6 +53,7 @@ _AIRFLOW_TOOLS = {
     ToolName.AIRFLOW_GET_DAG_RUN,
     ToolName.AIRFLOW_LIST_TASK_INSTANCES,
     ToolName.AIRFLOW_GET_TASK_LOG,
+    ToolName.AIRFLOW_TRIGGER_DAG,
 }
 _DBT_FAILURE_PREFIXES = ("Timeout:", "Command failed", "--- stdout ---", "--- stderr ---")
 

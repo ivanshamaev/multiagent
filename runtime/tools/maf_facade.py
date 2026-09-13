@@ -18,6 +18,7 @@ from contracts import (
     AirflowListDagRunsCall,
     AirflowListDagsCall,
     AirflowListTaskInstancesCall,
+    AirflowTriggerDagCall,
     ClickHouseListDatabasesCall,
     ClickHouseListTablesCall,
     ClickHouseRunQueryCall,
@@ -42,6 +43,7 @@ from runtime.tools.evidence_store import ToolEvidenceStore
 from runtime.tools.mcp_gateway import MCPGatewayError, MCPToolGateway
 from runtime.tools.mcp_stdio import (
     create_airflow_mcp_tool,
+    create_airflow_trigger_mcp_tool,
     create_clickhouse_mcp_tool,
     create_dbt_mcp_tool,
 )
@@ -60,6 +62,65 @@ class ConnectedDataEngineerMCPTools:
 class ConnectedAirflowMCPTools:
     tools: tuple[FunctionTool, ...]
     gateway: MCPToolGateway
+
+
+@dataclass(frozen=True)
+class ConnectedAirflowTriggerTools:
+    tools: tuple[FunctionTool, ...]
+    gateway: MCPToolGateway
+
+
+class AirflowTriggerMCPTools:
+    """Bind one task identity to the separately approved trigger schema."""
+
+    def __init__(
+        self,
+        gateway: MCPToolGateway,
+        *,
+        task_id: str,
+        actor_id: str,
+        role: str = "airflow-trigger-controller",
+    ) -> None:
+        self._gateway = gateway
+        self._task_id = task_id
+        self._actor_id = actor_id
+        self._role = role
+        self._sequence = count(1)
+
+        @tool(
+            name="airflow_trigger_dag",
+            description="Trigger one approved local DAG with a stable idempotency key.",
+            approval_mode="always_require",
+        )
+        async def trigger_dag(
+            dag_id: str,
+            idempotency_key: str,
+            approval_id: str,
+        ) -> str:
+            try:
+                call = AirflowTriggerDagCall(
+                    task_id=self._task_id,
+                    dag_id=dag_id,
+                    idempotency_key=idempotency_key,
+                    approval_id=approval_id,
+                )
+            except (TypeError, ValueError) as error:
+                raise MiddlewareFailure("tool arguments failed closed validation") from error
+            sequence = next(self._sequence)
+            seed = f"{self._task_id}:{self._actor_id}:{sequence}"
+            request = ToolRequest(
+                request_id=f"tool-request-{sha256(seed.encode()).hexdigest()[:24]}",
+                task_id=self._task_id,
+                actor_id=self._actor_id,
+                role=self._role,
+                call=call,
+            )
+            try:
+                return (await self._gateway.execute(request)).content
+            except MCPGatewayError as error:
+                raise MiddlewareFailure(str(error)) from error
+
+        self.tools = (trigger_dag,) if ToolName.AIRFLOW_TRIGGER_DAG in gateway.allowed_tools else ()
 
 
 class AirflowMCPTools:
@@ -504,3 +565,38 @@ async def connect_airflow_mcp_tools(
             role=role,
         )
         yield ConnectedAirflowMCPTools(tools=facade.tools, gateway=gateway)
+
+
+@asynccontextmanager
+async def connect_airflow_trigger_tools(
+    repository_root: Path,
+    profile: CapabilityProfile,
+    *,
+    task_id: str,
+    actor_id: str,
+    base_url: str,
+    username: str,
+    password: str,
+    role: str = "airflow-trigger-controller",
+) -> AsyncIterator[ConnectedAirflowTriggerTools]:
+    """Connect only the separately approved local Airflow trigger MCP."""
+
+    if len(profile.allowed_airflow_dags) != 1:
+        raise ValueError("Airflow trigger profile must allow exactly one DAG")
+    airflow = create_airflow_trigger_mcp_tool(
+        repository_root,
+        base_url=base_url,
+        username=username,
+        password=password,
+        allowed_dag=profile.allowed_airflow_dags[0],
+    )
+    store = ToolEvidenceStore(repository_root, repository_root / ".scenario-state")
+    async with airflow:
+        gateway = MCPToolGateway(profile, None, None, store, airflow=airflow)
+        facade = AirflowTriggerMCPTools(
+            gateway,
+            task_id=task_id,
+            actor_id=actor_id,
+            role=role,
+        )
+        yield ConnectedAirflowTriggerTools(tools=facade.tools, gateway=gateway)

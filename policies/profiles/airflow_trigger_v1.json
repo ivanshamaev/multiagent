@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "profile_id": "airflow-trigger-v1",
+  "role": "airflow-trigger-controller",
+  "allowed_tools": [
+    "airflow.trigger_dag"
+  ],
+  "readable_paths": [],
+  "writable_paths": [],
+  "allowed_databases": [],
+  "allowed_airflow_dags": [
+    "ecommerce_acceptance"
+  ],
+  "max_query_rows": 1,
+  "max_query_chars": 1,
+  "max_read_bytes": 1,
+  "max_write_bytes": 1,
+  "max_tool_calls": 4,
+  "max_wall_time_seconds": 60,
+  "max_output_bytes": 50000
+}

@@ -20,6 +20,7 @@ from contracts.tools import (
     AirflowGetTaskLogCall,
     AirflowListDagRunsCall,
     AirflowListTaskInstancesCall,
+    AirflowTriggerDagCall,
     ClickHouseListTablesCall,
     ClickHouseRunQueryCall,
     DatabaseName,
@@ -143,6 +144,7 @@ class PolicyCode(StrEnum):
     PATH_DENIED = "path_denied"
     DATABASE_DENIED = "database_denied"
     AIRFLOW_DAG_DENIED = "airflow_dag_denied"
+    REQUEST_MISMATCH = "request_mismatch"
     QUERY_DENIED = "query_denied"
     BUDGET_DENIED = "budget_denied"
 
@@ -309,6 +311,14 @@ def authorize_tool_call(
             AirflowGetTaskLogCall,
         ),
     ):
+        if call.dag_id not in profile.allowed_airflow_dags:
+            return _deny(
+                PolicyCode.AIRFLOW_DAG_DENIED,
+                "Airflow DAG is not present in the allowlist",
+            )
+    elif isinstance(call, AirflowTriggerDagCall):
+        if call.task_id != request.task_id:
+            return _deny(PolicyCode.REQUEST_MISMATCH, "trigger task does not match its envelope")
         if call.dag_id not in profile.allowed_airflow_dags:
             return _deny(
                 PolicyCode.AIRFLOW_DAG_DENIED,

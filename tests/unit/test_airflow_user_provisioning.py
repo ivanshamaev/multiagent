@@ -54,3 +54,16 @@ def test_compose_uses_only_repository_user_bootstrap() -> None:
 
     assert "_AIRFLOW_WWW_USER_CREATE" not in compose
     assert "command: python /opt/airflow/ensure_mcp_viewer.py" in compose
+
+
+def test_trigger_role_has_only_dag_specific_minimum_permissions() -> None:
+    module = _module()
+
+    assert module.TRIGGER_PERMISSIONS == {
+        ("can_create", "DAG Runs"),
+        ("can_read", "DAG Runs"),
+        ("can_edit", "DAG:ecommerce_acceptance"),
+        ("can_read", "DAG:ecommerce_acceptance"),
+        ("can_read", "Website"),
+    }
+    assert ("can_edit", "DAGs") not in module.TRIGGER_PERMISSIONS
