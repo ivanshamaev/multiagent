@@ -9,7 +9,7 @@
 GET-only Airflow MCP под отдельным Viewer и controlled trigger одного dev-DAG под отдельной identity.
 Runtime работает локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в
 Docker Compose. LLM-вызовы идут через OpenAI-совместимый GateLLM с токеном из локального `.env`.
-Phase J содержит hardened MAF checkpoint storage и six-role checkpointable pipeline.
+Phase J содержит hardened MAF checkpoints, branching six-role pipeline и durable role receipts.
 Работают ClickHouse,
 контейнерный dbt baseline, Airflow 3.3.1 с Astronomer Cosmos 1.15.0 и PostgreSQL 16.15.
 
@@ -49,9 +49,9 @@ trigger/pause/clear/retry, connection/variable/XCom или произвольн�
 восстанавливает pending вторую стадию в новом процессе. Счётчики подтверждают отсутствие
 повторного выполнения уже committed стадии.
 
-`make role-pipeline-test` проверяет шесть отдельных MAF executors (`Analyst → PM → DE → Validator
-→ QA → Reviewer`), typed JSON handoffs и новый процесс, продолжающий работу после DE без повторного
-запуска завершённых ролей. Тест детерминированный и не вызывает LLM или Data Platform.
+`make role-pipeline-test` проверяет отдельные MAF executors (`Analyst → PM → DE → Validator → QA →
+Reviewer`), typed JSON handoffs, terminal/rework branches и два crash window. Durable receipts не
+дают повторить DE после kill между role result и MAF checkpoint. Тест не вызывает LLM/Data Platform.
 
 ClickHouse публикуется только на loopback-интерфейсе. HTTP и native endpoints по умолчанию доступны на `127.0.0.1:8123` и `127.0.0.1:9000`.
 

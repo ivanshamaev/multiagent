@@ -70,3 +70,60 @@ def test_new_process_resumes_after_data_engineer_without_repeating_completed_rol
     assert {
         role: int((run_dir / f"{role}.count").read_text(encoding="utf-8")) for role in ROLES
     } == {role: 1 for role in ROLES}
+
+
+def test_receipt_prevents_duplicate_de_after_kill_before_maf_checkpoint(tmp_path: Path) -> None:
+    run_dir = tmp_path / "receipt-recovery"
+    run_dir.mkdir(mode=0o700)
+    storage = SecureCheckpointStorage(tmp_path, run_dir / "checkpoints")
+    base_command = [
+        sys.executable,
+        "-m",
+        "tests.workflow.role_pipeline_worker",
+        "--repository-root",
+        str(tmp_path),
+        "--run-dir",
+        str(run_dir),
+        "--pause-role",
+        "none",
+        "--pause-after-receipt",
+        "data_engineer",
+    ]
+    environment = {"PATH": os.environ.get("PATH", ""), "PYTHONHASHSEED": "0"}
+    child = subprocess.Popen(
+        base_command,
+        env=environment,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    checkpoint_id = None
+    deadline = time.monotonic() + 15
+    try:
+        while time.monotonic() < deadline:
+            checkpoints = asyncio.run(storage.list_checkpoints(workflow_name=ROLE_PIPELINE_NAME))
+            committed = [item for item in checkpoints if item.iteration_count == 2]
+            if committed and (run_dir / "data_engineer.receipt-entered").exists():
+                checkpoint_id = committed[0].checkpoint_id
+                break
+            if child.poll() is not None:
+                raise RuntimeError("role worker exited before receipt crash boundary")
+            time.sleep(0.05)
+    finally:
+        child.kill()
+        child.wait(timeout=3)
+    assert checkpoint_id is not None
+    assert int((run_dir / "data_engineer.count").read_text(encoding="utf-8")) == 1
+
+    resumed = subprocess.run(
+        [*base_command, "--checkpoint-id", checkpoint_id],
+        env=environment,
+        capture_output=True,
+        text=True,
+        timeout=15,
+        check=False,
+    )
+    assert resumed.returncode == 0, resumed.stderr
+    assert json.loads(resumed.stdout.strip().splitlines()[-1])["stage"] == "done"
+    assert {
+        role: int((run_dir / f"{role}.count").read_text(encoding="utf-8")) for role in ROLES
+    } == {role: 1 for role in ROLES}

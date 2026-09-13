@@ -17,6 +17,7 @@ from runtime.role_pipeline import (
     decode_role_snapshot,
     initial_role_message,
 )
+from runtime.role_receipts import SecureRoleReceiptStore
 from tests.workflow.test_role_pipeline import _handlers, _request
 
 
@@ -63,9 +64,27 @@ def _instrument(run_dir: Path, pause_role: str) -> RolePipelineHandlers:
     )
 
 
+def _after_receipt(run_dir: Path, pause_role: str):
+    async def hook(executor_id: str, operation_id: str) -> None:
+        role = executor_id.removeprefix("role_")
+        if role != pause_role:
+            return
+        _atomic_text(run_dir / f"{role}.receipt-entered", operation_id)
+        while not (run_dir / f"{role}.receipt-release").exists():
+            await asyncio.sleep(0.05)
+
+    return hook
+
+
 async def _run(args) -> dict[str, object]:
     storage = SecureCheckpointStorage(args.repository_root, args.run_dir / "checkpoints")
-    workflow = build_role_pipeline(_instrument(args.run_dir, args.pause_role), storage)
+    receipts = SecureRoleReceiptStore(args.repository_root, args.run_dir / "receipts")
+    workflow = build_role_pipeline(
+        _instrument(args.run_dir, args.pause_role),
+        storage,
+        receipts,
+        after_receipt=_after_receipt(args.run_dir, args.pause_after_receipt),
+    )
     result = (
         await workflow.run(checkpoint_id=args.checkpoint_id)
         if args.checkpoint_id
@@ -80,6 +99,7 @@ def main() -> int:
     parser.add_argument("--repository-root", type=Path, required=True)
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--pause-role", default="validator")
+    parser.add_argument("--pause-after-receipt", default="")
     parser.add_argument("--checkpoint-id")
     args = parser.parse_args()
     try:

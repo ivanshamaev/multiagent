@@ -179,5 +179,6 @@ rework через повторные validator/QA gates, QA mutation detection 5
 отдельную least-privilege identity. STEP-0018 завершил MAF-native hardened checkpoint storage и
 process-kill/resume proof. STEP-0019 разложил happy-path `Analyst → PM → DE → Validator → QA →
 Reviewer` на шесть MAF executors с typed JSON boundaries и доказал restart после DE без повторного
-запуска завершённых ролей. Следующий Phase J slice добавляет branching/rework и idempotency текущей
-роли; затем следуют OTel и runner isolation.
+запуска завершённых ролей. STEP-0020 добавил native branching, bounded rework, terminal convergence
+и durable role receipts, исключающие повтор handler после post-result/pre-checkpoint crash. Следующий
+Phase J slice — OTel traces; затем runner identity, filesystem/network isolation и MCP auth.

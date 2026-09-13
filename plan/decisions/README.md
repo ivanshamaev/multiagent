@@ -32,3 +32,4 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0026](ADR-0026-accept-upstream-httpx2.md) | Accept pinned upstream HTTPX2 dependency | accepted |
 | [ADR-0027](ADR-0027-maf-native-hardened-checkpoints.md) | MAF-native checkpoints behind hardened local storage | accepted |
 | [ADR-0028](ADR-0028-typed-json-role-checkpoint-boundaries.md) | Typed JSON boundaries between checkpointable role executors | accepted |
+| [ADR-0029](ADR-0029-stage-routing-and-role-receipts.md) | Code-owned stage routing and durable role receipts | accepted |

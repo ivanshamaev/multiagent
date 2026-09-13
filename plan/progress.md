@@ -330,3 +330,16 @@
   контейнеры не запускались и остаются остановленными. Evidence:
   `plan/evidence/STEP-0019-checkpointable-role-pipeline.md`.
 - Следующий Phase J slice — branching/rework с idempotency незавершённой роли, затем OTel tracing.
+
+## 2026-09-13 — STEP-0020 завершён
+
+- Six-role graph v2 использует native MAF switch/case: PM/DE terminal outcomes завершаются сразу,
+  Validator/QA/Reviewer rework возвращается только в DE, `DONE|BLOCKED|FAILED` сходятся в terminal.
+- Immutable `gate_history` сохраняет прошлые implementation и gate artifacts; reducer event-chain,
+  общий rework budget и hard limit 32 supersteps ограничивают циклы независимо от model output.
+- Owner-only `SecureRoleReceiptStore` связывает результат с workflow/executor/revision/input hash.
+  Atomic create-only receipt даёт cache hit при повторе и отклоняет escape/symlink/mode/hash/collision.
+- SIGKILL после DE receipt, но до MAF checkpoint, затем resume с iteration 2 завершился `DONE`; все
+  role counters равны 1. Targeted suite — 13 passed; полный `make check` — 395 passed.
+- Evidence: `plan/evidence/STEP-0020-branching-rework-idempotency.md`. Далее — OTel tracing, затем
+  runner identity и filesystem/network/MCP isolation.

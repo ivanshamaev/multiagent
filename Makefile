@@ -188,7 +188,8 @@ checkpoint-smoke:
 	$(UV) run python -m runtime.checkpoint_smoke
 
 role-pipeline-test:
-	$(UV) run pytest -q tests/workflow/test_role_pipeline.py tests/integration/test_role_pipeline_recovery.py
+	$(UV) run pytest -q tests/unit/test_role_receipts.py tests/workflow/test_role_pipeline.py \
+		tests/integration/test_role_pipeline_recovery.py
 
 airflow-failure-test: airflow-validate
 	$(UV) run python platform/airflow/scripts/api_smoke.py --expect-failure

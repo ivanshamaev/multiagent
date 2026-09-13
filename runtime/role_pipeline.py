@@ -5,28 +5,45 @@ from __future__ import annotations
 import json
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from hashlib import sha256
 from typing import Never
 
-from agent_framework import Executor, Workflow, WorkflowBuilder, WorkflowContext, handler
+from agent_framework import (
+    Case,
+    Default,
+    Executor,
+    Workflow,
+    WorkflowBuilder,
+    WorkflowContext,
+    handler,
+)
 from pydantic import model_validator
 
 from contracts import (
     AnalysisReport,
+    Artifact,
     ImplementationResult,
+    ImplementationStatus,
     PMRequirementsHandoff,
+    QADecision,
     QAReport,
     RequirementsAnalysisReport,
+    ReviewDecision,
     ReviewReport,
+    SpecificationDecision,
     TaskSpecification,
+    ValidationDecision,
     ValidationResult,
 )
 from contracts.common import FrozenModel
 from orchestrator import EventChainError, Stage, WorkflowEvent, WorkflowState, verify_event_chain
 from runtime.analyst import AnalystRunRequest
 from runtime.checkpoints import SecureCheckpointStorage
+from runtime.role_receipts import RoleReceipt, SecureRoleReceiptStore, role_operation_id
 
-ROLE_PIPELINE_NAME = "agentic-data-role-pipeline-v1"
+ROLE_PIPELINE_NAME = "agentic-data-role-pipeline-v2"
 MAX_ROLE_MESSAGE_BYTES = 5_000_000
+MAX_ROLE_PIPELINE_ITERATIONS = 32
 
 
 class RoleBoundaryError(RuntimeError):
@@ -47,23 +64,22 @@ class RolePipelineSnapshot(FrozenModel):
     validation: ValidationResult | None = None
     qa_report: QAReport | None = None
     review_report: ReviewReport | None = None
+    gate_history: tuple[Artifact, ...] = ()
 
     @model_validator(mode="after")
     def validate_accepted_tip(self):
+        artifacts = (
+            self.requirements,
+            self.handoff,
+            self.specification,
+            self.analysis,
+            self.implementation,
+            self.validation,
+            self.qa_report,
+            self.review_report,
+        )
         if self.state is None:
-            if self.events or any(
-                item is not None
-                for item in (
-                    self.requirements,
-                    self.handoff,
-                    self.specification,
-                    self.analysis,
-                    self.implementation,
-                    self.validation,
-                    self.qa_report,
-                    self.review_report,
-                )
-            ):
+            if self.events or self.gate_history or any(item is not None for item in artifacts):
                 raise ValueError("an unstarted pipeline cannot contain accepted state or artifacts")
             return self
 
@@ -75,28 +91,31 @@ class RolePipelineSnapshot(FrozenModel):
         try:
             verify_event_chain(self.events, expected_state=state)
         except EventChainError as error:
-            # Pydantic validators must expose one closed validation failure at this boundary.
             raise ValueError("snapshot event chain is invalid") from error
 
-        # AnalysisReport is supporting DE reasoning. Unlike gate artifacts, the current reducer
-        # deliberately does not append its ID; ImplementationResult is the accepted DE outcome.
-        accepted_artifacts = tuple(
+        if any(
+            not isinstance(item, (ImplementationResult, ValidationResult, QAReport, ReviewReport))
+            for item in self.gate_history
+        ):
+            raise ValueError("gate history contains a non-attempt artifact")
+        current_gate = tuple(
             item
-            for item in (
-                self.requirements,
-                self.specification,
-                self.implementation,
-                self.validation,
-                self.qa_report,
-                self.review_report,
-            )
+            for item in (self.implementation, self.validation, self.qa_report, self.review_report)
             if item is not None
         )
-        scoped_artifacts = (*accepted_artifacts, *((self.analysis,) if self.analysis else ()))
-        if any(item.task_id != state.task_id for item in scoped_artifacts):
+        accepted = tuple(
+            item
+            for item in (self.requirements, self.specification, *self.gate_history, *current_gate)
+            if item is not None
+        )
+        scoped = (*accepted, *((self.analysis,) if self.analysis else ()))
+        if any(item.task_id != state.task_id for item in scoped):
             raise ValueError("snapshot contains an artifact from another task")
-        if any(item.artifact_id not in state.artifact_ids for item in accepted_artifacts):
-            raise ValueError("snapshot contains an artifact not accepted by the reducer")
+        if state.artifact_ids != (
+            self.request.task.artifact_id,
+            *(item.artifact_id for item in accepted),
+        ):
+            raise ValueError("snapshot artifact ledger does not match reducer history")
         if self.handoff is not None:
             if self.requirements is None or self.handoff.analysis != self.requirements:
                 raise ValueError("PM handoff does not contain the accepted requirements report")
@@ -109,49 +128,7 @@ class RolePipelineSnapshot(FrozenModel):
 
     def _validate_stage_shape(self) -> None:
         assert self.state is not None
-        required_by_stage = {
-            Stage.ANALYSIS_READY: (self.requirements, self.handoff),
-            Stage.SPEC_READY: (self.requirements, self.handoff, self.specification),
-            Stage.IMPLEMENTED: (
-                self.requirements,
-                self.handoff,
-                self.specification,
-                self.analysis,
-                self.implementation,
-            ),
-            Stage.VALIDATED: (
-                self.requirements,
-                self.handoff,
-                self.specification,
-                self.analysis,
-                self.implementation,
-                self.validation,
-            ),
-            Stage.QA_PASSED: (
-                self.requirements,
-                self.handoff,
-                self.specification,
-                self.analysis,
-                self.implementation,
-                self.validation,
-                self.qa_report,
-            ),
-            Stage.DONE: (
-                self.requirements,
-                self.handoff,
-                self.specification,
-                self.analysis,
-                self.implementation,
-                self.validation,
-                self.qa_report,
-                self.review_report,
-            ),
-        }
-        required = required_by_stage.get(self.state.stage)
-        if required is None:
-            raise ValueError("role pipeline snapshot is not at a committed happy-path boundary")
-        if any(item is None for item in required):
-            raise ValueError(f"snapshot is incomplete for {self.state.stage.value}")
+        stage = self.state.stage
         ordered = (
             self.requirements,
             self.handoff,
@@ -162,18 +139,127 @@ class RolePipelineSnapshot(FrozenModel):
             self.qa_report,
             self.review_report,
         )
-        expected_count = {
+        happy_counts = {
             Stage.ANALYSIS_READY: 2,
             Stage.SPEC_READY: 3,
             Stage.IMPLEMENTED: 5,
             Stage.VALIDATED: 6,
             Stage.QA_PASSED: 7,
             Stage.DONE: 8,
-        }[self.state.stage]
-        if any(item is None for item in ordered[:expected_count]) or any(
-            item is not None for item in ordered[expected_count:]
+        }
+        if stage in happy_counts:
+            count = happy_counts[stage]
+            if any(item is None for item in ordered[:count]) or any(
+                item is not None for item in ordered[count:]
+            ):
+                raise ValueError(f"snapshot has out-of-order artifacts for {stage.value}")
+            self._validate_success_decisions(stage)
+            return
+        if stage is Stage.REWORK:
+            self._validate_rework_shape()
+            return
+        if stage in {Stage.BLOCKED, Stage.FAILED}:
+            self._validate_terminal_shape(stage)
+            return
+        raise ValueError("role pipeline snapshot is not at a committed role boundary")
+
+    def _validate_success_decisions(self, stage: Stage) -> None:
+        if (
+            stage is Stage.SPEC_READY
+            and self.specification.decision is not SpecificationDecision.READY
         ):
-            raise ValueError(f"snapshot has out-of-order artifacts for {self.state.stage.value}")
+            raise ValueError("spec_ready requires a ready specification")
+        if (
+            stage is Stage.IMPLEMENTED
+            and self.implementation.status is not ImplementationStatus.COMPLETED
+        ):
+            raise ValueError("implemented requires a completed implementation")
+        if stage in {Stage.VALIDATED, Stage.QA_PASSED, Stage.DONE}:
+            if self.validation.decision is not ValidationDecision.PASS:
+                raise ValueError("downstream role requires passing validation")
+        if (
+            stage in {Stage.QA_PASSED, Stage.DONE}
+            and self.qa_report.decision is not QADecision.PASS
+        ):
+            raise ValueError("downstream review requires passing QA")
+        if stage is Stage.DONE and self.review_report.decision is not ReviewDecision.APPROVE:
+            raise ValueError("done requires reviewer approval")
+
+    def _validate_rework_shape(self) -> None:
+        if any(
+            item is None
+            for item in (
+                self.requirements,
+                self.handoff,
+                self.specification,
+                self.analysis,
+                self.implementation,
+            )
+        ):
+            raise ValueError("rework snapshot is missing upstream artifacts")
+        validator_failed = (
+            self.validation is not None
+            and self.validation.decision is ValidationDecision.FAIL
+            and self.qa_report is None
+            and self.review_report is None
+        )
+        qa_failed = (
+            self.validation is not None
+            and self.validation.decision is ValidationDecision.PASS
+            and self.qa_report is not None
+            and self.qa_report.decision is QADecision.FAIL
+            and self.review_report is None
+        )
+        reviewer_failed = (
+            self.validation is not None
+            and self.validation.decision is ValidationDecision.PASS
+            and self.qa_report is not None
+            and self.qa_report.decision is QADecision.PASS
+            and self.review_report is not None
+            and self.review_report.decision is ReviewDecision.REQUEST_CHANGES
+        )
+        if not (validator_failed or qa_failed or reviewer_failed):
+            raise ValueError("rework snapshot does not contain one accepted failing gate")
+
+    def _validate_terminal_shape(self, stage: Stage) -> None:
+        if self.requirements is None or self.handoff is None:
+            raise ValueError("terminal snapshot is missing requirements")
+        if stage is Stage.BLOCKED:
+            valid = (
+                (
+                    self.specification is not None
+                    and self.specification.decision is SpecificationDecision.BLOCKED
+                    and self.implementation is None
+                )
+                or (
+                    self.implementation is not None
+                    and self.implementation.status is ImplementationStatus.BLOCKED
+                )
+                or (self.qa_report is not None and self.qa_report.decision is QADecision.BLOCKED)
+                or (
+                    self.review_report is not None
+                    and self.review_report.decision is ReviewDecision.BLOCKED
+                )
+            )
+        else:
+            valid = (
+                (
+                    self.implementation is not None
+                    and self.implementation.status is ImplementationStatus.FAILED
+                )
+                or (
+                    self.validation is not None
+                    and self.validation.decision
+                    in {ValidationDecision.FAIL, ValidationDecision.ERROR}
+                )
+                or (self.qa_report is not None and self.qa_report.decision is QADecision.FAIL)
+                or (
+                    self.review_report is not None
+                    and self.review_report.decision is ReviewDecision.REQUEST_CHANGES
+                )
+            )
+        if not valid:
+            raise ValueError(f"snapshot does not explain terminal {stage.value}")
 
 
 RoleStageHandler = Callable[[RolePipelineSnapshot], Awaitable[RolePipelineSnapshot]]
@@ -217,27 +303,75 @@ class _RoleExecutor(Executor):
         self,
         executor_id: str,
         stage_handler: RoleStageHandler,
-        incoming: Stage | None,
-        outgoing: Stage,
+        incoming: frozenset[Stage | None],
+        outgoing: frozenset[Stage],
+        receipt_store: SecureRoleReceiptStore | None = None,
+        after_receipt: Callable[[str, str], Awaitable[None]] | None = None,
     ) -> None:
         super().__init__(id=executor_id)
         self.stage_handler = stage_handler
         self.incoming = incoming
         self.outgoing = outgoing
+        self.receipt_store = receipt_store
+        self.after_receipt = after_receipt
 
     async def advance(self, payload: str) -> RolePipelineSnapshot:
         snapshot = decode_role_snapshot(payload)
         actual = snapshot.state.stage if snapshot.state is not None else None
-        if actual is not self.incoming:
-            expected = self.incoming.value if self.incoming is not None else "unstarted"
+        if actual not in self.incoming:
+            expected = ",".join(
+                "unstarted" if item is None else item.value
+                for item in sorted(
+                    self.incoming, key=lambda value: "" if value is None else value.value
+                )
+            )
             raise RoleBoundaryError(f"{self.id} requires {expected} input")
-        result = await self.stage_handler(snapshot)
-        if not isinstance(result, RolePipelineSnapshot):
-            raise RoleBoundaryError(f"{self.id} returned an invalid snapshot type")
+        revision = snapshot.state.revision if snapshot.state is not None else 0
+        operation_id = role_operation_id(
+            workflow_id=snapshot.request.workflow_id,
+            executor_id=self.id,
+            input_revision=revision,
+            input_payload=payload,
+        )
+        receipt = self.receipt_store.get(operation_id) if self.receipt_store else None
+        if receipt is None:
+            result = await self.stage_handler(snapshot)
+            if not isinstance(result, RolePipelineSnapshot):
+                raise RoleBoundaryError(f"{self.id} returned an invalid snapshot type")
+            result = self._validate_result(snapshot, result)
+            if self.receipt_store is not None:
+                output = encode_role_snapshot(result)
+                self.receipt_store.save(
+                    RoleReceipt(
+                        operation_id=operation_id,
+                        workflow_id=snapshot.request.workflow_id,
+                        executor_id=self.id,
+                        input_revision=revision,
+                        input_sha256=sha256(payload.encode("utf-8")).hexdigest(),
+                        output_sha256=sha256(output.encode("utf-8")).hexdigest(),
+                        output=output,
+                    )
+                )
+                if self.after_receipt is not None:
+                    await self.after_receipt(self.id, operation_id)
+            return result
+        if (
+            receipt.workflow_id != snapshot.request.workflow_id
+            or receipt.executor_id != self.id
+            or receipt.input_revision != revision
+            or receipt.input_sha256 != sha256(payload.encode("utf-8")).hexdigest()
+        ):
+            raise RoleBoundaryError(f"{self.id} receipt does not match role input")
+        return self._validate_result(snapshot, decode_role_snapshot(receipt.output))
+
+    def _validate_result(
+        self, snapshot: RolePipelineSnapshot, result: RolePipelineSnapshot
+    ) -> RolePipelineSnapshot:
         # Round-trip at the trust boundary; do not trust model construction shortcuts.
         result = decode_role_snapshot(encode_role_snapshot(result))
-        if result.state is None or result.state.stage is not self.outgoing:
-            raise RoleBoundaryError(f"{self.id} did not reach {self.outgoing.value}")
+        if result.state is None or result.state.stage not in self.outgoing:
+            expected = ",".join(sorted(item.value for item in self.outgoing))
+            raise RoleBoundaryError(f"{self.id} did not reach one of {expected}")
         if result.request != snapshot.request:
             raise RoleBoundaryError(f"{self.id} replaced the immutable pipeline request")
         if snapshot.state is not None:
@@ -249,6 +383,38 @@ class _RoleExecutor(Executor):
                 raise RoleBoundaryError(f"{self.id} did not make exactly one gated role step")
         elif len(result.events) != 2:
             raise RoleBoundaryError(f"{self.id} did not make exactly one gated role step")
+        if snapshot.state is not None and snapshot.state.stage is Stage.REWORK:
+            if self.id != "role_data_engineer":
+                raise RoleBoundaryError("only Data Engineer may consume rework")
+            rolled = tuple(
+                item
+                for item in (
+                    snapshot.implementation,
+                    snapshot.validation,
+                    snapshot.qa_report,
+                    snapshot.review_report,
+                )
+                if item is not None
+            )
+            if result.gate_history != (*snapshot.gate_history, *rolled):
+                raise RoleBoundaryError("Data Engineer did not preserve the prior attempt ledger")
+            if any(
+                item is not None
+                for item in (result.validation, result.qa_report, result.review_report)
+            ):
+                raise RoleBoundaryError("Data Engineer did not reset completed downstream gates")
+        elif result.gate_history != snapshot.gate_history:
+            raise RoleBoundaryError(f"{self.id} rewrote gate history")
+        mutable = {
+            "role_analyst": frozenset({"requirements", "handoff"}),
+            "role_pm": frozenset({"specification"}),
+            "role_data_engineer": frozenset({"implementation"}),
+            "role_validator": frozenset({"validation"}),
+            "role_qa": frozenset({"qa_report"}),
+            "role_reviewer": frozenset({"review_report"}),
+        }[self.id]
+        if snapshot.state is not None and snapshot.state.stage is Stage.REWORK:
+            mutable = mutable | {"validation", "qa_report", "review_report"}
         for field in (
             "requirements",
             "handoff",
@@ -260,7 +426,7 @@ class _RoleExecutor(Executor):
             "review_report",
         ):
             before = getattr(snapshot, field)
-            if before is not None and getattr(result, field) != before:
+            if before is not None and field not in mutable and getattr(result, field) != before:
                 raise RoleBoundaryError(f"{self.id} replaced accepted {field}")
         return result
 
@@ -297,38 +463,136 @@ class QAExecutor(_RoleExecutor):
 
 class ReviewerExecutor(_RoleExecutor):
     @handler
+    async def run(self, payload: str, ctx: WorkflowContext[str]) -> None:
+        await ctx.send_message(encode_role_snapshot(await self.advance(payload)))
+
+
+class TerminalExecutor(Executor):
+    def __init__(self) -> None:
+        super().__init__(id="role_terminal")
+
+    @handler
     async def run(self, payload: str, ctx: WorkflowContext[Never, str]) -> None:
-        await ctx.yield_output(encode_role_snapshot(await self.advance(payload)))
+        snapshot = decode_role_snapshot(payload)
+        if snapshot.state is None or not snapshot.state.stage.terminal:
+            raise RoleBoundaryError("terminal executor requires done, blocked, or failed")
+        await ctx.yield_output(encode_role_snapshot(snapshot))
+
+
+def _route_stage(payload: str, stage: Stage) -> bool:
+    snapshot = decode_role_snapshot(payload)
+    return snapshot.state is not None and snapshot.state.stage is stage
+
+
+def route_spec_ready(payload: str) -> bool:
+    return _route_stage(payload, Stage.SPEC_READY)
+
+
+def route_implemented(payload: str) -> bool:
+    return _route_stage(payload, Stage.IMPLEMENTED)
+
+
+def route_validated(payload: str) -> bool:
+    return _route_stage(payload, Stage.VALIDATED)
+
+
+def route_qa_passed(payload: str) -> bool:
+    return _route_stage(payload, Stage.QA_PASSED)
+
+
+def route_rework(payload: str) -> bool:
+    return _route_stage(payload, Stage.REWORK)
 
 
 def build_role_pipeline(
     handlers: RolePipelineHandlers,
     checkpoint_storage: SecureCheckpointStorage,
+    receipt_store: SecureRoleReceiptStore,
+    *,
+    after_receipt: Callable[[str, str], Awaitable[None]] | None = None,
 ) -> Workflow:
-    """Build a stable six-role graph; graph identity is part of the restore contract."""
+    """Build the bounded branching graph; graph identity is part of the restore contract."""
 
-    analyst = AnalystExecutor("role_analyst", handlers.analyst, None, Stage.ANALYSIS_READY)
-    pm = PMExecutor("role_pm", handlers.pm, Stage.ANALYSIS_READY, Stage.SPEC_READY)
+    common = {"receipt_store": receipt_store, "after_receipt": after_receipt}
+    analyst = AnalystExecutor(
+        "role_analyst",
+        handlers.analyst,
+        frozenset({None}),
+        frozenset({Stage.ANALYSIS_READY}),
+        **common,
+    )
+    pm = PMExecutor(
+        "role_pm",
+        handlers.pm,
+        frozenset({Stage.ANALYSIS_READY}),
+        frozenset({Stage.SPEC_READY, Stage.BLOCKED}),
+        **common,
+    )
     data_engineer = DataEngineerExecutor(
-        "role_data_engineer", handlers.data_engineer, Stage.SPEC_READY, Stage.IMPLEMENTED
+        "role_data_engineer",
+        handlers.data_engineer,
+        frozenset({Stage.SPEC_READY, Stage.REWORK}),
+        frozenset({Stage.IMPLEMENTED, Stage.BLOCKED, Stage.FAILED}),
+        **common,
     )
     validator = ValidatorExecutor(
-        "role_validator", handlers.validator, Stage.IMPLEMENTED, Stage.VALIDATED
+        "role_validator",
+        handlers.validator,
+        frozenset({Stage.IMPLEMENTED}),
+        frozenset({Stage.VALIDATED, Stage.REWORK, Stage.FAILED}),
+        **common,
     )
-    qa = QAExecutor("role_qa", handlers.qa, Stage.VALIDATED, Stage.QA_PASSED)
-    reviewer = ReviewerExecutor("role_reviewer", handlers.reviewer, Stage.QA_PASSED, Stage.DONE)
+    qa = QAExecutor(
+        "role_qa",
+        handlers.qa,
+        frozenset({Stage.VALIDATED}),
+        frozenset({Stage.QA_PASSED, Stage.REWORK, Stage.BLOCKED, Stage.FAILED}),
+        **common,
+    )
+    reviewer = ReviewerExecutor(
+        "role_reviewer",
+        handlers.reviewer,
+        frozenset({Stage.QA_PASSED}),
+        frozenset({Stage.DONE, Stage.REWORK, Stage.BLOCKED, Stage.FAILED}),
+        **common,
+    )
+    terminal = TerminalExecutor()
     return (
         WorkflowBuilder(
+            max_iterations=MAX_ROLE_PIPELINE_ITERATIONS,
             name=ROLE_PIPELINE_NAME,
             start_executor=analyst,
             checkpoint_storage=checkpoint_storage,
-            output_from=[reviewer],
+            output_from=[terminal],
         )
         .add_edge(analyst, pm)
-        .add_edge(pm, data_engineer)
-        .add_edge(data_engineer, validator)
-        .add_edge(validator, qa)
-        .add_edge(qa, reviewer)
+        .add_switch_case_edge_group(
+            pm, [Case(condition=route_spec_ready, target=data_engineer), Default(target=terminal)]
+        )
+        .add_switch_case_edge_group(
+            data_engineer,
+            [Case(condition=route_implemented, target=validator), Default(target=terminal)],
+        )
+        .add_switch_case_edge_group(
+            validator,
+            [
+                Case(condition=route_validated, target=qa),
+                Case(condition=route_rework, target=data_engineer),
+                Default(target=terminal),
+            ],
+        )
+        .add_switch_case_edge_group(
+            qa,
+            [
+                Case(condition=route_qa_passed, target=reviewer),
+                Case(condition=route_rework, target=data_engineer),
+                Default(target=terminal),
+            ],
+        )
+        .add_switch_case_edge_group(
+            reviewer,
+            [Case(condition=route_rework, target=data_engineer), Default(target=terminal)],
+        )
         .build()
     )
 
