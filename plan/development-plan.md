@@ -176,5 +176,6 @@ rework через повторные validator/QA gates, QA mutation detection 5
 а tool-free PM принимает только этот artifact и детерминированно выбирает полный spec или
 `blocked / needs_user`. Phase I завершена: GET-only observer и отдельный controlled trigger работают
 поверх `/api/v2`; trigger требует одноразовый approval, использует детерминированный run ID и
-отдельную least-privilege identity. Следующая итерация — планирование Phase J reliability,
-observability и isolation.
+отдельную least-privilege identity. STEP-0018 завершил MAF-native hardened checkpoint storage и
+process-kill/resume proof. Следующий Phase J slice декомпозирует реальный role pipeline по typed
+checkpoint boundaries; затем следуют OTel и runner isolation.

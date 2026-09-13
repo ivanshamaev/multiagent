@@ -298,3 +298,21 @@
   проверяет ключевые инварианты planning ledger; QA assert и Reviewer tuple mismatch исправлены.
 - `make check` — 374 tests; scenario, grader и полный platform gate PASS. Крупная герметизация
   tests/identities/runtime helpers явно перенесена в Phase J, coverage — в Phase K.
+
+## 2026-09-13 — STEP-0018 начат
+
+- ADR-0027 выбрал MAF-native checkpoint semantics за hardened repository adapter вместо второго
+  custom workflow runtime; untrusted checkpoint ingestion остаётся запрещённым.
+- Реализованы contained 0700/0600 storage, UUID/symlink/mode/size/create-only gates и fail-closed
+  restore. Двухстадийный graph сохраняет pending message после первого superstep.
+- Первый `make checkpoint-smoke` прошёл реальный `SIGKILL → new process → resume`: обе стадии
+  вызваны ровно один раз, output восстановлен из iteration-1 checkpoint. Focused suite — 6 PASS.
+
+## 2026-09-13 — STEP-0018 завершён
+
+- Hardened MAF checkpoint adapter отклоняет escape/symlink/loose mode/malformed/incompatible graph,
+  хранит UUID records create-only под 0700/0600 и не регистрирует application pickle types.
+- Два реальных `SIGKILL → restart → resume` gate подтвердили iteration 1, сохранённый pending
+  message и ровно один вызов каждой стадии; committed stage не началась с task zero.
+- Финальные gates: `make check` 381 tests; scenario/grader и Airflow/Cosmos/dbt/SQL platform PASS.
+  Следующий Phase J slice — декомпозиция реального role pipeline по checkpointable typed handoffs.

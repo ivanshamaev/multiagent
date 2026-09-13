@@ -6,15 +6,15 @@
 experiments, evidence, and progress; follow the fuller workflow in `Claude.md`.
 
 Control-plane code belongs in `orchestrator/`, `runtime/`, `agents/`, `contracts/`, and `policies/`.
-Services/dbt live in `platform/`; MCP packaging in `mcp/`; scenarios and the security-critical
-isolated oracle in `scenarios/` and `grader/`. Tests use
+Services/dbt live in `platform/`; MCP packaging in `mcp/`; scenarios and the isolated oracle in
+`scenarios/` and `grader/`. Tests use
 `tests/{unit,integration,workflow,policy,adversarial}`. Keep authorization in code, not prompts.
 
 ## Build, Test, and Development Commands
 
 - `make bootstrap` syncs Python 3.12 `.venv` from `uv.lock`.
-- `make check` runs Ruff, pytest, and Compose validation.
-- `make platform-up` starts healthy ClickHouse and Airflow/PostgreSQL.
+- `make check` runs Ruff, pytest, plan lint, and Compose validation.
+- `make platform-up` starts the Data Platform.
 - `make dbt-build` builds models and runs 68 data tests.
 - `make airflow-test` validates JWT auth and an 11-task Cosmos/dbt execution graph.
 - `make platform-test` combines Airflow, dbt, and independent SQL checks.
@@ -25,6 +25,7 @@ isolated oracle in `scenarios/` and `grader/`. Tests use
 - `make scenario-run` builds a candidate; `make scenario-contract-test` runs independent SQL;
   `make scenario-grade` invokes the isolated grader.
 - `make scenario-repro-test` and `make scenario-grade-baseline-test` validate isolation boundaries.
+- `make checkpoint-smoke` proves process-kill recovery from a durable MAF checkpoint.
 - `make platform-down` stops services without deleting volumes.
 
 Keep scheduled `ecommerce_hourly` paused unless data readiness is intentional.

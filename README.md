@@ -9,6 +9,7 @@
 GET-only Airflow MCP под отдельным Viewer и controlled trigger одного dev-DAG под отдельной identity.
 Runtime работает локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в
 Docker Compose. LLM-вызовы идут через OpenAI-совместимый GateLLM с токеном из локального `.env`.
+Phase J начата hardened MAF checkpoint storage и реальным process-kill/resume gate.
 Работают ClickHouse,
 контейнерный dbt baseline, Airflow 3.3.1 с Astronomer Cosmos 1.15.0 и PostgreSQL 16.15.
 
@@ -42,6 +43,11 @@ trigger/pause/clear/retry, connection/variable/XCom или произвольн�
 `ecommerce_acceptance`, сам выводит стабильный run ID и всегда отправляет пустой `conf`.
 `make airflow-trigger-smoke` временно unpause-ит manual DAG test-fixture, доказывает повтор без
 дубликата и гарантированно возвращает paused-состояние.
+
+`make checkpoint-smoke` не вызывает LLM или Data Platform: он завершает первую стадию
+двухшагового MAF graph, дожидается durable checkpoint, убивает процесс через `SIGKILL` и
+восстанавливает pending вторую стадию в новом процессе. Счётчики подтверждают отсутствие
+повторного выполнения уже committed стадии.
 
 ClickHouse публикуется только на loopback-интерфейсе. HTTP и native endpoints по умолчанию доступны на `127.0.0.1:8123` и `127.0.0.1:9000`.
 

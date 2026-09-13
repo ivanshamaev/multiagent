@@ -43,6 +43,12 @@ Agent control plane работает на Ubuntu локально: Python 3.12, 
 
 Make targets — стабильный пользовательский интерфейс. Детали `docker compose` и service networking остаются внутри Make/config. Добавляй healthchecks, детерминированный seed и идемпотентные операции. Не заявляй, что target работает, пока он не выполнен с exit code `0`.
 
+Checkpointing использует MAF-native state/messages/graph signature через repository adapter:
+только `.scenario-state/checkpoints/**`, root 0700, files 0600, UUID IDs, без symlink и без
+application pickle types. Checkpoint — trusted local control-plane state, не model/tool input.
+Committed superstep не повторяется после resume; side effects внутри оборванной стадии всё равно
+обязаны иметь собственную idempotency.
+
 Airflow baseline использует LocalExecutor, public `airflow.sdk` и pinned Astronomer Cosmos; будущие tools обращаются к `/api/v2`. dbt выполняется Cosmos в `ExecutionMode.LOCAL` через отдельный hash-locked virtualenv; собственный dbt subprocess runner запрещён без нового ADR. DAG-файлы являются исполняемым кодом: агентские изменения нельзя сразу монтировать в активную папку DAG. Scheduled `ecommerce_hourly` остаётся paused по умолчанию, а API acceptance выполняется на его manual twin.
 
 ## Contracts, evidence и validation

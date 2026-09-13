@@ -30,3 +30,4 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0024](ADR-0024-local-read-only-airflow-mcp.md) | Local read-only Airflow MCP uses public API only | accepted |
 | [ADR-0025](ADR-0025-separate-approved-idempotent-airflow-trigger.md) | Separate approved and idempotent dev-DAG trigger | accepted |
 | [ADR-0026](ADR-0026-accept-upstream-httpx2.md) | Accept pinned upstream HTTPX2 dependency | accepted |
+| [ADR-0027](ADR-0027-maf-native-hardened-checkpoints.md) | MAF-native checkpoints behind hardened local storage | accepted |
