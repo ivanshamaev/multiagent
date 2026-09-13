@@ -1,6 +1,8 @@
 """Versioned structured artifacts exchanged between workflow stages."""
 
 from contracts.artifacts import (
+    AnalysisFact,
+    AnalysisFactKind,
     AnalysisReport,
     Artifact,
     CheckResult,
@@ -10,8 +12,10 @@ from contracts.artifacts import (
     Defect,
     ImplementationResult,
     ImplementationStatus,
+    PMRequirementsHandoff,
     QADecision,
     QAReport,
+    RequirementsAnalysisReport,
     ReviewDecision,
     ReviewFinding,
     ReviewReport,
@@ -50,6 +54,8 @@ from contracts.tools import (
 )
 
 __all__ = [
+    "AnalysisFact",
+    "AnalysisFactKind",
     "AnalysisReport",
     "Artifact",
     "ArtifactReference",
@@ -75,8 +81,10 @@ __all__ = [
     "EvidenceKind",
     "ImplementationResult",
     "ImplementationStatus",
+    "PMRequirementsHandoff",
     "QADecision",
     "QAReport",
+    "RequirementsAnalysisReport",
     "ReviewDecision",
     "ReviewFinding",
     "ReviewReport",

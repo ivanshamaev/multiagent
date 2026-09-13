@@ -3,6 +3,8 @@
 from datetime import UTC, datetime, timedelta
 
 from contracts import (
+    AnalysisFact,
+    AnalysisFactKind,
     AnalysisReport,
     ArtifactReference,
     CheckResult,
@@ -15,6 +17,7 @@ from contracts import (
     ImplementationStatus,
     QADecision,
     QAReport,
+    RequirementsAnalysisReport,
     ReviewDecision,
     ReviewReport,
     SpecificationDecision,
@@ -105,6 +108,29 @@ def analysis_report() -> AnalysisReport:
         findings=("Refunds can arrive after the order date.",),
         recommended_approach="Aggregate events per order before the reporting grain.",
         semantic_risks=("Currencies have no conversion table.",),
+        evidence=(item,),
+    )
+
+
+def requirements_analysis_report() -> RequirementsAnalysisReport:
+    item = evidence("evidence-requirements-analysis", 1, producer_id="analyst-tool")
+    return RequirementsAnalysisReport(
+        artifact_id="artifact-requirements-analysis",
+        task_id=TASK_ID,
+        producer_id="analyst",
+        created_at=at(2),
+        facts=(
+            AnalysisFact(
+                fact_id="fact-source-orders",
+                kind=AnalysisFactKind.SOURCE,
+                statement="raw.orders exists",
+                evidence_ids=(item.evidence_id,),
+            ),
+        ),
+        assumptions=("Currencies remain separate.",),
+        open_questions=(),
+        risks=("No FX source exists.",),
+        recommended_next_steps=("PM should define the metric grain.",),
         evidence=(item,),
     )
 

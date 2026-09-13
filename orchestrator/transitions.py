@@ -7,12 +7,12 @@ from typing import Self
 from pydantic import Field, model_validator
 
 from contracts import (
-    AnalysisReport,
     Artifact,
     ImplementationResult,
     ImplementationStatus,
     QADecision,
     QAReport,
+    RequirementsAnalysisReport,
     ReviewDecision,
     ReviewReport,
     SpecificationDecision,
@@ -26,11 +26,11 @@ from orchestrator.errors import ArtifactGateError, IllegalTransitionError
 from orchestrator.state import BudgetCharge, BudgetState, Stage, WorkflowState
 
 ALLOWED_TRANSITIONS: dict[Stage, frozenset[Stage]] = {
-    Stage.CREATED: frozenset({Stage.SPECIFYING}),
+    Stage.CREATED: frozenset({Stage.ANALYZING}),
     Stage.SPECIFYING: frozenset({Stage.SPEC_READY, Stage.BLOCKED}),
-    Stage.SPEC_READY: frozenset({Stage.ANALYZING}),
+    Stage.SPEC_READY: frozenset({Stage.IMPLEMENTING}),
     Stage.ANALYZING: frozenset({Stage.ANALYSIS_READY}),
-    Stage.ANALYSIS_READY: frozenset({Stage.IMPLEMENTING}),
+    Stage.ANALYSIS_READY: frozenset({Stage.SPECIFYING}),
     Stage.IMPLEMENTING: frozenset({Stage.IMPLEMENTED, Stage.BLOCKED, Stage.FAILED}),
     Stage.IMPLEMENTED: frozenset({Stage.VALIDATING}),
     Stage.VALIDATING: frozenset({Stage.VALIDATED, Stage.REWORK, Stage.FAILED}),
@@ -109,7 +109,7 @@ def _validate_artifact_gate(state: WorkflowState, command: TransitionCommand) ->
         if specification.decision is not SpecificationDecision.READY:
             raise ArtifactGateError("spec_ready requires a ready specification")
     elif target is Stage.ANALYSIS_READY:
-        _require_artifact(command, AnalysisReport)
+        _require_artifact(command, RequirementsAnalysisReport)
     elif target is Stage.IMPLEMENTED:
         implementation = _require_artifact(command, ImplementationResult)
         if implementation.status is not ImplementationStatus.COMPLETED:

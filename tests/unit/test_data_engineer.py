@@ -78,18 +78,20 @@ def test_prepared_request_uses_verified_frozen_specification() -> None:
     assert request.budget_limits.tool_calls == 80
 
 
-def test_human_spec_enters_analysis_through_normal_reducer_gates() -> None:
+def test_human_spec_enters_implementation_through_normal_reducer_gates() -> None:
     request = _request_with_context("# task\n")
 
     state, events = seed_data_engineer_state(request)
 
-    assert state.stage is Stage.ANALYZING
+    assert state.stage is Stage.IMPLEMENTING
     assert state.artifact_ids[-1] == "specification-net-revenue-v1-0-0"
     assert state.budgets.used.tool_calls == 0
     assert [event.to_stage for event in events] == [
+        Stage.ANALYZING,
+        Stage.ANALYSIS_READY,
         Stage.SPECIFYING,
         Stage.SPEC_READY,
-        Stage.ANALYZING,
+        Stage.IMPLEMENTING,
     ]
     verify_event_chain(events, expected_state=state)
 

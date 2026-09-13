@@ -228,3 +228,25 @@
   11/11, dbt 68/68, canonical 78/78, public SQL и hidden grader PASS.
 - Evidence: `plan/evidence/STEP-0011-reviewer-approval-gate.md`. Phase G завершена; следующий этап —
   Phase H, read-only Analyst и requirements pipeline.
+
+## 2026-09-13 — STEP-0012 запланирован
+
+- Зафиксирован подробный план pre-PM requirements discovery: immutable `TaskRequest`, read-only
+  Analyst, evidence-backed facts/lineage/profiling и typed handoff в будущий PM gate.
+- Перед реализацией требуется ADR о миграции текущего порядка state machine с
+  `SPEC_READY → ANALYZING` на `TaskRequest → Analyst → PM`, без ослабления downstream gates.
+- Scope STEP-0012 заканчивается проверенным Analyst artifact/handoff; PM reasoning будет отдельным
+  STEP-0013.
+
+## 2026-09-13 — STEP-0012 завершён
+
+- ADR-0022 и reducer перенесли discovery перед PM; новый `RequirementsAnalysisReport` не смешивается
+  с техническим DE `AnalysisReport`, а прямой обход Analyst/PM gate запрещён.
+- `analyst_v1` выполняет три fresh read-only MCP phase и tool-free synthesis. Facts принимаются
+  только как точные excerpts успешного same-task evidence; typed handoff сохраняет unknowns.
+- GPT-5.6 Luna прошёл canonical и ambiguous-metric: 25 facts в каждом, 9 open questions во втором,
+  суммарно 6 tools/8 model calls без write/policy violation. PROBLEM-0011 исправил `ordered_at` probe.
+- Финальные gates: `make check` 322 tests; MCP smoke, reproducibility, baseline grader,
+  Airflow/Cosmos 11/11, ClickHouse и dbt 68/68 — PASS.
+- Evidence: `plan/evidence/STEP-0012-analyst-requirements-discovery.md`. Следующий шаг — STEP-0013,
+  PM specification gate, принимающий только validated requirements handoff.

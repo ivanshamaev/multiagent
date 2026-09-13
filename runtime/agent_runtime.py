@@ -11,7 +11,17 @@ from typing import Never
 
 from agent_framework import Executor, Workflow, WorkflowBuilder, WorkflowContext, handler
 
-from contracts import SpecificationDecision, TaskRequest, TaskSpecification
+from contracts import (
+    AnalysisFact,
+    AnalysisFactKind,
+    ArtifactReference,
+    Evidence,
+    EvidenceKind,
+    RequirementsAnalysisReport,
+    SpecificationDecision,
+    TaskRequest,
+    TaskSpecification,
+)
 from contracts.artifacts import TextTuple
 from contracts.common import FrozenModel, Identifier, NonEmptyText, UtcDateTime
 from orchestrator import (
@@ -157,6 +167,66 @@ class SpecificationExecutor(Executor):
             correlation_id=request.correlation_id,
             limits=request.budget_limits,
         )
+        first_document = request.context.documents[0]
+        discovery_evidence = Evidence(
+            evidence_id=_identifier("evidence", request.workflow_id, "verified-context"),
+            task_id=request.task.task_id,
+            producer_id="context-builder",
+            kind=EvidenceKind.ARTIFACT,
+            source="verified-workspace-context",
+            invocation=f"workspace_fingerprint={request.context.workspace_fingerprint}",
+            exit_code=0,
+            artifact=ArtifactReference(
+                path=first_document.path,
+                sha256=first_document.sha256,
+                media_type="text/plain",
+                size_bytes=first_document.size_bytes,
+            ),
+            occurred_at=request.task.created_at,
+        )
+        discovery = RequirementsAnalysisReport(
+            artifact_id=_identifier("requirements-analysis", request.workflow_id, "compatibility"),
+            task_id=request.task.task_id,
+            producer_id="analyst-compatibility",
+            created_at=request.task.created_at,
+            facts=(
+                AnalysisFact(
+                    fact_id=_identifier("fact", request.workflow_id, "verified-context"),
+                    kind=AnalysisFactKind.SOURCE,
+                    statement="Verified scenario context is available for PM specification.",
+                    evidence_ids=(discovery_evidence.evidence_id,),
+                ),
+            ),
+            assumptions=(),
+            open_questions=(),
+            risks=("Compatibility input has not run autonomous data profiling.",),
+            recommended_next_steps=("PM must validate semantics against the supplied context.",),
+            evidence=(discovery_evidence,),
+        )
+        started_at = self.now()
+        state, events = append_transition(
+            state,
+            TransitionCommand(
+                command_id=_identifier("cmd", request.workflow_id, "analyzing"),
+                task_id=request.task.task_id,
+                actor_id="workflow",
+                target_stage=Stage.ANALYZING,
+                occurred_at=started_at,
+            ),
+            (),
+        )
+        state, events = append_transition(
+            state,
+            TransitionCommand(
+                command_id=_identifier("cmd", request.workflow_id, "analysis-ready"),
+                task_id=request.task.task_id,
+                actor_id="analyst-compatibility",
+                target_stage=Stage.ANALYSIS_READY,
+                occurred_at=started_at,
+                artifact=discovery,
+            ),
+            events,
+        )
         state, events = append_transition(
             state,
             TransitionCommand(
@@ -164,9 +234,9 @@ class SpecificationExecutor(Executor):
                 task_id=request.task.task_id,
                 actor_id="workflow",
                 target_stage=Stage.SPECIFYING,
-                occurred_at=self.now(),
+                occurred_at=started_at,
             ),
-            (),
+            events,
         )
 
         invocation = await self.provider.generate(

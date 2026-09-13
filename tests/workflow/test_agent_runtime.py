@@ -51,7 +51,7 @@ def test_maf_code_workflow_accepts_ready_specification_through_reducer() -> None
     assert output.artifact.producer_id == "pm-agent"
     assert output.state.stage is Stage.SPEC_READY
     assert output.state.budgets.used.model_tokens == 15
-    assert len(output.events) == 2
+    assert len(output.events) == 4
     assert len(output.model_call.request_sha256) == 64
     verify_event_chain(output.events, expected_state=output.state)
 

@@ -30,6 +30,8 @@ workflow/control plane → agents/reasoning → MCP/tools → Data Platform
 ```
 
 - Workflow кодом определяет стадии, transitions, retry limits, approvals и Definition of Done. LLM определяет только способ выполнения разрешённой стадии.
+- Requirements path: `TaskRequest → Analyst → PM → Data Engineer`. Analyst подтверждает data
+  facts, PM владеет business semantics, а readiness остаётся решением reducer.
 - В MVP взаимодействие агентов: `agent → typed artifact → workflow → next agent`. Прямой A2A и бесконтрольный group chat запрещены.
 - Между стадиями передавай минимальные versioned Pydantic/JSON-schema contracts, а не chat history.
 - Ошибка `dbt test` — ошибка платформы или реализации; agent failure возникает, если агент неверно обработал проверенный результат. Не смешивай классы отказов.
@@ -113,6 +115,12 @@ protocol использует свежую фазу чтения кандида�
 через полный повтор DE → validator → QA → Reviewer. Opt-in команды — `make qa-live`,
 `make reviewer-live` и `make quality-loop-live`; они расходуют GateLLM budget и не входят в
 обычный `make check`.
+
+Analyst запускается до PM через `analyst_v1`: три fresh phase получают только code-owned dbt
+inventory, `fct_orders` lineage и aggregate ClickHouse profile, затем tool-free synthesis. В
+`RequirementsAnalysisReport` разрешены только точные excerpts соответствующего retained evidence;
+assumptions и open questions не являются facts. `make analyst-live` — opt-in платный gate. До
+STEP-0013 PM не должен обходить typed `PMRequirementsHandoff`.
 
 Никогда не подключай production credentials и не выполняй production write/deploy. Исключение текущего local development — только `API_TOKEN` для явно разрешённого GateLLM gateway. Расширение file/network scope, secret access и необратимые действия требуют явного human approval. Не удаляй Docker volumes и не выполняй `docker system prune` без явного запроса.
 

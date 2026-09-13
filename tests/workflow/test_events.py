@@ -11,7 +11,13 @@ from orchestrator import (
     initial_state,
     verify_event_chain,
 )
-from tests.workflow.factories import TASK_ID, at, budget_limits, specification, task_request
+from tests.workflow.factories import (
+    TASK_ID,
+    at,
+    budget_limits,
+    requirements_analysis_report,
+    task_request,
+)
 
 
 def _two_event_chain():
@@ -26,18 +32,18 @@ def _two_event_chain():
         command_id="event-command-1",
         task_id=TASK_ID,
         actor_id="workflow",
-        target_stage=Stage.SPECIFYING,
+        target_stage=Stage.ANALYZING,
         occurred_at=at(1),
     )
     state, events = append_transition(state, first, events)
-    spec = specification()
+    analysis = requirements_analysis_report()
     second = TransitionCommand(
         command_id="event-command-2",
         task_id=TASK_ID,
-        actor_id="pm",
-        target_stage=Stage.SPEC_READY,
+        actor_id="analyst",
+        target_stage=Stage.ANALYSIS_READY,
         occurred_at=at(2),
-        artifact=spec,
+        artifact=analysis,
         charge=BudgetCharge(model_tokens=50),
     )
     state, events = append_transition(state, second, events)
@@ -86,7 +92,7 @@ def test_append_rejects_events_from_another_state() -> None:
         command_id="event-command-3",
         task_id=TASK_ID,
         actor_id="workflow",
-        target_stage=Stage.ANALYZING,
+        target_stage=Stage.SPECIFYING,
         occurred_at=at(3),
     )
 

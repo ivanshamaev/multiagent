@@ -12,7 +12,6 @@ from pathlib import Path
 from pydantic import Field, model_validator
 
 from contracts import (
-    AnalysisReport,
     ArtifactReference,
     Evidence,
     EvidenceKind,
@@ -206,16 +205,6 @@ def seed_installed_candidate(
             ("test", TEST_TARGET, installed.test_sha256),
         )
     )
-    analysis = AnalysisReport(
-        artifact_id=f"mutation-{mutation_id}-analysis",
-        task_id=state.task_id,
-        producer_id="mutation-harness",
-        created_at=now,
-        relevant_sources=("raw.orders", "raw.payments", "raw.refunds"),
-        findings=("Candidate installed from the independent QA mutation corpus.",),
-        recommended_approach="Measure whether QA detects the declared mutation.",
-        evidence=artifact_evidence,
-    )
     implementation = ImplementationResult(
         artifact_id=f"mutation-{mutation_id}-implementation",
         task_id=state.task_id,
@@ -227,21 +216,6 @@ def seed_installed_candidate(
         evidence=artifact_evidence,
     )
     for command in (
-        TransitionCommand(
-            command_id=f"mutation-{mutation_id}-analysis-ready",
-            task_id=state.task_id,
-            actor_id="mutation-harness",
-            target_stage=Stage.ANALYSIS_READY,
-            occurred_at=now,
-            artifact=analysis,
-        ),
-        TransitionCommand(
-            command_id=f"mutation-{mutation_id}-implementing",
-            task_id=state.task_id,
-            actor_id="workflow",
-            target_stage=Stage.IMPLEMENTING,
-            occurred_at=now,
-        ),
         TransitionCommand(
             command_id=f"mutation-{mutation_id}-implemented",
             task_id=state.task_id,

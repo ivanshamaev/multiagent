@@ -10,11 +10,15 @@ from pathlib import Path
 from pydantic import model_validator
 
 from contracts import (
+    AnalysisFact,
+    AnalysisFactKind,
     AnalysisReport,
+    ArtifactReference,
     Evidence,
     EvidenceKind,
     ImplementationResult,
     ImplementationStatus,
+    RequirementsAnalysisReport,
     ScenarioSpecification,
     TaskRequest,
     ToolCallEvidence,
@@ -190,7 +194,7 @@ def prepare_data_engineer_request(
 def seed_data_engineer_state(
     request: DataEngineerRunRequest,
 ) -> tuple[WorkflowState, tuple[WorkflowEvent, ...]]:
-    """Accept the human spec through normal reducer gates and enter analysis."""
+    """Accept an attested human discovery and specification, then enter implementation."""
 
     task_id = request.specification.specification.task_id
     task = TaskRequest(
@@ -208,7 +212,57 @@ def seed_data_engineer_state(
         limits=request.budget_limits,
     )
     events: tuple[WorkflowEvent, ...] = ()
+    discovery_evidence = Evidence(
+        evidence_id=_identifier("evidence", request.workflow_id, "human-task"),
+        task_id=task_id,
+        producer_id="human",
+        kind=EvidenceKind.ARTIFACT,
+        source="scenario-task",
+        invocation=f"task_sha256={request.specification.task_sha256}",
+        exit_code=0,
+        artifact=ArtifactReference(
+            path=f"scenarios/{request.specification.scenario_id}/TASK.md",
+            sha256=request.specification.task_sha256,
+            media_type="text/markdown",
+            size_bytes=0,
+        ),
+        occurred_at=request.started_at,
+    )
+    discovery = RequirementsAnalysisReport(
+        artifact_id=_identifier("requirements-analysis", request.workflow_id, "human"),
+        task_id=task_id,
+        producer_id="human",
+        created_at=request.started_at,
+        facts=(
+            AnalysisFact(
+                fact_id=_identifier("fact", request.workflow_id, "human-spec"),
+                kind=AnalysisFactKind.SEMANTIC,
+                statement="A frozen human-authored scenario specification is available.",
+                evidence_ids=(discovery_evidence.evidence_id,),
+            ),
+        ),
+        assumptions=request.specification.specification.assumptions,
+        open_questions=(),
+        risks=request.specification.specification.risks,
+        recommended_next_steps=("Implement the accepted human specification.",),
+        evidence=(discovery_evidence,),
+    )
     transitions = (
+        TransitionCommand(
+            command_id=_identifier("cmd", request.workflow_id, "analyzing"),
+            task_id=task_id,
+            actor_id="workflow",
+            target_stage=Stage.ANALYZING,
+            occurred_at=request.started_at,
+        ),
+        TransitionCommand(
+            command_id=_identifier("cmd", request.workflow_id, "analysis-ready"),
+            task_id=task_id,
+            actor_id="human",
+            target_stage=Stage.ANALYSIS_READY,
+            occurred_at=request.started_at,
+            artifact=discovery,
+        ),
         TransitionCommand(
             command_id=_identifier("cmd", request.workflow_id, "specifying"),
             task_id=task_id,
@@ -225,10 +279,10 @@ def seed_data_engineer_state(
             artifact=request.specification.specification,
         ),
         TransitionCommand(
-            command_id=_identifier("cmd", request.workflow_id, "analyzing"),
+            command_id=_identifier("cmd", request.workflow_id, "implementing"),
             task_id=task_id,
             actor_id="workflow",
-            target_stage=Stage.ANALYZING,
+            target_stage=Stage.IMPLEMENTING,
             occurred_at=request.started_at,
         ),
     )
@@ -277,8 +331,8 @@ def accept_data_engineer_draft(
 ) -> tuple[AnalysisReport, ImplementationResult, WorkflowState, tuple[WorkflowEvent, ...]]:
     """Assemble code-owned artifacts and accept them through deterministic gates."""
 
-    if state.stage is not Stage.ANALYZING:
-        raise DataEngineerBoundaryError("Data Engineer draft requires analyzing state")
+    if state.stage is not Stage.IMPLEMENTING:
+        raise DataEngineerBoundaryError("Data Engineer draft requires implementing state")
     if any(item.task_id != state.task_id for item in tool_evidence):
         raise DataEngineerBoundaryError("tool evidence belongs to another task")
     measured = tuple(_domain_evidence(item) for item in tool_evidence)
@@ -330,34 +384,6 @@ def accept_data_engineer_draft(
         evidence=measured,
     )
     wall_time_seconds = ceil(max(model_latency_ms, tool_usage.elapsed_ms) / 1_000)
-    state, events = append_transition(
-        state,
-        TransitionCommand(
-            command_id=_identifier("cmd", request.workflow_id, attempt, "analysis-ready"),
-            task_id=state.task_id,
-            actor_id=request.agent_id,
-            target_stage=Stage.ANALYSIS_READY,
-            occurred_at=completed_at,
-            artifact=analysis,
-            charge={
-                "tool_calls": tool_usage.completed_calls,
-                "model_tokens": model_usage.total_tokens,
-                "wall_time_seconds": wall_time_seconds,
-            },
-        ),
-        events,
-    )
-    state, events = append_transition(
-        state,
-        TransitionCommand(
-            command_id=_identifier("cmd", request.workflow_id, attempt, "implementing"),
-            task_id=state.task_id,
-            actor_id=request.agent_id,
-            target_stage=Stage.IMPLEMENTING,
-            occurred_at=completed_at,
-        ),
-        events,
-    )
     target = {
         ImplementationStatus.COMPLETED: Stage.IMPLEMENTED,
         ImplementationStatus.BLOCKED: Stage.BLOCKED,
@@ -375,6 +401,11 @@ def accept_data_engineer_draft(
             target_stage=target,
             occurred_at=completed_at,
             artifact=implementation,
+            charge={
+                "tool_calls": tool_usage.completed_calls,
+                "model_tokens": model_usage.total_tokens,
+                "wall_time_seconds": wall_time_seconds,
+            },
             reason=reason,
         ),
         events,

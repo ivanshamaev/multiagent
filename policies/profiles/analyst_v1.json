@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "profile_id": "analyst-v1",
+  "role": "analyst",
+  "allowed_tools": [
+    "workspace.read_file",
+    "clickhouse.list_tables",
+    "clickhouse.run_query",
+    "dbt.list",
+    "dbt.get_lineage_dev",
+    "dbt.get_node_details_dev"
+  ],
+  "readable_paths": [
+    "TASK.md",
+    "platform/dbt/models/**/*.sql",
+    "platform/dbt/models/**/*.yml"
+  ],
+  "writable_paths": [],
+  "allowed_databases": ["raw", "analytics"],
+  "max_query_rows": 50,
+  "max_query_chars": 12000,
+  "max_read_bytes": 50000,
+  "max_write_bytes": 1,
+  "max_tool_calls": 6,
+  "max_wall_time_seconds": 240,
+  "max_output_bytes": 400000
+}

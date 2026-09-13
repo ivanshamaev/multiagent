@@ -12,6 +12,7 @@ from contracts.common import (
     Identifier,
     NonEmptyText,
     RelativePath,
+    Sha256,
     ShortText,
     UtcDateTime,
     VersionedModel,
@@ -64,6 +65,14 @@ class Severity(StrEnum):
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
+
+
+class AnalysisFactKind(StrEnum):
+    SOURCE = "source"
+    MODEL = "model"
+    LINEAGE = "lineage"
+    PROFILE = "profile"
+    SEMANTIC = "semantic"
 
 
 class CriterionStatus(StrEnum):
@@ -143,6 +152,8 @@ class TaskSpecification(ArtifactBase):
 
 
 class AnalysisReport(ArtifactBase):
+    """Technical implementation analysis retained for version-one compatibility."""
+
     artifact_type: Literal["analysis_report"] = "analysis_report"
     relevant_sources: RequiredTextTuple
     relevant_models: TextTuple = ()
@@ -156,6 +167,67 @@ class AnalysisReport(ArtifactBase):
     @classmethod
     def unique_lists(cls, value: TextTuple, info) -> TextTuple:
         return ensure_unique(value, info.field_name)
+
+
+class AnalysisFact(FrozenModel):
+    """One observed data fact with explicit retained evidence references."""
+
+    fact_id: Identifier
+    kind: AnalysisFactKind
+    statement: NonEmptyText
+    evidence_ids: RequiredIdentifierTuple
+
+    @field_validator("evidence_ids")
+    @classmethod
+    def unique_evidence(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        return ensure_unique(value, "evidence_ids")
+
+
+class RequirementsAnalysisReport(ArtifactBase):
+    """Pre-PM discovery output; it does not make a specification decision."""
+
+    artifact_type: Literal["requirements_analysis_report"] = "requirements_analysis_report"
+    facts: Annotated[tuple[AnalysisFact, ...], Field(min_length=1, max_length=256)]
+    assumptions: TextTuple = ()
+    open_questions: TextTuple = ()
+    risks: TextTuple = ()
+    recommended_next_steps: RequiredTextTuple
+    evidence: NonEmptyEvidenceTuple
+
+    @field_validator("assumptions", "open_questions", "risks", "recommended_next_steps")
+    @classmethod
+    def unique_lists(cls, value: TextTuple, info) -> TextTuple:
+        return ensure_unique(value, info.field_name)
+
+    @model_validator(mode="after")
+    def validate_facts(self) -> Self:
+        ensure_unique(tuple(item.fact_id for item in self.facts), "fact ids")
+        ensure_unique(tuple(item.statement for item in self.facts), "fact statements")
+        evidence = {item.evidence_id: item for item in self.evidence}
+        references = {ref for fact in self.facts for ref in fact.evidence_ids}
+        if not references.issubset(evidence):
+            raise ValueError("analysis facts must reference attached evidence")
+        if any(not evidence[ref].succeeded for ref in references):
+            raise ValueError("analysis facts require successful evidence")
+        return self
+
+
+class PMRequirementsHandoff(VersionedModel):
+    """Validated pre-PM input without prompts, secrets, or mutable workspace content."""
+
+    workflow_id: Identifier
+    task: TaskRequest
+    analysis: RequirementsAnalysisReport
+    unresolved_questions: TextTuple = ()
+    configuration_fingerprint: Sha256
+
+    @model_validator(mode="after")
+    def validate_scope(self) -> Self:
+        if self.task.task_id != self.analysis.task_id:
+            raise ValueError("handoff task and analysis must match")
+        if self.unresolved_questions != self.analysis.open_questions:
+            raise ValueError("handoff questions must exactly match accepted analysis")
+        return self
 
 
 class ImplementationResult(ArtifactBase):
@@ -339,6 +411,7 @@ Artifact = Annotated[
     TaskRequest
     | TaskSpecification
     | AnalysisReport
+    | RequirementsAnalysisReport
     | ImplementationResult
     | ValidationResult
     | QAReport

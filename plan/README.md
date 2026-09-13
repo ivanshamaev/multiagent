@@ -23,7 +23,8 @@
 
 ## Текущий статус
 
-- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0011`](steps/STEP-0011-reviewer-approval-gate.md); persistent gate summaries сохранены в `evidence/`.
+- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0012`](steps/STEP-0012-analyst-requirements-discovery.md); persistent gate summaries сохранены в `evidence/`.
 - Phase G завершена: QA и Reviewer разделены, bounded rework повторяет validator/QA/Reviewer, а
   false pass/approval измерены на независимых мутациях.
-- Следующий этап: Phase H — read-only Analyst и requirements pipeline.
+- Phase H начата: read-only Analyst discovery и evidence-backed requirements handoff завершены.
+  Следующий план — STEP-0013, PM specification gate поверх принятого Analyst report.

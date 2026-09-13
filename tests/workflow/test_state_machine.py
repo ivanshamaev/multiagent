@@ -24,11 +24,11 @@ from orchestrator import (
 )
 from tests.workflow.factories import (
     TASK_ID,
-    analysis_report,
     at,
     budget_limits,
     implementation_result,
     qa_report,
+    requirements_analysis_report,
     review_report,
     specification,
     task_request,
@@ -74,16 +74,16 @@ def test_happy_path_reaches_done_with_verified_event_chain() -> None:
     initial = state
     events = ()
     spec = specification()
-    analysis = analysis_report()
+    analysis = requirements_analysis_report()
     implementation = implementation_result()
     validation = validation_result()
     qa = qa_report()
     review = review_report()
     commands = (
-        _command("command-01", Stage.SPECIFYING, 1),
-        _command("command-02", Stage.SPEC_READY, 2, actor="pm", artifact=spec),
-        _command("command-03", Stage.ANALYZING, 3),
-        _command("command-04", Stage.ANALYSIS_READY, 4, actor="analyst", artifact=analysis),
+        _command("command-01", Stage.ANALYZING, 1),
+        _command("command-02", Stage.ANALYSIS_READY, 2, actor="analyst", artifact=analysis),
+        _command("command-03", Stage.SPECIFYING, 3),
+        _command("command-04", Stage.SPEC_READY, 4, actor="pm", artifact=spec),
         _command("command-05", Stage.IMPLEMENTING, 5),
         _command(
             "command-06",
@@ -243,7 +243,7 @@ def test_resource_budget_cannot_underflow_or_mutate_original_state() -> None:
     original_budget = state.budgets
     command = _command(
         "command-over-budget",
-        Stage.SPECIFYING,
+        Stage.ANALYZING,
         1,
         charge=BudgetCharge(tool_calls=101),
     )
