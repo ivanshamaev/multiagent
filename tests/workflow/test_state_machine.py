@@ -318,14 +318,28 @@ def test_matching_blocked_and_failed_artifacts_reach_terminal_state(
 def test_non_happy_gate_decisions_follow_the_declared_branch(
     stage: Stage, artifact, actor: str, target: Stage
 ) -> None:
-    result = apply_transition(
-        workflow_state_at(stage),
-        _command("command-gate-branch", target, 12, actor=actor, artifact=artifact),
-    )
+    command = _command("command-gate-branch", target, 12, actor=actor, artifact=artifact)
+    if stage is Stage.SPECIFYING:
+        command = command.model_copy(update={"reason": "needs_user"})
+    result = apply_transition(workflow_state_at(stage), command)
 
     assert result.stage is target
     if target is Stage.REWORK:
         assert result.budgets.used.rework_attempts == 1
+
+
+def test_pm_blocked_transition_requires_typed_needs_user_reason() -> None:
+    with pytest.raises(ArtifactGateError, match="matching blocked artifact"):
+        apply_transition(
+            workflow_state_at(Stage.SPECIFYING),
+            _command(
+                "command-wrong-pm-reason",
+                Stage.BLOCKED,
+                12,
+                actor="pm",
+                artifact=specification(decision=SpecificationDecision.BLOCKED),
+            ),
+        )
 
 
 def test_qa_failure_cannot_exceed_shared_rework_budget() -> None:

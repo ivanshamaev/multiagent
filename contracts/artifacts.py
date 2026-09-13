@@ -30,6 +30,10 @@ class SpecificationDecision(StrEnum):
     BLOCKED = "blocked"
 
 
+class SpecificationBlockReason(StrEnum):
+    NEEDS_USER = "needs_user"
+
+
 class ImplementationStatus(StrEnum):
     COMPLETED = "completed"
     BLOCKED = "blocked"
@@ -110,6 +114,7 @@ class TaskRequest(ArtifactBase):
 class TaskSpecification(ArtifactBase):
     artifact_type: Literal["task_specification"] = "task_specification"
     decision: SpecificationDecision
+    blocked_reason: SpecificationBlockReason | None = None
     business_goal: NonEmptyText
     metric_definition: NonEmptyText | None = None
     grain: TextTuple = ()
@@ -138,6 +143,8 @@ class TaskSpecification(ArtifactBase):
     @model_validator(mode="after")
     def validate_decision(self) -> Self:
         if self.decision is SpecificationDecision.READY:
+            if self.blocked_reason is not None:
+                raise ValueError("ready specification cannot have a blocked reason")
             if self.metric_definition is None:
                 raise ValueError("ready specification requires metric_definition")
             if not self.grain or not self.dimensions or not self.source_requirements:
@@ -146,8 +153,11 @@ class TaskSpecification(ArtifactBase):
                 raise ValueError("ready specification requires acceptance criteria")
             if self.open_questions:
                 raise ValueError("ready specification cannot contain open questions")
-        elif not self.open_questions:
-            raise ValueError("blocked specification requires open questions")
+        else:
+            if self.blocked_reason is not SpecificationBlockReason.NEEDS_USER:
+                raise ValueError("blocked specification requires needs_user reason")
+            if not self.open_questions:
+                raise ValueError("blocked specification requires open questions")
         return self
 
 

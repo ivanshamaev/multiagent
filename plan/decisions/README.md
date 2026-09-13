@@ -23,3 +23,7 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0017](ADR-0017-clickhouse-query-ast-gate.md) | Strict SQL AST preflight as defense in depth | accepted |
 | [ADR-0018](ADR-0018-autonomous-de-control-plane-ownership.md) | Human spec, unified tool ledger and independent validator ownership | accepted |
 | [ADR-0019](ADR-0019-phased-agent-conversations.md) | Fresh least-privilege phases with cumulative evidence and usage | accepted |
+| [ADR-0020](ADR-0020-independent-qa-boundary.md) | Independent read-only QA and evidence-owned rework gate | accepted |
+| [ADR-0021](ADR-0021-independent-reviewer-gate.md) | Reviewer is the sole independent approval gate | accepted |
+| [ADR-0022](ADR-0022-pre-pm-requirements-discovery.md) | Analyst discovery precedes PM specification | accepted |
+| [ADR-0023](ADR-0023-pm-consumes-only-accepted-requirements.md) | PM consumes only accepted requirements handoff | accepted |

@@ -15,6 +15,7 @@ from contracts import (
     RequirementsAnalysisReport,
     ReviewDecision,
     ReviewReport,
+    SpecificationBlockReason,
     SpecificationDecision,
     TaskSpecification,
     ValidationDecision,
@@ -150,7 +151,11 @@ def _validate_artifact_gate(state: WorkflowState, command: TransitionCommand) ->
     elif target is Stage.BLOCKED:
         if state.stage is Stage.SPECIFYING:
             specification = _require_artifact(command, TaskSpecification)
-            valid = specification.decision is SpecificationDecision.BLOCKED
+            valid = (
+                specification.decision is SpecificationDecision.BLOCKED
+                and specification.blocked_reason is SpecificationBlockReason.NEEDS_USER
+                and command.reason == SpecificationBlockReason.NEEDS_USER.value
+            )
         elif state.stage is Stage.IMPLEMENTING:
             implementation = _require_artifact(command, ImplementationResult)
             valid = implementation.status is ImplementationStatus.BLOCKED

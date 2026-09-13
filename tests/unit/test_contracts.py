@@ -9,6 +9,7 @@ from contracts import (
     Evidence,
     EvidenceKind,
     ImplementationResult,
+    SpecificationBlockReason,
     SpecificationDecision,
     TaskSpecification,
 )
@@ -83,6 +84,18 @@ def test_blocked_specification_requires_open_question() -> None:
 
     with pytest.raises(ValidationError, match="requires open questions"):
         TaskSpecification.model_validate(payload)
+
+
+def test_specification_block_reason_matches_decision() -> None:
+    ready = specification().model_dump()
+    ready["blocked_reason"] = SpecificationBlockReason.NEEDS_USER
+    with pytest.raises(ValidationError, match="cannot have a blocked reason"):
+        TaskSpecification.model_validate(ready)
+
+    blocked = specification(decision=SpecificationDecision.BLOCKED).model_dump()
+    blocked["blocked_reason"] = None
+    with pytest.raises(ValidationError, match="requires needs_user reason"):
+        TaskSpecification.model_validate(blocked)
 
 
 def test_evidence_must_match_task_and_precede_artifact() -> None:

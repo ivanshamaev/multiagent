@@ -5,7 +5,7 @@
 ## Текущий статус
 
 Реализованы golden Data Platform, reproducible scenario harness, strict typed artifacts и
-детерминированный workflow с budgets и hash-chained events, а также controlled PM Agent runtime.
+детерминированный workflow с budgets и hash-chained events, read-only Analyst и tool-free PM gate.
 Runtime работает локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в
 Docker Compose. LLM-вызовы идут через OpenAI-совместимый GateLLM с токеном из локального `.env`.
 Работают ClickHouse,
@@ -27,10 +27,10 @@ make dbt-build
 make platform-test
 ```
 
-`make llm-catalog` безопасно обновляет metadata без completion. `make llm-smoke` — явный платный
-smoke: он проверяет disposable scenario, schema capability и один bounded PM workflow. Команда не
-печатает prompt, model output или token; текущая проверенная role-модель задаётся
-`LLM_DEFAULT_MODEL` и может быть переопределена через окружение.
+`make llm-catalog` безопасно обновляет metadata без completion. `make requirements-live` — явный
+платный вертикальный smoke `Analyst → PM`; модели задаются `ANALYST_MODEL` и `PM_MODEL`. Команда не
+печатает prompt, model output или token, а сохраняет только sanitised metrics. `make llm-smoke`
+оставлен как совместимый alias этого pipeline.
 
 ClickHouse публикуется только на loopback-интерфейсе. HTTP и native endpoints по умолчанию доступны на `127.0.0.1:8123` и `127.0.0.1:9000`.
 

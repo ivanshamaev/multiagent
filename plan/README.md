@@ -23,8 +23,9 @@
 
 ## Текущий статус
 
-- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0012`](steps/STEP-0012-analyst-requirements-discovery.md); persistent gate summaries сохранены в `evidence/`.
+- Завершены [`STEP-0001`](steps/STEP-0001-repository-bootstrap.md)–[`STEP-0013`](steps/STEP-0013-pm-specification-gate.md); persistent gate summaries сохранены в `evidence/`.
 - Phase G завершена: QA и Reviewer разделены, bounded rework повторяет validator/QA/Reviewer, а
   false pass/approval измерены на независимых мутациях.
-- Phase H начата: read-only Analyst discovery и evidence-backed requirements handoff завершены.
-  Следующий план — STEP-0013, PM specification gate поверх принятого Analyst report.
+- Phase H завершена: read-only Analyst discovery передаёт evidence-backed typed handoff tool-free
+  PM, который выдаёт полный spec либо детерминированный `blocked / needs_user`.
+- Следующий этап roadmap — Phase I, read-only Airflow MCP поверх stable `/api/v2`.

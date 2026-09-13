@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from runtime.agent_runtime import prepare_scenario_specification_request
+from runtime.analyst import prepare_analyst_request
 from runtime.context import build_scenario_context
 from runtime.scenario_harness import (
     ProtectedChangeError,
@@ -104,11 +104,12 @@ def test_context_is_read_only_from_verified_managed_workspace(tmp_path: Path) ->
     )
     assert all(not document.path.startswith("grader/") for document in context.documents)
 
-    request = prepare_scenario_specification_request(
+    request = prepare_analyst_request(
         repository,
         manifest.scenario_id,
         workflow_id="workflow-context-test",
         correlation_id="correlation-context-test",
+        configuration_fingerprint="a" * 64,
     )
     assert request.context == build_scenario_context(repository, manifest.scenario_id)
     assert request.budget_limits.model_tokens == 100
@@ -122,9 +123,10 @@ def test_request_preparation_rejects_protected_workspace_change(tmp_path: Path) 
     (workspace / "project/project.yml").write_text("name: tampered\n", encoding="utf-8")
 
     with pytest.raises(ProtectedChangeError, match=r"project/project\.yml"):
-        prepare_scenario_specification_request(
+        prepare_analyst_request(
             repository,
             manifest.scenario_id,
             workflow_id="workflow-protected-test",
             correlation_id="correlation-protected-test",
+            configuration_fingerprint="a" * 64,
         )

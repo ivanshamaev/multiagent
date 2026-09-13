@@ -250,3 +250,18 @@
   Airflow/Cosmos 11/11, ClickHouse и dbt 68/68 — PASS.
 - Evidence: `plan/evidence/STEP-0012-analyst-requirements-discovery.md`. Следующий шаг — STEP-0013,
   PM specification gate, принимающий только validated requirements handoff.
+
+## 2026-09-13 — STEP-0013 завершён
+
+- ADR-0023 удалил compatibility discovery: PM принимает только matching `PMRequirementsHandoff`,
+  `ANALYSIS_READY` state и проверенную hash-chain; workspace context и tools ему не выдаются.
+- `TaskSpecification` получил typed `needs_user`. Код запрещает PM превращать unresolved Analyst
+  questions в `ready` или менять их; IDs, identity, timestamps, budgets и transition остаются у
+  control plane.
+- Offline gates доказали READY и BLOCKED paths, malformed output, budget exhaustion, chain replay,
+  cross-task/workflow/artifact, identity collision и prompt injection. Полный suite: 328 tests.
+- Live GPT-5.6 Luna pipeline `requirements-net-revenue-canonical-05ebaff6e8c8` завершился ожидаемым
+  `BLOCKED/needs_user`: 22 facts, 9 questions, 3 tools, 5 model calls, 17,671 tokens, 1.932360 ₽.
+- Airflow/Cosmos 11/11, dbt 68/68, ClickHouse, MCP, reproducibility и baseline hidden grader gates
+  прошли. Evidence: `plan/evidence/STEP-0013-pm-specification-gate.md`. Phase H завершена;
+  следующий этап — STEP-0014, read-only Airflow MCP поверх `/api/v2`.
