@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "runner_id": "data-engineer-runner-v1",
+  "actor_id": "data-engineer-agent",
+  "role": "data-engineer",
+  "namespace_uid": 62003,
+  "capability_profile": "data_engineer_v1.json",
+  "max_input_bytes": 2000000,
+  "max_output_bytes": 2000000,
+  "timeout_seconds": 1200
+}

@@ -9,8 +9,8 @@
 GET-only Airflow MCP под отдельным Viewer и controlled trigger одного dev-DAG под отдельной identity.
 Runtime работает локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в
 Docker Compose. LLM-вызовы идут через OpenAI-совместимый GateLLM с токеном из локального `.env`.
-Phase J содержит hardened MAF checkpoints, branching six-role pipeline, durable role receipts и
-content-free OpenTelemetry trace chain.
+Phase J содержит hardened MAF checkpoints, branching six-role pipeline, durable role receipts,
+content-free OpenTelemetry trace chain и отдельные Bubblewrap role runners с authenticated MCP.
 Работают ClickHouse,
 контейнерный dbt baseline, Airflow 3.3.1 с Astronomer Cosmos 1.15.0 и PostgreSQL 16.15.
 
@@ -57,6 +57,11 @@ Reviewer`), typed JSON handoffs, terminal/rework branches и два crash window
 `make telemetry-test` проверяет единый `workflow → role → model/tool/artifact` trace, продолжение
 trace ID через typed checkpoint carrier, receipt-hit semantics и sanitised JSONL exporter. Prompts,
 ответы, tool arguments/results, exception messages и credentials в spans не записываются.
+
+`make runner-isolation-test` запускает пять реальных sandbox processes с UID 62001–62005. Каждый
+получает новый user/PID/IPC/UTS/network namespace, очищенный environment и capability-derived
+filesystem view. PM не видит workspace; Analyst/QA/Reviewer не пишут; DE пишет только dbt models и
+tests. Raw network закрыт. Role tool connections используют короткоживущий request-bound MCP bearer.
 
 ClickHouse публикуется только на loopback-интерфейсе. HTTP и native endpoints по умолчанию доступны на `127.0.0.1:8123` и `127.0.0.1:9000`.
 

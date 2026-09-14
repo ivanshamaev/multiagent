@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "runner_id": "pm-runner-v1",
+  "actor_id": "pm-agent",
+  "role": "pm",
+  "namespace_uid": 62002,
+  "capability_profile": null,
+  "max_input_bytes": 1000000,
+  "max_output_bytes": 1000000,
+  "timeout_seconds": 180
+}

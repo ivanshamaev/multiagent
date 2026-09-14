@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "runner_id": "qa-runner-v1",
+  "actor_id": "qa-agent",
+  "role": "qa",
+  "namespace_uid": 62004,
+  "capability_profile": "qa_v1.json",
+  "max_input_bytes": 1000000,
+  "max_output_bytes": 1000000,
+  "timeout_seconds": 300
+}

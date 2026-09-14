@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "runner_id": "analyst-runner-v1",
+  "actor_id": "analyst-agent",
+  "role": "analyst",
+  "namespace_uid": 62001,
+  "capability_profile": "analyst_v1.json",
+  "max_input_bytes": 1000000,
+  "max_output_bytes": 1000000,
+  "timeout_seconds": 300
+}

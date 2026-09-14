@@ -20,3 +20,5 @@ regression check. Полноту индекса проверяет `make plan-ch
 | [PRB-0037](PRB-0037-reviewer-canonical-false-rejection.md) | [PRB-0038](PRB-0038-fastmcp-duplicate-structured-text.md) | [PRB-0039](PRB-0039-airflow-cli-intermittent-sigsegv.md) |
 | [PRB-0040](PRB-0040-fab-custom-role-default-permission.md) | [PRB-0041](PRB-0041-paused-dag-trigger-smoke.md) | [PRB-0042](PRB-0042-analyst-probe-raw-timestamp.md) |
 | [PRB-0043](PRB-0043-receipt-artifact-span-duplication.md) |  |  |
+| [PRB-0044](PRB-0044-noncanonical-mcp-bearer-signature.md) | [PRB-0045](PRB-0045-writable-sandbox-directory-shell.md) |  |
+| [PRB-0046](PRB-0046-host-scoped-runner-nproc-limit.md) |  |  |

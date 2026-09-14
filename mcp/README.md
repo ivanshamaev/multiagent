@@ -12,3 +12,9 @@ The control plane starts both official servers over stdio; neither service publi
 Run `make mcp-images` to resolve/build images and `make mcp-users` to recreate least-privilege
 grants. Runtime clients use `docker compose run --rm --no-deps -T <service>` as their stdio command.
 Never pass `API_TOKEN` or the host `.env` to these containers.
+
+Role-facing MAF tools authenticate every canonical `ToolRequest` before it reaches the policy
+gateway. The local bearer is HS256-signed, short-lived and bound to runner/profile/role/actor/task,
+audience and request hash. The owner-only signing key is not forwarded to stdio MCP servers. This
+local mechanism is not the future HTTP protocol: remote MCP must use OAuth 2.1 resource/audience
+validation and must not pass its access token to downstream Data Platform APIs.

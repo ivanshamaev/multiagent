@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "runner_id": "reviewer-runner-v1",
+  "actor_id": "reviewer-agent",
+  "role": "reviewer",
+  "namespace_uid": 62005,
+  "capability_profile": "reviewer_v1.json",
+  "max_input_bytes": 1000000,
+  "max_output_bytes": 1000000,
+  "timeout_seconds": 180
+}

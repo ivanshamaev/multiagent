@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from hashlib import sha256
 from itertools import count
 from pathlib import Path
@@ -38,6 +39,13 @@ from contracts import (
     WorkspaceWriteCall,
 )
 from policies import CapabilityProfile
+from runtime.mcp_auth import (
+    AuthenticatedMCPGateway,
+    MCPAuthenticationError,
+    MCPKeyStore,
+    MCPTokenAuthority,
+)
+from runtime.runner_isolation import LoadedRunnerProfile, load_runner_profile
 from runtime.scenario_harness import ScenarioManifest
 from runtime.tools.evidence_store import ToolEvidenceStore
 from runtime.tools.mcp_gateway import MCPGatewayError, MCPToolGateway
@@ -264,16 +272,24 @@ class DataEngineerMCPTools:
 
     def __init__(
         self,
-        gateway: MCPToolGateway,
+        gateway: MCPToolGateway | AuthenticatedMCPGateway,
         *,
         task_id: str,
         actor_id: str,
         role: str = "data-engineer",
+        token_authority: MCPTokenAuthority | None = None,
+        runner_identity: LoadedRunnerProfile | None = None,
     ) -> None:
+        if (token_authority is None) != (runner_identity is None):
+            raise ValueError("MCP token authority and runner identity must be provided together")
+        if isinstance(gateway, AuthenticatedMCPGateway) and token_authority is None:
+            raise ValueError("authenticated MCP gateway requires a token authority")
         self._gateway = gateway
         self._task_id = task_id
         self._actor_id = actor_id
         self._role = role
+        self._token_authority = token_authority
+        self._runner_identity = runner_identity
         self._sequence = count(1)
         candidates = self._build_candidates()
         self.tools = tuple(
@@ -293,8 +309,18 @@ class DataEngineerMCPTools:
             call=call,
         )
         try:
-            result = await self._gateway.execute(request)
-        except MCPGatewayError as error:
+            if self._token_authority is None or self._runner_identity is None:
+                result = await self._gateway.execute(request)  # type: ignore[call-arg]
+            else:
+                authorization = self._token_authority.mint(
+                    self._runner_identity,
+                    request,
+                    now=datetime.now(UTC),
+                )
+                result = await self._gateway.execute(  # type: ignore[call-arg]
+                    request, authorization=authorization
+                )
+        except (MCPAuthenticationError, MCPGatewayError) as error:
             raise MiddlewareFailure(str(error)) from error
         return result.content
 
@@ -480,6 +506,34 @@ class DataEngineerMCPTools:
         )
 
 
+def _authenticated_role_gateway(
+    repository_root: Path,
+    profile: CapabilityProfile,
+    gateway: MCPToolGateway,
+    *,
+    actor_id: str,
+    role: str,
+) -> tuple[AuthenticatedMCPGateway, MCPTokenAuthority, LoadedRunnerProfile]:
+    profile_names = {
+        "analyst": "analyst_v1.json",
+        "data-engineer": "data_engineer_v1.json",
+        "qa": "qa_v1.json",
+        "reviewer": "reviewer_v1.json",
+    }
+    try:
+        runner_identity = load_runner_profile(repository_root, profile_names[role])
+    except KeyError:
+        raise ValueError("role has no authenticated runner profile") from None
+    if runner_identity.runner.actor_id != actor_id:
+        raise ValueError("tool actor does not match authenticated runner identity")
+    authority = MCPKeyStore(
+        repository_root,
+        repository_root / ".scenario-state/mcp-auth/keyring.json",
+    ).load_or_create()
+    authenticated = AuthenticatedMCPGateway(gateway, profile, runner_identity, authority)
+    return authenticated, authority, runner_identity
+
+
 @asynccontextmanager
 async def connect_data_engineer_mcp_tools(
     repository_root: Path,
@@ -497,11 +551,16 @@ async def connect_data_engineer_mcp_tools(
     store = ToolEvidenceStore(repository_root, repository_root / ".scenario-state")
     async with clickhouse, dbt:
         gateway = MCPToolGateway(profile, clickhouse, dbt, store)
+        authenticated, authority, identity = _authenticated_role_gateway(
+            repository_root, profile, gateway, actor_id=actor_id, role=role
+        )
         facade = DataEngineerMCPTools(
-            gateway,
+            authenticated,
             task_id=task_id,
             actor_id=actor_id,
             role=role,
+            token_authority=authority,
+            runner_identity=identity,
         )
         yield ConnectedDataEngineerMCPTools(tools=facade.tools, gateway=gateway)
 
@@ -525,11 +584,16 @@ async def connect_data_engineer_tools(
     workspace = WorkspaceToolAdapter(repository_root, manifest, profile)
     async with clickhouse, dbt:
         gateway = MCPToolGateway(profile, clickhouse, dbt, store, workspace)
+        authenticated, authority, identity = _authenticated_role_gateway(
+            repository_root, profile, gateway, actor_id=actor_id, role=role
+        )
         facade = DataEngineerMCPTools(
-            gateway,
+            authenticated,
             task_id=task_id,
             actor_id=actor_id,
             role=role,
+            token_authority=authority,
+            runner_identity=identity,
         )
         yield ConnectedDataEngineerMCPTools(tools=facade.tools, gateway=gateway)
 

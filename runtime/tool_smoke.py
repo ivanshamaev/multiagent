@@ -41,7 +41,7 @@ async def run_smoke(repository_root: Path, scenario_id: str) -> dict[str, object
         workspace,
         profile,
         task_id=f"scenario-{scenario_id}",
-        actor_id="data-engineer-smoke",
+        actor_id="data-engineer-agent",
     ) as connected:
         query_result = await _tool(connected.tools, "clickhouse_run_query").invoke(
             arguments={"query": "SELECT count() AS order_count FROM raw.orders LIMIT 1"}

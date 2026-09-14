@@ -34,3 +34,4 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0028](ADR-0028-typed-json-role-checkpoint-boundaries.md) | Typed JSON boundaries between checkpointable role executors | accepted |
 | [ADR-0029](ADR-0029-stage-routing-and-role-receipts.md) | Code-owned stage routing and durable role receipts | accepted |
 | [ADR-0030](ADR-0030-explicit-safe-otel-instrumentation.md) | Explicit safe OpenTelemetry instrumentation | accepted |
+| [ADR-0031](ADR-0031-bubblewrap-runners-and-local-mcp-auth.md) | Bubblewrap role runners and local MCP authentication | accepted |

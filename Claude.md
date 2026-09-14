@@ -56,6 +56,15 @@ workflow, role, model, tool и artifact. Trace carrier входит в typed sna
 arguments/results и exception messages/stacktraces запрещены. JSONL exporter принимает только
 закрытый attribute allowlist и owner-only contained path. Collector/backend пока не развёрнут.
 
+Untrusted role work запускается только через fail-closed Bubblewrap boundary: отдельные namespace
+UID, user/PID/IPC/UTS/network namespaces, clear environment, private tmpfs, read-only system roots и
+capability-derived workspace mounts. PM не получает workspace; только DE получает два writable dbt
+subtree. Отсутствие Bubblewrap/user namespaces не разрешает unsandboxed fallback. Raw egress у
+runner отсутствует; GateLLM остаётся trusted control-plane transport. Analyst/DE/QA/Reviewer tool
+connections проходят request-bound HMAC bearer перед `MCPToolGateway`; signing key остаётся в
+mode-0600 `.scenario-state/mcp-auth/` и не передаётся runner/downstream. Для будущего HTTP MCP нужен
+OAuth 2.1 с audience validation, а не повторное использование local HMAC protocol.
+
 Airflow baseline использует LocalExecutor, public `airflow.sdk` и pinned Astronomer Cosmos; будущие tools обращаются к `/api/v2`. dbt выполняется Cosmos в `ExecutionMode.LOCAL` через отдельный hash-locked virtualenv; собственный dbt subprocess runner запрещён без нового ADR. DAG-файлы являются исполняемым кодом: агентские изменения нельзя сразу монтировать в активную папку DAG. Scheduled `ecommerce_hourly` остаётся paused по умолчанию, а API acceptance выполняется на его manual twin.
 
 ## Contracts, evidence и validation

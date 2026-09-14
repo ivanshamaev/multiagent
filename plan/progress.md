@@ -354,3 +354,16 @@
   bounded-file overflow. PRB-0043 исключил повторный artifact span при receipt replay.
 - `make telemetry-test` — 48 passed; `make check` — 406 passed; Docker Compose пуст. Evidence:
   `plan/evidence/STEP-0021-opentelemetry-trace-chain.md`. Далее — runner identity и isolation.
+
+## 2026-09-14 — STEP-0022 завершён
+
+- Пять strict profiles задают отдельные role runner/actor/UID и связываются с существующими
+  capability profiles. Bubblewrap создаёт user/PID/IPC/UTS/network namespaces без fallback.
+- Реальный hostile subprocess доказал zero network, отсутствие `.env`, checkout, Docker socket и
+  чужих mounts; PM не видит workspace, read-only roles не пишут, DE меняет только два dbt subtree.
+- Role-facing MAF connections теперь подписывают каждый canonical request короткоживущим bearer;
+  gateway проверяет runner/profile/role/actor/task/audience/request hash до tool policy/adapter.
+- Закрыты PRB-0044…0046: Base64URL malleability, writable ephemeral directory shell и неверный
+  host-scoped `RLIMIT_NPROC`. `make runner-isolation-test` — 16 passed; `make check` — 422 passed.
+- Evidence: `plan/evidence/STEP-0022-runner-and-mcp-isolation.md`. Далее — operational telemetry
+  backend/metrics, затем Phase K.

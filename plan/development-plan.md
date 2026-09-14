@@ -182,5 +182,7 @@ Reviewer` на шесть MAF executors с typed JSON boundaries и доказа
 запуска завершённых ролей. STEP-0020 добавил native branching, bounded rework, terminal convergence
 и durable role receipts, исключающие повтор handler после post-result/pre-checkpoint crash.
 STEP-0021 добавил один content-free OTel trace через workflow/role/model/tool/artifact, persisted
-trace carrier и hardened JSONL exporter. Следующий Phase J slice — runner identity,
-filesystem/network isolation и MCP auth.
+trace carrier и hardened JSONL exporter. STEP-0022 добавил пять отдельных Bubblewrap runner
+identities, zero-network/capability-derived filesystem boundary и request-bound authentication во
+всех role-facing MCP connections. Следующий Phase J slice — operational OTel backend, metrics,
+sampling/retention и dashboard; затем Phase K evaluation benchmark.
