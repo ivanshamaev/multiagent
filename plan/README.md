@@ -30,7 +30,6 @@
   PM, который выдаёт полный spec либо детерминированный `blocked / needs_user`.
 - Phase I завершена: read-only observer отделён от approved/idempotent trigger единственного
   dev-DAG; identities, profiles и MCP processes не пересекаются.
-- STEP-0018…0021 закрыли durable MAF checkpoints, checkpointable branching role pipeline,
-  receipt idempotency и content-free OTel trace chain. STEP-0022 добавил отдельные Bubblewrap
-  identities, filesystem/network boundary и authenticated MCP. Далее — operational telemetry
-  backend/metrics, затем Phase K evaluation.
+- STEP-0018…0023 закрыли durable MAF checkpoints, branching/receipt idempotency, content-free OTel,
+  отдельные Bubblewrap identities, authenticated MCP и operational observability backend. Phase J
+  завершена; далее — Phase K evaluation benchmark.

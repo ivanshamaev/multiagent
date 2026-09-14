@@ -10,7 +10,8 @@ GET-only Airflow MCP под отдельным Viewer и controlled trigger од
 Runtime работает локально в Python 3.12 `.venv`, управляемом `uv`; Data Platform запускается в
 Docker Compose. LLM-вызовы идут через OpenAI-совместимый GateLLM с токеном из локального `.env`.
 Phase J содержит hardened MAF checkpoints, branching six-role pipeline, durable role receipts,
-content-free OpenTelemetry trace chain и отдельные Bubblewrap role runners с authenticated MCP.
+content-free OpenTelemetry trace chain, operational Collector/Tempo/Prometheus/Grafana stack и
+отдельные Bubblewrap role runners с authenticated MCP.
 Работают ClickHouse,
 контейнерный dbt baseline, Airflow 3.3.1 с Astronomer Cosmos 1.15.0 и PostgreSQL 16.15.
 
@@ -57,6 +58,13 @@ Reviewer`), typed JSON handoffs, terminal/rework branches и два crash window
 `make telemetry-test` проверяет единый `workflow → role → model/tool/artifact` trace, продолжение
 trace ID через typed checkpoint carrier, receipt-hit semantics и sanitised JSONL exporter. Prompts,
 ответы, tool arguments/results, exception messages и credentials в spans не записываются.
+
+`make observability-smoke` поднимает отдельный Compose profile, отправляет deterministic error trace
+через OTLP/HTTP, проверяет tail sampling, span metrics, Tempo, Prometheus и provisioned Grafana, а
+затем останавливает только эти четыре сервиса. Tempo хранит blocks 72h, Prometheus — 7d; named
+volumes сохраняются. UI: Grafana `http://127.0.0.1:3000`, Tempo `:3200`, Prometheus `:9090`;
+Collector metrics доступны только локально на `:8888`.
+Локальный Grafana login по умолчанию: `admin` / `admin_dev_only`.
 
 `make runner-isolation-test` запускает пять реальных sandbox processes с UID 62001–62005. Каждый
 получает новый user/PID/IPC/UTS/network namespace, очищенный environment и capability-derived

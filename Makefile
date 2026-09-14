@@ -21,11 +21,21 @@ AIRFLOW_TRIGGER_PASSWORD ?= airflow_trigger_dev_only
 AIRFLOW_API_REQUEST_TIMEOUT_SECONDS ?= 10
 AIRFLOW_API_POLL_TIMEOUT_SECONDS ?= 300
 AIRFLOW_API_POLL_INTERVAL_SECONDS ?= 2
+OTEL_HTTP_PORT ?= 4318
+OTEL_METRICS_PORT ?= 8888
+TEMPO_HTTP_PORT ?= 3200
+PROMETHEUS_HTTP_PORT ?= 9090
+GRAFANA_HTTP_PORT ?= 3000
+GRAFANA_ADMIN_USER ?= admin
+GRAFANA_ADMIN_PASSWORD ?= admin_dev_only
 export AIRFLOW_API_BASE_URL AIRFLOW_ADMIN_USERNAME AIRFLOW_ADMIN_PASSWORD
 export AIRFLOW_MCP_USERNAME AIRFLOW_MCP_PASSWORD
 export AIRFLOW_TRIGGER_USERNAME AIRFLOW_TRIGGER_PASSWORD
 export AIRFLOW_API_REQUEST_TIMEOUT_SECONDS AIRFLOW_API_POLL_TIMEOUT_SECONDS
 export AIRFLOW_API_POLL_INTERVAL_SECONDS
+export OTEL_HTTP_PORT TEMPO_HTTP_PORT PROMETHEUS_HTTP_PORT GRAFANA_HTTP_PORT
+export OTEL_METRICS_PORT
+export GRAFANA_ADMIN_USER GRAFANA_ADMIN_PASSWORD
 AIRFLOW = $(COMPOSE) exec -T airflow-scheduler airflow
 AIRFLOW_CHECK = bash platform/airflow/scripts/retry_on_sigsegv.sh $(AIRFLOW)
 AIRFLOW_VERSION = $(COMPOSE) run --rm --no-deps --entrypoint airflow airflow-init version
@@ -55,7 +65,8 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	scenario-grade-baseline-test scenario-repro-test scenario-test llm-catalog llm-smoke \
 	mcp-images mcp-users mcp-smoke airflow-mcp-smoke airflow-trigger-approve airflow-trigger-smoke \
 	checkpoint-smoke role-pipeline-test telemetry-test runner-isolation-test data-engineer-live analyst-live \
-	requirements-live qa-live reviewer-live quality-loop-live
+	requirements-live qa-live reviewer-live quality-loop-live observability-up observability-down \
+	observability-test observability-smoke
 
 secure-env:
 	@if test -f .env; then chmod 600 .env; test "$$(stat -c '%a' .env)" = 600; fi
@@ -203,6 +214,27 @@ runner-isolation-test:
 		tests/policy/test_runner_profiles.py tests/adversarial/test_runner_isolation_guards.py \
 		tests/integration/test_runner_namespace_isolation.py \
 		tests/integration/test_authenticated_mcp_gateway.py
+
+observability-up:
+	$(COMPOSE) --profile observability up -d otel-collector prometheus grafana
+
+observability-down:
+	$(COMPOSE) --profile observability stop --timeout 30 otel-collector tempo prometheus grafana
+	@test -z "$$($(COMPOSE) --profile observability ps --status running --format json)" || { \
+		$(COMPOSE) --profile observability ps; exit 1; \
+	}
+
+observability-test:
+	$(UV) run pytest -q tests/unit/test_observability.py \
+		tests/policy/test_observability_config.py \
+		tests/adversarial/test_observability_guards.py
+	$(COMPOSE) --profile observability config --quiet
+
+observability-smoke:
+	@set -e; \
+		trap '$(MAKE) --no-print-directory observability-down >/dev/null' EXIT; \
+		$(MAKE) --no-print-directory observability-up; \
+		$(UV) run python -m runtime.observability_smoke
 
 airflow-failure-test: airflow-validate
 	$(UV) run python platform/airflow/scripts/api_smoke.py --expect-failure

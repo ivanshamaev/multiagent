@@ -10,11 +10,19 @@ from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Annotated, Any
+from urllib.parse import urlsplit
 
 from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.http import Compression
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import ReadableSpan, TracerProvider
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter, SpanExportResult
+from opentelemetry.sdk.trace.export import (
+    BatchSpanProcessor,
+    SimpleSpanProcessor,
+    SpanExporter,
+    SpanExportResult,
+)
 from opentelemetry.trace import (
     NonRecordingSpan,
     Span,
@@ -25,7 +33,8 @@ from opentelemetry.trace import (
     Tracer,
     TraceState,
 )
-from pydantic import StringConstraints, model_validator
+from pydantic import Field, StrictInt, StringConstraints, model_validator
+from requests import Session
 
 from contracts import Artifact, ToolCallEvidence, ToolRequest, tool_arguments_sha256
 from contracts.common import FrozenModel
@@ -106,6 +115,29 @@ class TraceCarrier(FrozenModel):
 
 class TelemetryError(RuntimeError):
     """Telemetry configuration or safe-export validation failed."""
+
+
+class OTLPHTTPConfig(FrozenModel):
+    """Explicit local-only OTLP endpoint; exporter environment discovery is not used."""
+
+    endpoint: str = "http://127.0.0.1:4318"
+    timeout_seconds: StrictInt = Field(default=5, ge=1, le=30)
+
+    @model_validator(mode="after")
+    def validate_loopback_endpoint(self):
+        parsed = urlsplit(self.endpoint)
+        if (
+            parsed.scheme != "http"
+            or parsed.hostname not in {"127.0.0.1", "localhost"}
+            or parsed.port is None
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.path not in {"", "/"}
+            or parsed.query
+            or parsed.fragment
+        ):
+            raise ValueError("OTLP endpoint must be an explicit loopback HTTP origin")
+        return self
 
 
 class SafeSpan:
@@ -271,6 +303,32 @@ class AgenticTelemetry:
 def build_telemetry(exporter: SpanExporter) -> AgenticTelemetry:
     provider = TracerProvider(resource=Resource.create({"service.name": "agentic-data-platform"}))
     provider.add_span_processor(SimpleSpanProcessor(exporter))
+    return AgenticTelemetry(provider)
+
+
+def build_otlp_telemetry(config: OTLPHTTPConfig | None = None) -> AgenticTelemetry:
+    """Build batched OTLP/HTTP telemetry without proxy/env or global-provider side effects."""
+
+    active = config or OTLPHTTPConfig()
+    session = Session()
+    session.trust_env = False
+    exporter = OTLPSpanExporter(
+        endpoint=f"{active.endpoint.rstrip('/')}/v1/traces",
+        headers={},
+        timeout=active.timeout_seconds,
+        compression=Compression.Gzip,
+        session=session,
+    )
+    provider = TracerProvider(resource=Resource.create({"service.name": "agentic-data-platform"}))
+    provider.add_span_processor(
+        BatchSpanProcessor(
+            exporter,
+            max_queue_size=2_048,
+            schedule_delay_millis=1_000,
+            max_export_batch_size=512,
+            export_timeout_millis=active.timeout_seconds * 1_000,
+        )
+    )
     return AgenticTelemetry(provider)
 
 

@@ -54,7 +54,10 @@ stage predicates, reducer rework budget и hard MAF iteration limit. Post-result
 OpenTelemetry использует explicit, не global, provider и только пять repository-owned span names:
 workflow, role, model, tool и artifact. Trace carrier входит в typed snapshot; content, credentials,
 arguments/results и exception messages/stacktraces запрещены. JSONL exporter принимает только
-закрытый attribute allowlist и owner-only contained path. Collector/backend пока не развёрнут.
+закрытый attribute allowlist и owner-only contained path. Operational profile экспортирует только
+на validated loopback OTLP/HTTP; Collector всегда сохраняет errors и 25% healthy traces, а metrics
+не получают high-cardinality IDs. Tempo retention — 72h, Prometheus — 7d. Backend traffic идёт по
+internal network, UI binds — только loopback; `API_TOKEN` в эти containers не передаётся.
 
 Untrusted role work запускается только через fail-closed Bubblewrap boundary: отдельные namespace
 UID, user/PID/IPC/UTS/network namespaces, clear environment, private tmpfs, read-only system roots и

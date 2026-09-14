@@ -22,3 +22,6 @@ regression check. Полноту индекса проверяет `make plan-ch
 | [PRB-0043](PRB-0043-receipt-artifact-span-duplication.md) |  |  |
 | [PRB-0044](PRB-0044-noncanonical-mcp-bearer-signature.md) | [PRB-0045](PRB-0045-writable-sandbox-directory-shell.md) |  |
 | [PRB-0046](PRB-0046-host-scoped-runner-nproc-limit.md) |  |  |
+| [PRB-0047](PRB-0047-tempo-v3-default-target.md) |  |  |
+| [PRB-0048](PRB-0048-internal-network-loopback-publication.md) |  |  |
+| [PRB-0049](PRB-0049-prometheus-stale-sampling-baseline.md) |  |  |

@@ -1,0 +1,84 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "id": 1,
+      "options": {"legend": {"displayMode": "table", "placement": "bottom"}},
+      "targets": [{"expr": "sum(rate(agentic_calls_total[5m])) by (span_name)", "legendFormat": "{{span_name}}", "refId": "A"}],
+      "title": "Sampled span throughput",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "id": 2,
+      "options": {"legend": {"displayMode": "table", "placement": "bottom"}},
+      "targets": [{"expr": "sum(rate(agentic_calls_total{status_code=\"STATUS_CODE_ERROR\"}[5m])) by (span_name)", "legendFormat": "{{span_name}}", "refId": "A"}],
+      "title": "Error throughput",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "ms"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "id": 3,
+      "options": {"legend": {"displayMode": "table", "placement": "bottom"}},
+      "targets": [{"expr": "histogram_quantile(0.95, sum(rate(agentic_duration_milliseconds_bucket[5m])) by (le, span_name))", "legendFormat": "{{span_name}}", "refId": "A"}],
+      "title": "p95 span latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "id": 4,
+      "options": {"legend": {"displayMode": "table", "placement": "bottom"}},
+      "targets": [
+        {"expr": "sum(agentic_calls_total) by (agentic_role_name)", "legendFormat": "role {{agentic_role_name}}", "refId": "A"},
+        {"expr": "sum(agentic_calls_total) by (gen_ai_request_model)", "legendFormat": "model {{gen_ai_request_model}}", "refId": "B"},
+        {"expr": "sum(agentic_calls_total) by (agentic_tool_name)", "legendFormat": "tool {{agentic_tool_name}}", "refId": "C"}
+      ],
+      "title": "Role, model and tool totals",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 7, "w": 12, "x": 0, "y": 16},
+      "id": 5,
+      "options": {"legend": {"displayMode": "table", "placement": "bottom"}},
+      "targets": [{"expr": "sum(agentic_calls_total) by (agentic_workflow_stage, agentic_receipt_hit)", "legendFormat": "{{agentic_workflow_stage}} receipt={{agentic_receipt_hit}}", "refId": "A"}],
+      "title": "Workflow stage and receipt replay",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 7, "w": 12, "x": 12, "y": 16},
+      "id": 6,
+      "options": {"legend": {"displayMode": "table", "placement": "bottom"}},
+      "targets": [{"expr": "sum(rate(otelcol_processor_tail_sampling_count_traces_sampled{sampled=\"true\"}[5m])) by (policy)", "legendFormat": "{{policy}}", "refId": "A"}],
+      "title": "Tail sampling decisions",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 42,
+  "tags": ["agentic-data-platform", "opentelemetry"],
+  "templating": {"list": []},
+  "time": {"from": "now-1h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Agentic Data Platform — Operational Overview",
+  "uid": "agentic-operational-overview",
+  "version": 1
+}

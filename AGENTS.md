@@ -12,7 +12,7 @@ Services/dbt live in `platform/`; MCP packaging in `mcp/`; scenarios and the iso
 
 ## Build, Test, and Development Commands
 
-- `make bootstrap` syncs Python 3.12 `.venv` from `uv.lock`.
+- `make bootstrap` syncs the Python 3.12 `.venv`.
 - `make check` runs Ruff, pytest, plan lint, and Compose validation.
 - `make dbt-build` builds models and runs 68 data tests.
 - `make airflow-test` validates JWT auth and an 11-task Cosmos/dbt execution graph.
@@ -21,22 +21,20 @@ Services/dbt live in `platform/`; MCP packaging in `mcp/`; scenarios and the iso
 - `make scenario-reset` recreates the disposable Net Revenue baseline.
 - `make scenario-run` builds a candidate; `make scenario-grade` invokes the isolated grader.
 - `make checkpoint-smoke` proves process-kill recovery from a durable MAF checkpoint.
-- `make role-pipeline-test` proves typed branching/rework and receipt-backed role restart.
-- `make telemetry-test` proves the content-free workflow/role/model/tool/artifact trace contract.
+- `make role-pipeline-test` proves typed rework and receipt-backed restart.
+- `make telemetry-test` proves the content-free trace contract; `make observability-smoke` proves
+  Collector sampling/metrics, Tempo retention, Prometheus, and the provisioned Grafana dashboard.
 - `make runner-isolation-test` proves per-role Bubblewrap UID/filesystem/network isolation and
   request-bound MCP authentication.
-- `make platform-down` stops services without deleting volumes.
-
-Keep scheduled `ecommerce_hourly` paused unless data readiness is intentional.
+- `make platform-down` and `make observability-down` stop services without deleting volumes.
 
 ## Planning, Evidence, and Testing
 
 Before a nontrivial change, update `plan/steps/STEP-NNNN-short-name.md` with scope, acceptance,
-risks, and verification. Record architecture before implementation. A systematic defect needs
-reproduction, cause, fix, and regression coverage. On completion, record commands, exit codes,
-remaining risks, and persistent evidence.
+risks, and verification. Record architecture first. A systematic defect needs reproduction, cause,
+fix, and regression coverage. On completion, record commands, exit codes, risks, and evidence.
 
-Name Python tests `test_<behavior>.py`; every defect needs regression coverage. Keep hidden graders independent from agent-created tests. Never weaken assertions to obtain a pass.
+Name Python tests `test_<behavior>.py`; defects need regression coverage. Keep hidden graders independent. Never weaken assertions for a pass.
 
 ## Coding Style & Security
 

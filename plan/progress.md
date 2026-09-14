@@ -367,3 +367,16 @@
   host-scoped `RLIMIT_NPROC`. `make runner-isolation-test` — 16 passed; `make check` — 422 passed.
 - Evidence: `plan/evidence/STEP-0022-runner-and-mcp-isolation.md`. Далее — operational telemetry
   backend/metrics, затем Phase K.
+
+## 2026-09-14 — STEP-0023 завершён
+
+- Explicit local OTLP/HTTP exporter отправляет content-free spans в pinned Collector без global
+  provider/env instrumentation. Tail policy всегда хранит errors и выбирает 25% healthy traces.
+- Spanmetrics экспортирует только low-cardinality role/model/tool/stage/receipt dimensions. Tempo
+  хранит local blocks 72h, Prometheus — 7d/1GB; Grafana provisioned двумя datasource и read-only
+  operational dashboard.
+- Два live smoke с сохранёнными volumes нашли error traces, fresh `keep-errors` counters и
+  Prometheus metrics, подтвердили два healthy scrape target и Grafana provisioning без LLM/token.
+  PRB-0047…0049 фиксируют Tempo schema, Docker port и persisted-series defects.
+- Evidence: `plan/evidence/STEP-0023-operational-observability-backend.md`. Phase J завершена;
+  следующий этап — Phase K evaluation benchmark.
