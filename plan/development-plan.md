@@ -180,5 +180,7 @@ rework через повторные validator/QA gates, QA mutation detection 5
 process-kill/resume proof. STEP-0019 разложил happy-path `Analyst → PM → DE → Validator → QA →
 Reviewer` на шесть MAF executors с typed JSON boundaries и доказал restart после DE без повторного
 запуска завершённых ролей. STEP-0020 добавил native branching, bounded rework, terminal convergence
-и durable role receipts, исключающие повтор handler после post-result/pre-checkpoint crash. Следующий
-Phase J slice — OTel traces; затем runner identity, filesystem/network isolation и MCP auth.
+и durable role receipts, исключающие повтор handler после post-result/pre-checkpoint crash.
+STEP-0021 добавил один content-free OTel trace через workflow/role/model/tool/artifact, persisted
+trace carrier и hardened JSONL exporter. Следующий Phase J slice — runner identity,
+filesystem/network isolation и MCP auth.

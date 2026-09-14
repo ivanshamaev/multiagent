@@ -30,5 +30,6 @@
   PM, который выдаёт полный spec либо детерминированный `blocked / needs_user`.
 - Phase I завершена: read-only observer отделён от approved/idempotent trigger единственного
   dev-DAG; identities, profiles и MCP processes не пересекаются.
-- Первый срез Phase J завершён в STEP-0018: durable MAF checkpoints переживают реальный process
-  kill. Далее — checkpointable decomposition реального role pipeline, затем OTel и runner isolation.
+- STEP-0018…0021 закрыли durable MAF checkpoints, checkpointable branching role pipeline,
+  receipt idempotency и content-free OTel trace chain. Далее — runner identity и
+  filesystem/network/MCP isolation.

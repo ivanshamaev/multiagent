@@ -4,9 +4,11 @@ from types import SimpleNamespace
 from typing import Any
 
 import pytest
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 from contracts import ToolCallStatus, ToolRequest
 from policies import CapabilityProfile, PolicyCode, load_capability_profile
+from runtime.telemetry import build_telemetry
 from runtime.tools import (
     DataEngineerMCPTools,
     MCPAuthorizationError,
@@ -82,6 +84,29 @@ def test_gateway_reauthorizes_normalizes_and_retains_text(tmp_path: Path) -> Non
     assert artifact.stat().st_mode & 0o777 == 0o600
     assert gateway.usage.completed_calls == 1
     assert gateway.usage.output_bytes == result.size_bytes
+
+
+def test_gateway_exports_hashed_tool_metadata_for_success_and_denial(tmp_path: Path) -> None:
+    exporter = InMemorySpanExporter()
+    telemetry = build_telemetry(exporter)
+    clickhouse = RecordingCaller([SimpleNamespace(type="text", text='{"rows": [[1]]}')])
+    store = ToolEvidenceStore(tmp_path, tmp_path / ".scenario-state")
+    gateway = MCPToolGateway(_profile(), clickhouse, RecordingCaller(), store, telemetry=telemetry)
+    successful = _request({"tool": "clickhouse.list_tables", "database": "raw"}, "request-ok")
+    denied_query = "DROP TABLE secret_customer_data"
+    denied = _request({"tool": "clickhouse.run_query", "query": denied_query}, "request-denied")
+
+    asyncio.run(gateway.execute(successful))
+    with pytest.raises(MCPAuthorizationError):
+        asyncio.run(gateway.execute(denied))
+
+    spans = [span for span in exporter.get_finished_spans() if span.name == "agentic.tool"]
+    assert [span.attributes["agentic.tool.status"] for span in spans] == ["success", "denied"]
+    assert spans[0].attributes["agentic.tool.output_bytes"] > 0
+    assert spans[1].attributes["agentic.tool.output_bytes"] == 0
+    assert spans[1].attributes["error.type"] == "MCPAuthorizationError"
+    assert all(len(span.attributes["agentic.tool.arguments.sha256"]) == 64 for span in spans)
+    assert denied_query not in repr([span.attributes for span in spans])
 
 
 def test_gateway_denies_before_call_and_retains_no_output(tmp_path: Path) -> None:

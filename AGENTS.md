@@ -27,6 +27,7 @@ Services/dbt live in `platform/`; MCP packaging in `mcp/`; scenarios and the iso
 - `make scenario-repro-test` and `make scenario-grade-baseline-test` validate isolation boundaries.
 - `make checkpoint-smoke` proves process-kill recovery from a durable MAF checkpoint.
 - `make role-pipeline-test` proves typed branching/rework and receipt-backed role restart.
+- `make telemetry-test` proves the content-free workflow/role/model/tool/artifact trace contract.
 - `make platform-down` stops services without deleting volumes.
 
 Keep scheduled `ecommerce_hourly` paused unless data readiness is intentional.

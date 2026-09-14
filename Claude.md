@@ -39,7 +39,7 @@ workflow/control plane → agents/reasoning → MCP/tools → Data Platform
 
 ## Runtime и зависимости
 
-Agent control plane работает на Ubuntu локально: Python 3.12, `uv`, `.venv`, Microsoft Agent Framework, Pydantic и pytest. Текущая Data Platform в Docker Compose содержит ClickHouse, dbt, Airflow 3 + Astronomer Cosmos и PostgreSQL; observability относится к будущей Phase J. Не устанавливай project dependencies глобально. `uv.lock` обязателен; floating dependencies и Docker tag `latest` запрещены.
+Agent control plane работает на Ubuntu локально: Python 3.12, `uv`, `.venv`, Microsoft Agent Framework, Pydantic, OpenTelemetry SDK и pytest. Текущая Data Platform в Docker Compose содержит ClickHouse, dbt, Airflow 3 + Astronomer Cosmos и PostgreSQL. Не устанавливай project dependencies глобально. `uv.lock` обязателен; floating dependencies и Docker tag `latest` запрещены.
 
 Make targets — стабильный пользовательский интерфейс. Детали `docker compose` и service networking остаются внутри Make/config. Добавляй healthchecks, детерминированный seed и идемпотентные операции. Не заявляй, что target работает, пока он не выполнен с exit code `0`.
 
@@ -51,6 +51,10 @@ Committed superstep не повторяется после resume; side effects 
 stage predicates, reducer rework budget и hard MAF iteration limit. Post-result/pre-checkpoint окно
 закрывается owner-only durable role receipt; crash внутри внешнего side effect до receipt требует
 того же deterministic operation ID или read-after-timeout reconciliation на уровне tool adapter.
+OpenTelemetry использует explicit, не global, provider и только пять repository-owned span names:
+workflow, role, model, tool и artifact. Trace carrier входит в typed snapshot; content, credentials,
+arguments/results и exception messages/stacktraces запрещены. JSONL exporter принимает только
+закрытый attribute allowlist и owner-only contained path. Collector/backend пока не развёрнут.
 
 Airflow baseline использует LocalExecutor, public `airflow.sdk` и pinned Astronomer Cosmos; будущие tools обращаются к `/api/v2`. dbt выполняется Cosmos в `ExecutionMode.LOCAL` через отдельный hash-locked virtualenv; собственный dbt subprocess runner запрещён без нового ADR. DAG-файлы являются исполняемым кодом: агентские изменения нельзя сразу монтировать в активную папку DAG. Scheduled `ecommerce_hourly` остаётся paused по умолчанию, а API acceptance выполняется на его manual twin.
 

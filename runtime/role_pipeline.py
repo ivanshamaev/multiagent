@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Awaitable, Callable
+from contextlib import nullcontext
 from dataclasses import dataclass
 from hashlib import sha256
 from typing import Never
@@ -15,6 +16,7 @@ from agent_framework import (
     Workflow,
     WorkflowBuilder,
     WorkflowContext,
+    WorkflowRunResult,
     handler,
 )
 from pydantic import model_validator
@@ -40,8 +42,9 @@ from orchestrator import EventChainError, Stage, WorkflowEvent, WorkflowState, v
 from runtime.analyst import AnalystRunRequest
 from runtime.checkpoints import SecureCheckpointStorage
 from runtime.role_receipts import RoleReceipt, SecureRoleReceiptStore, role_operation_id
+from runtime.telemetry import AgenticTelemetry, SafeSpan, TraceCarrier
 
-ROLE_PIPELINE_NAME = "agentic-data-role-pipeline-v2"
+ROLE_PIPELINE_NAME = "agentic-data-role-pipeline-v3"
 MAX_ROLE_MESSAGE_BYTES = 5_000_000
 MAX_ROLE_PIPELINE_ITERATIONS = 32
 
@@ -65,6 +68,7 @@ class RolePipelineSnapshot(FrozenModel):
     qa_report: QAReport | None = None
     review_report: ReviewReport | None = None
     gate_history: tuple[Artifact, ...] = ()
+    trace: TraceCarrier | None = None
 
     @model_validator(mode="after")
     def validate_accepted_tip(self):
@@ -307,6 +311,7 @@ class _RoleExecutor(Executor):
         outgoing: frozenset[Stage],
         receipt_store: SecureRoleReceiptStore | None = None,
         after_receipt: Callable[[str, str], Awaitable[None]] | None = None,
+        telemetry: AgenticTelemetry | None = None,
     ) -> None:
         super().__init__(id=executor_id)
         self.stage_handler = stage_handler
@@ -314,6 +319,7 @@ class _RoleExecutor(Executor):
         self.outgoing = outgoing
         self.receipt_store = receipt_store
         self.after_receipt = after_receipt
+        self.telemetry = telemetry
 
     async def advance(self, payload: str) -> RolePipelineSnapshot:
         snapshot = decode_role_snapshot(payload)
@@ -333,36 +339,87 @@ class _RoleExecutor(Executor):
             input_revision=revision,
             input_payload=payload,
         )
-        receipt = self.receipt_store.get(operation_id) if self.receipt_store else None
-        if receipt is None:
-            result = await self.stage_handler(snapshot)
-            if not isinstance(result, RolePipelineSnapshot):
-                raise RoleBoundaryError(f"{self.id} returned an invalid snapshot type")
-            result = self._validate_result(snapshot, result)
-            if self.receipt_store is not None:
-                output = encode_role_snapshot(result)
-                self.receipt_store.save(
-                    RoleReceipt(
-                        operation_id=operation_id,
-                        workflow_id=snapshot.request.workflow_id,
-                        executor_id=self.id,
-                        input_revision=revision,
-                        input_sha256=sha256(payload.encode("utf-8")).hexdigest(),
-                        output_sha256=sha256(output.encode("utf-8")).hexdigest(),
-                        output=output,
+        trace_scope = (
+            self.telemetry.role(
+                snapshot.trace,
+                workflow_id=snapshot.request.workflow_id,
+                task_id=snapshot.request.task.task_id,
+                role_name=self.id.removeprefix("role_"),
+                input_stage="unstarted" if actual is None else actual.value,
+                operation_id=operation_id,
+            )
+            if self.telemetry is not None and snapshot.trace is not None
+            else nullcontext(None)
+        )
+        with trace_scope as role_span:
+            receipt = self.receipt_store.get(operation_id) if self.receipt_store else None
+            if receipt is None:
+                result = await self.stage_handler(snapshot)
+                if not isinstance(result, RolePipelineSnapshot):
+                    raise RoleBoundaryError(f"{self.id} returned an invalid snapshot type")
+                result = self._validate_result(snapshot, result)
+                if self.receipt_store is not None:
+                    output = encode_role_snapshot(result)
+                    self.receipt_store.save(
+                        RoleReceipt(
+                            operation_id=operation_id,
+                            workflow_id=snapshot.request.workflow_id,
+                            executor_id=self.id,
+                            input_revision=revision,
+                            input_sha256=sha256(payload.encode("utf-8")).hexdigest(),
+                            output_sha256=sha256(output.encode("utf-8")).hexdigest(),
+                            output=output,
+                        )
                     )
-                )
-                if self.after_receipt is not None:
-                    await self.after_receipt(self.id, operation_id)
+                    if self.after_receipt is not None:
+                        await self.after_receipt(self.id, operation_id)
+                self._complete_trace(snapshot, result, role_span, receipt_hit=False)
+                return result
+            if (
+                receipt.workflow_id != snapshot.request.workflow_id
+                or receipt.executor_id != self.id
+                or receipt.input_revision != revision
+                or receipt.input_sha256 != sha256(payload.encode("utf-8")).hexdigest()
+            ):
+                raise RoleBoundaryError(f"{self.id} receipt does not match role input")
+            result = self._validate_result(snapshot, decode_role_snapshot(receipt.output))
+            self._complete_trace(snapshot, result, role_span, receipt_hit=True)
             return result
-        if (
-            receipt.workflow_id != snapshot.request.workflow_id
-            or receipt.executor_id != self.id
-            or receipt.input_revision != revision
-            or receipt.input_sha256 != sha256(payload.encode("utf-8")).hexdigest()
-        ):
-            raise RoleBoundaryError(f"{self.id} receipt does not match role input")
-        return self._validate_result(snapshot, decode_role_snapshot(receipt.output))
+
+    def _complete_trace(
+        self,
+        before: RolePipelineSnapshot,
+        after: RolePipelineSnapshot,
+        span: SafeSpan | None,
+        *,
+        receipt_hit: bool,
+    ) -> None:
+        if span is None or self.telemetry is None or after.state is None:
+            return
+        span.set("agentic.stage.output", after.state.stage.value)
+        span.set("agentic.receipt.hit", receipt_hit)
+        if receipt_hit:
+            return
+        artifacts = {
+            item.artifact_id: item
+            for item in (
+                after.requirements,
+                after.specification,
+                *after.gate_history,
+                after.implementation,
+                after.validation,
+                after.qa_report,
+                after.review_report,
+            )
+            if item is not None
+        }
+        for event in after.events[len(before.events) :]:
+            if event.artifact_id is not None:
+                self.telemetry.artifact(
+                    artifacts[event.artifact_id],
+                    workflow_id=after.state.workflow_id,
+                    event_hash=event.event_hash,
+                )
 
     def _validate_result(
         self, snapshot: RolePipelineSnapshot, result: RolePipelineSnapshot
@@ -374,6 +431,8 @@ class _RoleExecutor(Executor):
             raise RoleBoundaryError(f"{self.id} did not reach one of {expected}")
         if result.request != snapshot.request:
             raise RoleBoundaryError(f"{self.id} replaced the immutable pipeline request")
+        if result.trace != snapshot.trace:
+            raise RoleBoundaryError(f"{self.id} replaced trace identity")
         if snapshot.state is not None:
             if result.state.workflow_id != snapshot.state.workflow_id:
                 raise RoleBoundaryError(f"{self.id} changed workflow identity")
@@ -510,10 +569,15 @@ def build_role_pipeline(
     receipt_store: SecureRoleReceiptStore,
     *,
     after_receipt: Callable[[str, str], Awaitable[None]] | None = None,
+    telemetry: AgenticTelemetry | None = None,
 ) -> Workflow:
     """Build the bounded branching graph; graph identity is part of the restore contract."""
 
-    common = {"receipt_store": receipt_store, "after_receipt": after_receipt}
+    common = {
+        "receipt_store": receipt_store,
+        "after_receipt": after_receipt,
+        "telemetry": telemetry,
+    }
     analyst = AnalystExecutor(
         "role_analyst",
         handlers.analyst,
@@ -597,5 +661,31 @@ def build_role_pipeline(
     )
 
 
-def initial_role_message(request: AnalystRunRequest) -> str:
-    return encode_role_snapshot(RolePipelineSnapshot(request=request))
+def initial_role_message(
+    request: AnalystRunRequest, *, trace_carrier: TraceCarrier | None = None
+) -> str:
+    return encode_role_snapshot(RolePipelineSnapshot(request=request, trace=trace_carrier))
+
+
+async def run_traced_role_pipeline(
+    workflow: Workflow,
+    request: AnalystRunRequest,
+    telemetry: AgenticTelemetry,
+) -> WorkflowRunResult:
+    """Run a fresh workflow under one root span and persist its trace carrier."""
+
+    with telemetry.workflow(
+        workflow_id=request.workflow_id,
+        task_id=request.task.task_id,
+        correlation_id=request.correlation_id,
+    ) as (span, carrier):
+        result = await workflow.run(initial_role_message(request, trace_carrier=carrier))
+        outputs = result.get_outputs()
+        if len(outputs) != 1:
+            raise RoleBoundaryError("traced workflow must produce exactly one output")
+        snapshot = decode_role_snapshot(outputs[0])
+        if snapshot.state is None:
+            raise RoleBoundaryError("traced workflow output has no state")
+        span.set("agentic.workflow.stage", snapshot.state.stage.value)
+        span.set("agentic.workflow.revision", snapshot.state.revision)
+        return result

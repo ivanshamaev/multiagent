@@ -26,6 +26,7 @@ from contracts.common import (
     UtcDateTime,
 )
 from runtime.settings import GateLLMSettings, ModelIdentifier
+from runtime.telemetry import AgenticTelemetry
 
 PromptText = Annotated[
     str,
@@ -548,6 +549,7 @@ class MAFModelProvider:
         max_tool_iterations: int = 12,
         max_function_calls: int = 80,
         require_initial_tool_call: bool = False,
+        telemetry: AgenticTelemetry | None = None,
     ) -> None:
         selected_model = model_id or settings.default_model
         if selected_model is None:
@@ -556,6 +558,7 @@ class MAFModelProvider:
         self.model_id = cast(ModelIdentifier, selected_model)
         self._client = client
         self._require_initial_tool_call = require_initial_tool_call
+        self._telemetry = telemetry
         if isinstance(max_tool_iterations, bool) or not 1 <= max_tool_iterations <= 40:
             raise ValueError("max_tool_iterations must be between 1 and 40")
         if isinstance(max_function_calls, bool) or not 1 <= max_function_calls <= 256:
@@ -622,6 +625,37 @@ class MAFModelProvider:
         )
 
     async def _generate(
+        self,
+        response_model: type[ResponseT],
+        *,
+        system_prompt: PromptText,
+        user_prompt: PromptText,
+        tools: Sequence[FunctionTool],
+    ) -> ModelInvocation[ResponseT]:
+        if self._telemetry is None:
+            return await self._generate_untraced(
+                response_model,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                tools=tools,
+            )
+        with self._telemetry.model(
+            model_id=self.model_id, schema_name=response_model.__name__
+        ) as span:
+            try:
+                invocation = await self._generate_untraced(
+                    response_model,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    tools=tools,
+                )
+            except ModelOutputValidationError as error:
+                self._telemetry.complete_model(span, error.model_call)
+                raise
+            self._telemetry.complete_model(span, invocation)
+            return invocation
+
+    async def _generate_untraced(
         self,
         response_model: type[ResponseT],
         *,

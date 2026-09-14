@@ -24,6 +24,7 @@ from policies import (
     ToolUsage,
     authorize_tool_call,
 )
+from runtime.telemetry import AgenticTelemetry
 from runtime.tools.evidence_store import ToolEvidenceStore
 from runtime.tools.workspace import (
     WorkspaceAuthorizationError,
@@ -90,6 +91,7 @@ class MCPToolGateway:
         workspace: WorkspaceToolAdapter | None = None,
         *,
         airflow: MCPCaller | None = None,
+        telemetry: AgenticTelemetry | None = None,
     ) -> None:
         self._profile = profile
         self._clickhouse = clickhouse
@@ -97,6 +99,7 @@ class MCPToolGateway:
         self._evidence_store = evidence_store
         self._workspace = workspace
         self._airflow = airflow
+        self._telemetry = telemetry
         self._usage = ToolUsage()
         self._evidence: list[ToolCallEvidence] = []
         self._execution_lock = asyncio.Lock()
@@ -124,6 +127,20 @@ class MCPToolGateway:
 
     async def execute(self, request: ToolRequest) -> ToolResult:
         """Execute one validated MCP request after a fresh policy decision."""
+
+        if self._telemetry is None:
+            return await self._execute(request)
+        with self._telemetry.tool(request) as span:
+            try:
+                result = await self._execute(request)
+            except MCPGatewayError as error:
+                self._telemetry.complete_tool(span, error.evidence)
+                raise
+            self._telemetry.complete_tool(span, result.evidence)
+            return result
+
+    async def _execute(self, request: ToolRequest) -> ToolResult:
+        """Run the serialized policy and adapter path under an optional outer trace span."""
 
         async with self._execution_lock:
             started_at = datetime.now(UTC)

@@ -54,7 +54,8 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	scenario-baseline-build scenario-run scenario-contract-test scenario-grader-image scenario-grade \
 	scenario-grade-baseline-test scenario-repro-test scenario-test llm-catalog llm-smoke \
 	mcp-images mcp-users mcp-smoke airflow-mcp-smoke airflow-trigger-approve airflow-trigger-smoke \
-	checkpoint-smoke role-pipeline-test data-engineer-live analyst-live requirements-live qa-live reviewer-live quality-loop-live
+	checkpoint-smoke role-pipeline-test telemetry-test data-engineer-live analyst-live \
+	requirements-live qa-live reviewer-live quality-loop-live
 
 secure-env:
 	@if test -f .env; then chmod 600 .env; test "$$(stat -c '%a' .env)" = 600; fi
@@ -190,6 +191,12 @@ checkpoint-smoke:
 role-pipeline-test:
 	$(UV) run pytest -q tests/unit/test_role_receipts.py tests/workflow/test_role_pipeline.py \
 		tests/integration/test_role_pipeline_recovery.py
+
+telemetry-test:
+	$(UV) run pytest -q tests/unit/test_telemetry.py tests/unit/test_model_provider.py \
+		tests/unit/test_mcp_gateway.py \
+		tests/integration/test_telemetry_trace_chain.py \
+		tests/adversarial/test_telemetry_guards.py
 
 airflow-failure-test: airflow-validate
 	$(UV) run python platform/airflow/scripts/api_smoke.py --expect-failure

@@ -343,3 +343,14 @@
   role counters равны 1. Targeted suite — 13 passed; полный `make check` — 395 passed.
 - Evidence: `plan/evidence/STEP-0020-branching-rework-idempotency.md`. Далее — OTel tracing, затем
   runner identity и filesystem/network/MCP isolation.
+
+## 2026-09-14 — STEP-0021 завершён
+
+- Explicit OpenTelemetry provider связывает `workflow → role → model/tool/artifact`; typed carrier
+  сохраняет trace/workflow span IDs в checkpoint snapshot и восстанавливает parent после restart.
+- Closed façade экспортирует IDs, stages, operation/receipt state, token usage, latency, statuses и
+  hashes, но не prompts, completions, arguments/results, exception messages/stacks или credentials.
+- Owner-only JSONL exporter отклоняет unknown spans/attributes, escape, symlink, loose modes и
+  bounded-file overflow. PRB-0043 исключил повторный artifact span при receipt replay.
+- `make telemetry-test` — 48 passed; `make check` — 406 passed; Docker Compose пуст. Evidence:
+  `plan/evidence/STEP-0021-opentelemetry-trace-chain.md`. Далее — runner identity и isolation.

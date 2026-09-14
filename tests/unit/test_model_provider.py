@@ -7,6 +7,7 @@ import pytest
 from agent_framework import tool
 from agent_framework.openai import OpenAIChatCompletionClient
 from openai import AsyncOpenAI
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from pydantic import BaseModel, ConfigDict, ValidationError
 
 from runtime.model_provider import (
@@ -23,6 +24,7 @@ from runtime.model_provider import (
     select_cheapest_available_chat_model,
     select_cheapest_chat_model,
 )
+from runtime.telemetry import build_telemetry
 from tests.fakes import TEST_API_TOKEN, StaticChatClient, gate_settings
 
 
@@ -469,6 +471,46 @@ def test_maf_provider_parses_structured_output_and_records_safe_metadata() -> No
     assert client.options["response_format"] is SyntheticResult
     assert TEST_API_TOKEN not in repr(provider)
     assert TEST_API_TOKEN not in invocation.model_dump_json()
+
+
+def test_maf_provider_exports_only_safe_model_metadata() -> None:
+    exporter = InMemorySpanExporter()
+    telemetry = build_telemetry(exporter)
+    provider = MAFModelProvider(
+        gate_settings(),
+        client=StaticChatClient('{"task_id":"TASK-001","summary":"classified"}'),
+        telemetry=telemetry,
+    )
+
+    secret_prompt = "API_TOKEN=must-never-be-exported"
+    with telemetry.workflow(
+        workflow_id="workflow-1", task_id="TASK-001", correlation_id="correlation-1"
+    ) as (_, carrier):
+        with telemetry.role(
+            carrier,
+            workflow_id="workflow-1",
+            task_id="TASK-001",
+            role_name="analyst",
+            input_stage="unstarted",
+            operation_id="operation-1",
+        ):
+            invocation = asyncio.run(
+                provider.generate(
+                    SyntheticResult,
+                    system_prompt="Return strict JSON.",
+                    user_prompt=secret_prompt,
+                )
+            )
+
+    model_span = next(
+        span for span in exporter.get_finished_spans() if span.name == "agentic.model"
+    )
+    assert model_span.parent is not None
+    assert model_span.attributes["gen_ai.usage.input_tokens"] == 10
+    assert model_span.attributes["gen_ai.usage.output_tokens"] == 5
+    assert model_span.attributes["agentic.model.request.sha256"] == invocation.request_sha256
+    assert model_span.attributes["agentic.model.response.sha256"] == invocation.response_sha256
+    assert secret_prompt not in repr(model_span.attributes)
 
 
 def test_maf_provider_exposes_only_explicit_tools_for_bounded_generation() -> None:
