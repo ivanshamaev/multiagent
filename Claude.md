@@ -47,7 +47,10 @@ Checkpointing использует MAF-native state/messages/graph signature ч�
 только `.scenario-state/checkpoints/**`, root 0700, files 0600, UUID IDs, без symlink и без
 application pickle types. Checkpoint — trusted local control-plane state, не model/tool input.
 Committed superstep не повторяется после resume; side effects внутри оборванной стадии всё равно
-обязаны иметь собственную idempotency.
+обязаны иметь собственную idempotency. Branching role pipeline использует только named code-owned
+stage predicates, reducer rework budget и hard MAF iteration limit. Post-result/pre-checkpoint окно
+закрывается owner-only durable role receipt; crash внутри внешнего side effect до receipt требует
+того же deterministic operation ID или read-after-timeout reconciliation на уровне tool adapter.
 
 Airflow baseline использует LocalExecutor, public `airflow.sdk` и pinned Astronomer Cosmos; будущие tools обращаются к `/api/v2`. dbt выполняется Cosmos в `ExecutionMode.LOCAL` через отдельный hash-locked virtualenv; собственный dbt subprocess runner запрещён без нового ADR. DAG-файлы являются исполняемым кодом: агентские изменения нельзя сразу монтировать в активную папку DAG. Scheduled `ecommerce_hourly` остаётся paused по умолчанию, а API acceptance выполняется на его manual twin.
 

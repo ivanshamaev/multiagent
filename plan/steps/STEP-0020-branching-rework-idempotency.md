@@ -2,6 +2,10 @@
 
 Status: completed
 
+Owner: Codex
+
+Updated: 2026-09-14
+
 ## Goal
 
 Расширить six-role MAF graph управляемыми `BLOCKED`/`FAILED` terminal branches и bounded
@@ -22,6 +26,19 @@ handler и следующим MAF checkpoint через durable idempotency rece
 Не входят: exactly-once для произвольного side effect внутри handler без idempotency key,
 OpenTelemetry и отдельные OS/container identities.
 
+## Affected layers and allowed paths
+
+- control plane: `runtime/role_pipeline.py`, `runtime/role_receipts.py`;
+- verification: `tests/{unit,workflow,integration,adversarial}/`, `Makefile`;
+- ledger/docs: `plan/`, `README.md`, `AGENTS.md`, `Claude.md`.
+
+`contracts/`, `orchestrator/`, `agents/`, `platform/`, `scenarios/` и `grader/` не изменяются.
+
+## Permissions and approvals
+
+Работа ограничена локальными файлами репозитория и subprocess tests. GateLLM, production systems,
+Docker write, удаление volumes и дополнительные credentials не разрешены и не требуются.
+
 ## Acceptance criteria
 
 1. PM/DE/Validator/QA/Reviewer допускают только свои явные success/terminal/rework outcomes.
@@ -38,12 +55,12 @@ OpenTelemetry и отдельные OS/container identities.
 
 ## Implementation sequence
 
-1. Принять ADR-0029 о stage routing и durable role receipts.
-2. Версионировать snapshot для artifact history и terminal/rework boundaries.
-3. Реализовать receipt store и idempotent executor wrapper.
-4. Собрать switch/case graph и terminal sink.
-5. Добавить happy, blocked, rework, exhaustion, hostile storage и process recovery tests.
-6. Записать evidence, обновить roadmap и remaining risks.
+- [x] Принять ADR-0029 о stage routing и durable role receipts.
+- [x] Версионировать snapshot для artifact history и terminal/rework boundaries.
+- [x] Реализовать receipt store и idempotent executor wrapper.
+- [x] Собрать switch/case graph и terminal sink.
+- [x] Добавить happy, blocked, rework, exhaustion, hostile storage и process recovery tests.
+- [x] Записать evidence, обновить roadmap и remaining risks.
 
 ## Verification record
 
@@ -65,3 +82,9 @@ Remaining risks: receipt не может гарантировать exactly-once
 или реализовать read-after-timeout reconciliation. Retention/garbage collection receipts и
 checkpoints также ещё не определены. Следующий Phase J slice — OpenTelemetry tracing; затем runner
 identity, filesystem/network isolation и MCP authentication.
+
+## Work log
+
+- 2026-09-14: проверен pinned MAF API; выбран native named switch/case routing.
+- 2026-09-14: добавлены artifact history, terminal sink, bounded cycles и hardened receipts.
+- 2026-09-14: доказаны branch/exhaustion и оба SIGKILL recovery windows; шаг завершён.

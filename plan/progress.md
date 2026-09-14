@@ -331,7 +331,7 @@
   `plan/evidence/STEP-0019-checkpointable-role-pipeline.md`.
 - Следующий Phase J slice — branching/rework с idempotency незавершённой роли, затем OTel tracing.
 
-## 2026-09-13 — STEP-0020 завершён
+## 2026-09-14 — STEP-0020 завершён
 
 - Six-role graph v2 использует native MAF switch/case: PM/DE terminal outcomes завершаются сразу,
   Validator/QA/Reviewer rework возвращается только в DE, `DONE|BLOCKED|FAILED` сходятся в terminal.

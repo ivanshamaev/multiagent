@@ -1,6 +1,6 @@
 # STEP-0020 evidence — branching, rework and role idempotency
 
-Date: 2026-09-13
+Date: 2026-09-14
 
 ## Proven behavior
 
