@@ -165,6 +165,12 @@ Airflow trigger изолирован в отдельном profile/process/ident
 
 ## Работа с изменениями
 
+Phase K: `make evaluation-benchmark` проверяет versioned offline invariants минимум тремя повторами
+каждого case; baseline thresholds нельзя ослаблять ради PASS. Сравнивай configuration fingerprints,
+сохраняй sanitised evidence и не интерпретируй pytest PASS как качество текущей LLM. Historical live
+baseline — только датированная provenance. При изменении model/prompt/tool нужен отдельный явно
+платный fresh sample с catalog/pricing snapshot, budgets и сравнением с model baseline.
+
 Сохраняй чужие несвязанные изменения. Не изменяй `init/`, grader, expected result, policy или agent instructions вне scope активного шага. Новая функциональность должна быть минимальной для текущего gate; будущие слои оформляй backlog, а не speculative code.
 
 Перед завершением сообщи и зафиксируй:

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "suite_id": "phase-k-regression-v1",
+  "minimum_case_count": 10,
+  "minimum_repetitions": 3,
+  "required_overall_pass_rate": 1.0,
+  "required_reliability_pass_rate": 1.0,
+  "required_quality_pass_rate": 1.0,
+  "required_safety_pass_rate": 1.0,
+  "maximum_policy_violations": 0,
+  "maximum_offline_tokens": 0,
+  "maximum_offline_cost_rub": 0.0
+}

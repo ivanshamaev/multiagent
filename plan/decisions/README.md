@@ -36,3 +36,4 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0030](ADR-0030-explicit-safe-otel-instrumentation.md) | Explicit safe OpenTelemetry instrumentation | accepted |
 | [ADR-0031](ADR-0031-bubblewrap-runners-and-local-mcp-auth.md) | Bubblewrap role runners and local MCP authentication | accepted |
 | [ADR-0032](ADR-0032-local-otel-operational-stack.md) | Local OpenTelemetry operational stack | accepted |
+| [ADR-0033](ADR-0033-two-layer-evaluation-benchmark.md) | Repeated offline regression plus provenanced live evaluation | accepted |

@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 import pytest
-from agent_framework import WorkflowCheckpoint
+from agent_framework import FileCheckpointStorage, WorkflowCheckpoint
 from agent_framework.exceptions import WorkflowCheckpointException
 
 from runtime.checkpoints import SecureCheckpointStorage
@@ -75,3 +75,26 @@ def test_checkpoint_save_is_create_only(tmp_path: Path) -> None:
 
     with pytest.raises(WorkflowCheckpointException, match="already exists"):
         asyncio.run(storage.save(checkpoint))
+
+
+def test_reader_never_sees_checkpoint_before_owner_only_publication(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    storage = SecureCheckpointStorage(tmp_path)
+    checkpoint = _checkpoint()
+    original = FileCheckpointStorage.save
+    observed = []
+
+    async def inspect_before_publication(delegate, value):
+        checkpoint_id = await original(delegate, value)
+        observed.append(await storage.list_checkpoint_ids(workflow_name="unit-workflow"))
+        assert not (storage.storage_path / f"{checkpoint_id}.json").exists()
+        return checkpoint_id
+
+    monkeypatch.setattr(FileCheckpointStorage, "save", inspect_before_publication)
+    checkpoint_id = asyncio.run(storage.save(checkpoint))
+    assert observed == [[]]
+    assert (storage.storage_path / f"{checkpoint_id}.json").stat().st_mode & 0o777 == 0o600
+    listed = asyncio.run(storage.list_checkpoint_ids(workflow_name="unit-workflow"))
+    assert listed == [checkpoint_id]
+    assert not list(storage.storage_path.glob(".pending-*"))

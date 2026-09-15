@@ -32,4 +32,5 @@
   dev-DAG; identities, profiles и MCP processes не пересекаются.
 - STEP-0018…0023 закрыли durable MAF checkpoints, branching/receipt idempotency, content-free OTel,
   отдельные Bubblewrap identities, authenticated MCP и operational observability backend. Phase J
-  завершена; далее — Phase K evaluation benchmark.
+  завершена. STEP-0024 добавляет Phase K offline regression benchmark и historical live provenance;
+  свежая оценка качества модели остаётся отдельным opt-in платным gate.

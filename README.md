@@ -12,6 +12,7 @@ Docker Compose. LLM-вызовы идут через OpenAI-совместимы
 Phase J содержит hardened MAF checkpoints, branching six-role pipeline, durable role receipts,
 content-free OpenTelemetry trace chain, operational Collector/Tempo/Prometheus/Grafana stack и
 отдельные Bubblewrap role runners с authenticated MCP.
+Phase K добавляет versioned offline regression benchmark и отдельный dated historical LLM baseline.
 Работают ClickHouse,
 контейнерный dbt baseline, Airflow 3.3.1 с Astronomer Cosmos 1.15.0 и PostgreSQL 16.15.
 
@@ -76,6 +77,15 @@ ClickHouse публикуется только на loopback-интерфейс�
 `make dbt-build` создаёт 6 views и 2 MergeTree marts и выполняет 68 tests. `make platform-test` проверяет Airflow через API, повторяет dbt tests и независимо проверяет физические таблицы и фиксированные агрегаты. Net Revenue намеренно отсутствует: это будущая benchmark-задача Data Engineer Agent.
 
 ## Scenario harness
+
+`make evaluation-test` проверяет benchmark runner. `make evaluation-benchmark` выполняет 17 offline
+cases по три раза в fresh pytest processes: reliability, quality-gate invariants и safety. Строгий
+baseline требует 100% PASS и zero violations; отчёт с configuration fingerprint и p50/p95 пишется
+в `.scenario-state/evaluations/phase-k-latest.json` (0600). Для сравнения запусков задайте
+`EVALUATION_REPORT_NAME=phase-k-run-a.json`. LLM/Data Platform не вызываются. Исторические 24 live
+attempts в `evals/phase_k/historical_live_baseline.json` не являются текущим model-quality rerun.
+`make test` и benchmark используют общий `flock`: scenario fixtures разделяют disposable workspace.
+Не запускайте прямой `pytest` или другие scenario-mutating команды параллельно с benchmark.
 
 Benchmark `net-revenue` запускается только в disposable workspace; основной checkout не меняется:
 

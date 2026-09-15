@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-`init/` contains proposals, not evidence. `plan/` holds steps, decisions, problems, experiments,
+`init/` contains proposals. `plan/` holds steps, decisions, problems, experiments,
 evidence, and progress; follow `Claude.md`.
 
 Control-plane code belongs in `orchestrator/`, `runtime/`, `agents/`, `contracts/`, and `policies/`.
@@ -22,6 +22,7 @@ Services/dbt live in `platform/`; MCP packaging in `mcp/`; scenarios and the iso
 - `make scenario-run` builds a candidate; `make scenario-grade` invokes the isolated grader.
 - `make checkpoint-smoke` proves process-kill recovery from a durable MAF checkpoint.
 - `make role-pipeline-test` proves typed rework and receipt-backed restart.
+- `make evaluation-benchmark` repeats 17 offline cases against strict thresholds.
 - `make telemetry-test` proves the content-free trace contract; `make observability-smoke` proves
   Collector sampling/metrics, Tempo retention, Prometheus, and the provisioned Grafana dashboard.
 - `make runner-isolation-test` proves per-role Bubblewrap UID/filesystem/network isolation and
@@ -46,6 +47,6 @@ fallback. MCP signing keys remain under owner-only `.scenario-state/mcp-auth/`.
 
 ## Commit & Pull Request Guidelines
 
-Use short imperative subjects such as `feat(platform): add airflow baseline`. PRs identify the
+Use imperative subjects: `feat(platform): add airflow baseline`. PRs identify the
 problem, affected layers, linked step, validation evidence, ADR/problem records, and remaining
 risks. Authors may not approve their own changes.

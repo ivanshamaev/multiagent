@@ -25,3 +25,6 @@ regression check. Полноту индекса проверяет `make plan-ch
 | [PRB-0047](PRB-0047-tempo-v3-default-target.md) |  |  |
 | [PRB-0048](PRB-0048-internal-network-loopback-publication.md) |  |  |
 | [PRB-0049](PRB-0049-prometheus-stale-sampling-baseline.md) |  |  |
+| [PRB-0050](PRB-0050-pytest-evaluation-module-collision.md) |  |  |
+| [PRB-0051](PRB-0051-concurrent-offline-scenario-fixtures.md) |  |  |
+| [PRB-0052](PRB-0052-checkpoint-publication-permission-race.md) |  |  |

@@ -186,4 +186,6 @@ trace carrier и hardened JSONL exporter. STEP-0022 добавил пять от
 identities, zero-network/capability-derived filesystem boundary и request-bound authentication во
 всех role-facing MCP connections. STEP-0023 завершил Phase J: OTLP Collector применяет tail
 sampling и строит metrics, Tempo/Prometheus ограничивают retention, а Grafana получает provisioned
-read-only dashboard. Следующий этап — Phase K evaluation benchmark.
+read-only dashboard. STEP-0024 реализует Phase K versioned offline benchmark (17 cases × 3), strict
+baseline, fingerprint и historical live provenance. Offline PASS не заменяет fresh model-quality
+sample при смене модели/prompts/tools. Далее — Phase L: практический курс из подтверждённых evidence.

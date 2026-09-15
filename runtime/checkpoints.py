@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import os
 import re
 import stat
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
@@ -76,8 +78,19 @@ class SecureCheckpointStorage:
             raise WorkflowCheckpointException("checkpoint target must not be a symlink")
         if target.exists():
             raise WorkflowCheckpointException("checkpoint already exists")
-        checkpoint_id = await self._delegate.save(checkpoint)
-        target.chmod(0o600)
+        with tempfile.TemporaryDirectory(prefix=".pending-", dir=self.storage_path) as staging_name:
+            staging = Path(staging_name)
+            checkpoint_id = await FileCheckpointStorage(staging).save(checkpoint)
+            completed = staging / f"{checkpoint_id}.json"
+            completed.chmod(0o600)
+            if completed.stat().st_size > MAX_CHECKPOINT_BYTES:
+                raise WorkflowCheckpointException("checkpoint exceeds the size limit")
+            with completed.open("rb") as stream:
+                os.fsync(stream.fileno())
+            try:
+                os.link(completed, target)
+            except FileExistsError:
+                raise WorkflowCheckpointException("checkpoint already exists") from None
         self._validate_file(checkpoint_id)
         return checkpoint_id
 
@@ -88,6 +101,16 @@ class SecureCheckpointStorage:
     async def list_checkpoints(self, *, workflow_name: str) -> list[WorkflowCheckpoint]:
         checkpoints: list[WorkflowCheckpoint] = []
         for path in sorted(self.storage_path.iterdir()):
+            if re.fullmatch(r"\.pending-[a-z0-9_]{8}", path.name):
+                try:
+                    metadata = path.lstat()
+                except FileNotFoundError:
+                    continue
+                if not stat.S_ISDIR(metadata.st_mode):
+                    raise WorkflowCheckpointException("invalid checkpoint staging entry")
+                if stat.S_IMODE(metadata.st_mode) != 0o700:
+                    raise WorkflowCheckpointException("checkpoint staging must have mode 0700")
+                continue
             if path.name.endswith(".json.tmp"):
                 continue
             if path.suffix != ".json":

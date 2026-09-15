@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "suite_id": "phase-k-regression-v1",
+  "protocol_version": "offline-pytest-v1",
+  "repetitions": 3,
+  "case_timeout_seconds": 30,
+  "max_output_bytes": 262144,
+  "configuration_inputs": [
+    "Makefile",
+    "pyproject.toml",
+    "uv.lock",
+    "agents/analyst/instructions.md",
+    "agents/data_engineer/instructions.md",
+    "agents/pm/instructions.md",
+    "agents/qa/instructions.md",
+    "agents/reviewer/instructions.md",
+    "contracts/artifacts.py",
+    "contracts/tools.py",
+    "orchestrator/transitions.py",
+    "policies/tool_policy.py",
+    "policies/profiles/data_engineer_v1.json",
+    "policies/profiles/analyst_v1.json",
+    "policies/profiles/qa_v1.json",
+    "policies/profiles/reviewer_v1.json",
+    "policies/runner_profiles/data_engineer_v1.json",
+    "runtime/model_provider.py",
+    "runtime/role_pipeline.py",
+    "runtime/runner_isolation.py",
+    "runtime/mcp_auth.py",
+    "scenarios/net-revenue/manifest.json",
+    "scenarios/net-revenue/specification.json",
+    "tests/fixtures/analyst_cases.json",
+    "tests/fixtures/qa_mutants/manifest.json",
+    "tests/fixtures/reviewer_mutants/manifest.json"
+  ],
+  "cases": [
+    {
+      "id": "role-pipeline-happy",
+      "category": "reliability",
+      "failure_mode": "workflow",
+      "node_id": "tests/workflow/test_role_pipeline.py::test_six_role_graph_reaches_done_and_checkpoints_every_boundary"
+    },
+    {
+      "id": "validator-rework",
+      "category": "reliability",
+      "failure_mode": "workflow",
+      "node_id": "tests/workflow/test_role_pipeline.py::test_validator_rework_returns_to_de_then_repeats_all_quality_gates"
+    },
+    {
+      "id": "rework-exhaustion",
+      "category": "reliability",
+      "failure_mode": "budget",
+      "node_id": "tests/workflow/test_role_pipeline.py::test_rework_budget_exhaustion_routes_failed_to_terminal"
+    },
+    {
+      "id": "checkpoint-process-resume",
+      "category": "reliability",
+      "failure_mode": "infrastructure",
+      "node_id": "tests/integration/test_role_pipeline_recovery.py::test_new_process_resumes_after_data_engineer_without_repeating_completed_roles"
+    },
+    {
+      "id": "receipt-crash-window",
+      "category": "reliability",
+      "failure_mode": "infrastructure",
+      "node_id": "tests/integration/test_role_pipeline_recovery.py::test_receipt_prevents_duplicate_de_after_kill_before_maf_checkpoint"
+    },
+    {
+      "id": "qa-mutation-corpus",
+      "category": "quality",
+      "failure_mode": "reasoning",
+      "node_id": "tests/unit/test_qa_mutations.py::test_mutation_corpus_has_required_independent_defects"
+    },
+    {
+      "id": "qa-repair-loop",
+      "category": "quality",
+      "failure_mode": "reasoning",
+      "node_id": "tests/integration/test_qa_workflow.py::test_qa_failure_drives_de_repair_full_validation_and_qa_pass"
+    },
+    {
+      "id": "reviewer-mutation-corpus",
+      "category": "quality",
+      "failure_mode": "reasoning",
+      "node_id": "tests/unit/test_reviewer_mutations.py::test_reviewer_mutation_corpus_has_required_defects"
+    },
+    {
+      "id": "reviewer-rework-loop",
+      "category": "quality",
+      "failure_mode": "reasoning",
+      "node_id": "tests/integration/test_reviewer_workflow.py::test_review_changes_repeat_validator_qa_and_reviewer_before_done"
+    },
+    {
+      "id": "analyst-failure-corpus",
+      "category": "quality",
+      "failure_mode": "reasoning",
+      "node_id": "tests/adversarial/test_analyst_guards.py::test_offline_evaluation_corpus_covers_required_failure_modes"
+    },
+    {
+      "id": "tool-prompt-poisoning",
+      "category": "safety",
+      "failure_mode": "policy",
+      "node_id": "tests/adversarial/test_tool_policy_guards.py::test_prompt_injection_content_cannot_expand_later_capabilities"
+    },
+    {
+      "id": "pm-prompt-poisoning",
+      "category": "safety",
+      "failure_mode": "policy",
+      "node_id": "tests/adversarial/test_pm_guards.py::test_handoff_prompt_injection_cannot_erase_needs_user_gate"
+    },
+    {
+      "id": "airflow-tool-output-poisoning",
+      "category": "safety",
+      "failure_mode": "policy",
+      "node_id": "tests/adversarial/test_airflow_mcp_guards.py::test_poisoned_output_cannot_expand_dag_or_method_scope"
+    },
+    {
+      "id": "self-approval-escalation",
+      "category": "safety",
+      "failure_mode": "policy",
+      "node_id": "tests/adversarial/test_workflow_guards.py::test_implementation_author_cannot_review_or_approve_self"
+    },
+    {
+      "id": "protected-path-escalation",
+      "category": "safety",
+      "failure_mode": "policy",
+      "node_id": "tests/adversarial/test_scenario_boundaries.py::test_protected_change_is_denied"
+    },
+    {
+      "id": "authenticated-mcp-boundary",
+      "category": "safety",
+      "failure_mode": "policy",
+      "node_id": "tests/integration/test_authenticated_mcp_gateway.py::test_authenticated_runner_request_reaches_real_policy_gateway_without_token_passthrough"
+    },
+    {
+      "id": "runner-namespace-boundary",
+      "category": "safety",
+      "failure_mode": "policy",
+      "node_id": "tests/integration/test_runner_namespace_isolation.py::test_five_role_processes_have_distinct_uid_zero_network_and_scoped_filesystem"
+    }
+  ]
+}

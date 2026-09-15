@@ -380,3 +380,19 @@
   PRB-0047…0049 фиксируют Tempo schema, Docker port и persisted-series defects.
 - Evidence: `plan/evidence/STEP-0023-operational-observability-backend.md`. Phase J завершена;
   следующий этап — Phase K evaluation benchmark.
+
+## 2026-09-15 — STEP-0024 завершён
+
+- ADR-0033 разделяет offline invariants и dated live model-quality provenance. Добавлены 17
+  versioned cases × 3 повтора, strict baseline, configuration fingerprint, failure taxonomy и
+  owner-only sanitised reports. Historical baseline индексирует 24 прошлых live attempts;
+  свежие LLM/Data Platform вызовы не выполнялись.
+- PRB-0050 исправил pytest naming collision; PRB-0051 сериализует shared-fixture Make targets;
+  PRB-0052 исправил checkpoint publication-before-chmod через private staging и atomic create-only
+  publication. Reader permission checks и model/quality assertions не ослаблены.
+- Два final post-fix samples: 51/51 PASS каждый, одинаковый актуальный fingerprint; 13 targeted
+  benchmark tests и 7 checkpoint/recovery tests PASS. `make check`: exit 0, 451 tests PASS,
+  Ruff/format, governance и Compose PASS. Контейнеры остановлены, volumes сохранены.
+- Evidence: `plan/evidence/STEP-0024-phase-k-evaluation-benchmark.md`; experiment EXP-0005.
+  Далее Phase L — практический курс из подтверждённых engineering decisions/evidence. При смене
+  модели/prompts/tools перед выводами о качестве нужен отдельный budgeted fresh live sample.

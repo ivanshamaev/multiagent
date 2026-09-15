@@ -45,6 +45,7 @@ QA_MODEL ?= openai/gpt-5.6-luna
 QA_MUTATION ?= canonical
 REVIEW_MODEL ?= openai/gpt-5.6-luna
 REVIEW_MUTATION ?= canonical
+EVALUATION_REPORT_NAME ?= phase-k-latest.json
 ANALYST_MODEL ?= openai/gpt-5.6-luna
 ANALYST_CASE ?= canonical
 PM_MODEL ?= openai/gpt-5.6-luna
@@ -66,7 +67,7 @@ SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	mcp-images mcp-users mcp-smoke airflow-mcp-smoke airflow-trigger-approve airflow-trigger-smoke \
 	checkpoint-smoke role-pipeline-test telemetry-test runner-isolation-test data-engineer-live analyst-live \
 	requirements-live qa-live reviewer-live quality-loop-live observability-up observability-down \
-	observability-test observability-smoke
+	observability-test observability-smoke evaluation-test evaluation-benchmark
 
 secure-env:
 	@if test -f .env; then chmod 600 .env; test "$$(stat -c '%a' .env)" = 600; fi
@@ -81,7 +82,8 @@ format-check:
 	$(UV) run ruff format --check .
 
 test:
-	$(UV) run pytest
+	@mkdir -p .scenario-state
+	flock .scenario-state/offline-validation.lock $(UV) run pytest
 
 plan-check:
 	$(UV) run python -m policies.plan_governance
@@ -235,6 +237,15 @@ observability-smoke:
 		trap '$(MAKE) --no-print-directory observability-down >/dev/null' EXIT; \
 		$(MAKE) --no-print-directory observability-up; \
 		$(UV) run python -m runtime.observability_smoke
+
+evaluation-test:
+	$(UV) run pytest -q tests/unit/test_evaluation_benchmark.py \
+		tests/policy/test_evaluation_policy.py \
+		tests/adversarial/test_evaluation_benchmark_guards.py
+
+evaluation-benchmark:
+	@mkdir -p .scenario-state
+	flock .scenario-state/offline-validation.lock $(UV) run python -m runtime.evaluation_benchmark --report-name "$(EVALUATION_REPORT_NAME)"
 
 airflow-failure-test: airflow-validate
 	$(UV) run python platform/airflow/scripts/api_smoke.py --expect-failure
