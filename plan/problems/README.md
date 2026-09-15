@@ -28,3 +28,9 @@ regression check. Полноту индекса проверяет `make plan-ch
 | [PRB-0050](PRB-0050-pytest-evaluation-module-collision.md) |  |  |
 | [PRB-0051](PRB-0051-concurrent-offline-scenario-fixtures.md) |  |  |
 | [PRB-0052](PRB-0052-checkpoint-publication-permission-race.md) |  |  |
+| [PRB-0053](PRB-0053-course-checker-dependency-scan.md) | Course checker scanned dependency docs | resolved |
+| [PRB-0054](PRB-0054-fullscreen-escape-headless.md) | Explicit fullscreen Escape and focus return | resolved |
+| [PRB-0055](PRB-0055-state-diagram-label-overlap.md) | Long state transition labels overlap | resolved |
+| [PRB-0056](PRB-0056-roadmap-generated-id-collision.md) | Roadmap generated IDs/local links | resolved |
+| [PRB-0057](PRB-0057-long-inline-tokens-mobile-overflow.md) | Long inline tokens overflow mobile page | resolved |
+| [PRB-0058](PRB-0058-authored-lecture-outline-status.md) | Authored text mislabeled unwritten | resolved |

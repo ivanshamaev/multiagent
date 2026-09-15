@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "id": "S01",
+      "title": "Building effective agents",
+      "url": "https://www.anthropic.com/engineering/building-effective-agents",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S02",
+      "title": "How we built our multi-agent research system",
+      "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S03",
+      "title": "Don’t Build Multi-Agents",
+      "url": "https://cognition.com/blog/dont-build-multi-agents",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S04",
+      "title": "Multi-Agents: What’s Actually Working",
+      "url": "https://cognition.com/blog/multi-agents-working",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S05",
+      "title": "LangGraph: Multi-Agent Workflows",
+      "url": "https://www.langchain.com/blog/langgraph-multi-agent-workflows",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S06",
+      "title": "Introducing Microsoft Agent Framework: The Open-Source Engine for Agentic AI Apps",
+      "url": "https://devblogs.microsoft.com/foundry/introducing-microsoft-agent-framework-the-open-source-engine-for-agentic-ai-apps/",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S07",
+      "title": "Effective context engineering for AI agents",
+      "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S08",
+      "title": "Writing effective tools for agents — with agents",
+      "url": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S09",
+      "title": "Effective harnesses for long-running agents",
+      "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S10",
+      "title": "Beyond permission prompts: making Claude Code more secure and autonomous",
+      "url": "https://www.anthropic.com/engineering/claude-code-sandboxing",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S11",
+      "title": "Introducing the Model Context Protocol",
+      "url": "https://www.anthropic.com/news/model-context-protocol",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S12",
+      "title": "Making retries safe with idempotent APIs",
+      "url": "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S13",
+      "title": "Exponential Backoff And Jitter",
+      "url": "https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S14",
+      "title": "Data Mesh Principles and Logical Architecture",
+      "url": "https://martinfowler.com/articles/data-mesh-principles.html",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S15",
+      "title": "Build and centralize metrics with the dbt Semantic Layer",
+      "url": "https://www.getdbt.com/blog/build-centralize-and-deliver-consistent-metrics-with-the-dbt-semantic-layer",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S16",
+      "title": "Using Materialized Views in ClickHouse",
+      "url": "https://clickhouse.com/blog/using-materialized-views-in-clickhouse",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S17",
+      "title": "What is analytics engineering?",
+      "url": "https://www.getdbt.com/blog/what-is-analytics-engineering",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S18",
+      "title": "Why data testing is essential for analytics engineering",
+      "url": "https://www.getdbt.com/blog/data-testing",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S19",
+      "title": "Code Health: Google’s Internal Code Quality Efforts",
+      "url": "https://testing.googleblog.com/2017/04/code-health-googles-internal-code.html",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S20",
+      "title": "Demystifying evals for AI agents",
+      "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S21",
+      "title": "Quantifying infrastructure noise in agentic coding evals",
+      "url": "https://www.anthropic.com/engineering/infrastructure-noise",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S22",
+      "title": "Three Tenancy Models For Kubernetes",
+      "url": "https://kubernetes.io/blog/2021/04/15/three-tenancy-models-for-kubernetes/",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S23",
+      "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+      "url": "https://arxiv.org/abs/2210.03629",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S24",
+      "title": "Magentic-One: A Generalist Multi-Agent System for Solving Complex Tasks",
+      "url": "https://www.microsoft.com/en-us/research/articles/magentic-one-a-generalist-multi-agent-system-for-solving-complex-tasks/",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S25",
+      "title": "Mitigating prompt injection attacks with a layered defense strategy",
+      "url": "https://blog.google/security/mitigating-prompt-injection-attacks/",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S26",
+      "title": "Code execution with MCP: Building more efficient agents",
+      "url": "https://www.anthropic.com/engineering/code-execution-with-mcp",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S27",
+      "title": "Scaling Managed Agents: Decoupling the brain from the hands",
+      "url": "https://www.anthropic.com/engineering/managed-agents",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S28",
+      "title": "Apache Airflow 3 is Generally Available!",
+      "url": "https://airflow.apache.org/blog/airflow-three-point-oh-is-here/",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S29",
+      "title": "Dapper, a Large-Scale Distributed Systems Tracing Infrastructure",
+      "url": "https://research.google/pubs/dapper-a-large-scale-distributed-systems-tracing-infrastructure/",
+      "checked": "2026-09-15"
+    },
+    {
+      "id": "S30",
+      "title": "Equipping agents for the real world with Agent Skills",
+      "url": "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills",
+      "checked": "2026-09-15"
+    }
+  ]
+}

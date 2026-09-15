@@ -2,7 +2,10 @@
 
 ## Назначение и источники истины
 
-Репозиторий создаёт проверенную multi-agent систему для Data Engineering, а затем практический курс на основе реальных решений, экспериментов и ошибок. Документы `init/` описывают целевую архитектуру и syllabus, но не доказывают наличие реализации.
+Репозиторий создаёт проверенную multi-agent систему для Data Engineering, а затем глубокий
+теоретический курс: наша система служит сквозным примером, лабораторные и практика исключены.
+Документы `init/` описывают исходную архитектуру и syllabus, но не доказывают наличие реализации.
+Уточнённый формат Phase L и редакторские gates определяют ADR-0034 и STEP-0025.
 
 Порядок приоритетов: явная задача пользователя → `AGENTS.md` и этот файл → принятые ADR в `plan/decisions/` → активный шаг в `plan/steps/` → исполняемый код/config → исходные материалы `init/`. Архитектурный конфликт не разрешай молча: зафиксируй его и создай/обнови ADR.
 
@@ -164,6 +167,31 @@ Airflow trigger изолирован в отдельном profile/process/ident
 Никогда не подключай production credentials и не выполняй production write/deploy. Исключение текущего local development — только `API_TOKEN` для явно разрешённого GateLLM gateway. Расширение file/network scope, secret access и необратимые действия требуют явного human approval. Не удаляй Docker volumes и не выполняй `docker system prune` без явного запроса.
 
 ## Работа с изменениями
+
+Для курса применять `technical-markdown-lectures` с глубиной, заданной пользователем. После каждой
+лекции выполнять отдельные полную редакторскую вычитку и technical verification, исправлять
+замечания и перепроверять текст. Record связывается с content hash; missing/stale review или
+существенные unresolved findings запрещают reviewed. Editorial skills подготовлены в course/skills
+и локально; перед каждым применением читать инструкции и фиксировать фактическое usage в receipt.
+Не превращать примеры нашей системы в student labs.
+Тексты лекций хранить в `course/lectures/`, todo-планы — в `plan/steps/lections/`.
+Соблюдать `course/technical-requirements.md`: Mermaid source в Markdown, build-time SVG,
+общий HTML-компонент zoom/pan/fullscreen, текстовый fallback и обязательная визуальная проверка.
+`make course-check` — offline governance; `make course-build` собирает allowlisted landing,
+roadmap, Markdown outlines, prototype и technical requirements (STEP-0026/0028).
+Не выдавать prototype PASS за публикационный gate
+всех лекций; reviewed Mermaid требует отдельной подтверждённой визуальной проверки.
+STEP-0030 добавляет publication receipts: обычный reader публикует только reviewed
+с актуальными content/publication fingerprints. Candidate build — отдельная labelled
+directory; `make course-review COURSE_LECTURE=0`. AX semantics не выдавать за actual
+Orca/NVDA/VoiceOver interaction. При изменении builder/styles/JS выполнять browser recheck.
+Дизайн будущего сайта задан `course/design/site-design.md` и ADR-0038: Cyberpunk landing,
+manifest-driven SVG roadmap, course navigation слева и AST TOC справа. STEP-0028 реализует
+прототип UI для outlines, не publisher лекций. Сохранять readability/no-JS/CSP и review gates; не добавлять React/Tailwind
+только ради синтаксиса пользовательского reference.
+Сверять primary concept ownership и prerequisites, заменять повторное полное объяснение cross-link.
+Курс рассматривает code-owned workflow и agent-orchestrator как альтернативы, включая scenario
+comparison/hybrid; это теоретический scope, не разрешение добавлять planner в runtime (ADR-0035).
 
 Phase K: `make evaluation-benchmark` проверяет versioned offline invariants минимум тремя повторами
 каждого case; baseline thresholds нельзя ослаблять ради PASS. Сравнивай configuration fingerprints,

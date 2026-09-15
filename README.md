@@ -1,8 +1,16 @@
 # Agentic Data Platform
 
-Практический reference project для построения команды AI-агентов, которая выполняет задачи Data Engineering в управляемом workflow. После стабилизации системы её решения, traces, эксперименты и failure records станут основой курса.
+Практический reference project для построения команды AI-агентов, которая выполняет задачи Data
+Engineering в управляемом workflow. Phase L — глубокий теоретический курс без лабораторных и
+практики: система, её решения, traces и failure records служат сквозным примером. Каждая лекция
+проходит редакторскую вычитку и техническую перепроверку.
 
 ## Текущий статус
+
+Phase L: [каркас теоретического курса](course/README.md), 27 outlines и обязательный
+per-lecture review workflow. `make course-check` проверяет metadata/Markdown/receipts;
+полные лекции ещё не написаны. [SVG/HTML-прототип](course/build-status.md) собирается
+через `make course-build`, локальный просмотр — `make course-preview`.
 
 Реализованы golden Data Platform, reproducible scenario harness, strict typed artifacts и
 детерминированный workflow с budgets и hash-chained events, read-only Analyst, tool-free PM gate и

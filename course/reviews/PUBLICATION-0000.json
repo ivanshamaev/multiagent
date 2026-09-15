@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "lecture_id": 0,
+  "reviewer": "Codex; same-author separate browser/visual passes, not independent review",
+  "checked_at": "2026-09-15T19:10:25Z",
+  "publication_digest": "3a48c82afd65dfccf38bf11cbca739121d140560e581dddedaf499ddf3e43773",
+  "passes": {
+    "desktop": true,
+    "mobile": true,
+    "light": true,
+    "dark": true,
+    "no_js": true,
+    "keyboard": true,
+    "print": true,
+    "accessibility_tree": true,
+    "subpath": true,
+    "csp": true,
+    "links": true,
+    "visual": true
+  },
+  "assistive_technology": {
+    "tested": false,
+    "scope": "Chrome AX main landmark and named/described SVG checked; actual Orca/NVDA/VoiceOver interaction not tested."
+  },
+  "renderer": {
+    "browser_version": "Google Chrome for Testing 153.0.8010.36",
+    "builder_sha256": "095fa29ffe2926bea7999900eee5f269a02376c9ef09c8e4e723a2c62d85f994",
+    "cli": "11.17.0",
+    "diagram_config_sha256": "bc12b7e5869cf9fea920a4ed5b52619096949dc7c1c3de2cef760e0d105cdd8d",
+    "font_sha256": {
+      "cyrillic": "05af9e705d3b63aedba67197d19fb448b97353e1386930716c7e835b08f126ba",
+      "latin": "0d352d8a993d3f79d860e44d74ee3e132649253f2af24caad088c3aed6ec08c8"
+    },
+    "lock_sha256": "2e528e208a65c3ffd5c89446637e68812dc5c56f1e30762f24c2a2e3449fd928",
+    "mermaid": "11.16.1",
+    "node": "v22.22.0",
+    "system_render_font_sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d"
+  },
+  "rendered_sha256": "aaf9f0b9812b668b985c50dd8d08e6d675184d39980b332ba467307ef4b4c032",
+  "artifacts_sha256": {
+    "output/playwright/step31/lecture-0/dark.png": "4c07fc965f4ab8dac7b3e85e0aeff56022682d505f4365aea4c6236e598e00cd",
+    "output/playwright/step31/lecture-0/desktop.png": "1ecf035e594dc0b554483a9e3fb91289c3601bbfb9e2b8e367471248d6a0da1d",
+    "output/playwright/step31/lecture-0/mobile-diagram.png": "98155b70f08e31943c5830849440d2dfc2f32afb6cdd51a58ea3f5a3d8ff5e81",
+    "output/playwright/step31/lecture-0/mobile.png": "51e9c179861c1fcf1a5e30585c48120349ded646527116225218fa955dc40fb4",
+    "output/playwright/step31/lecture-0/no-js.png": "51e9c179861c1fcf1a5e30585c48120349ded646527116225218fa955dc40fb4",
+    "output/playwright/step31/lecture-0/print-diagram.png": "ec47a57db3c25457bc27dc9718b4525d66307f970705d77e92a9b7a04005e2e3",
+    "output/playwright/step31/lecture-0/print-top.png": "372d5275f482aad121ca532d5362d1c7adf08c9ded188068e0195af80e21cea6"
+  },
+  "scope": "Complete local reader candidate, 360px and desktop, light/dark browser preferences with fixed dark site palette, no-JS, keyboard/fullscreen focus, print geometry and screenshot inspection. No actual AT, paper/PDF, hardware touch or cross-browser audit.",
+  "evidence": "plan/evidence/STEP-0031-lecture-organization.md"
+}

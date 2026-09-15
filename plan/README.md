@@ -34,3 +34,22 @@
   отдельные Bubblewrap identities, authenticated MCP и operational observability backend. Phase J
   завершена. STEP-0024 добавляет Phase K offline regression benchmark и historical live provenance;
   свежая оценка качества модели остаётся отдельным opt-in платным gate.
+- Завершён [STEP-0025](steps/STEP-0025-phase-l-course-scaffold.md): Phase L,
+  [теоретический каркас](../course/README.md), 27 outlines, editorial Skills и обязательные
+  review gates каждой лекции. `make course-check` подключён к `make check`.
+  Тексты создаются отдельно в `course/lectures/`; пилотная лекция 00 написана в STEP-0029.
+  [27 todo-планов](steps/lections/README.md) описывают границы, prerequisites, источники и comparison;
+  тексты будут отдельно в `course/lectures/`.
+- STEP-0026 добавляет [SVG/static HTML prototype](../course/build-status.md): locked renderer,
+  allowlisted build, viewer и browser checks. Это не публикационный gate лекций.
+- STEP-0027 зафиксировал [дизайн сайта](../course/design/site-design.md): Cyberpunk landing,
+  SVG roadmap, программа слева и lecture TOC справа.
+- STEP-0028 реализует этот UI для Markdown outlines: landing, linked roadmap, reader shell,
+  responsive/no-JS navigation и build-time local link/ID checks; publication gate лекций не изменён.
+- STEP-0029 добавляет пилотную теоретическую лекцию 00 с отдельными editorial/technical
+  проверками и receipt; публикация выполнена следующим STEP-0030.
+- [STEP-0030](steps/STEP-0030-lecture-publication-gate.md) вводит отдельные publication receipts,
+  isolated candidate и проверенный full reader. Missing/stale passes запрещают публикацию.
+- [STEP-0031](steps/STEP-0031-lecture-organization.md) добавляет лекцию 01, отдельную вычитку,
+  primary-source verification и browser gate. Лекции 00/01 доступны в локальном reader;
+  остальные 25 тем — outlines. Далее по teaching order — лекция 03, не 02.

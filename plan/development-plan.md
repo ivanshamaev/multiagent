@@ -2,7 +2,10 @@
 
 ## 1. Цель и граница проекта
 
-Сначала строим и проверяем работающую multi-agent систему для инженерии данных. Только после стабильной версии превращаем реальные коммиты, traces, эксперименты, ошибки и исправления в практический курс. Курс не должен опираться на непроверенную теорию.
+Сначала строим и проверяем работающую multi-agent систему для инженерии данных. По уточнению
+пользователя Phase L создаёт глубокий теоретический курс без лабораторных и практики; наша система,
+traces, эксперименты и ошибки иллюстрируют принципы. Реализация примера и общие теоретические
+утверждения имеют отдельную provenance; после каждой лекции обязательны вычитка и перепроверка.
 
 Первая значимая цель:
 
@@ -149,11 +152,15 @@ Gate: kill/restart продолжает работу с последнего che
 
 Gate: воспроизводимый evaluation report содержит configuration fingerprint, число прогонов, success/safety/quality/cost metrics и разбор regressions.
 
-### Phase L — Практический курс
+### Phase L — Глубокий теоретический курс
 
-Задачи: построить модули из ADR, commits, traces, problem records и experiments; для каждой темы дать theory, наблюдаемую проблему, реализацию, лабораторную работу, hidden checks и критерии сдачи.
+Задачи: объяснить модели, инварианты, архитектурные альтернативы и ограничения multi-agent систем;
+использовать нашу Data Platform как сквозной пример с ADR/traces/PRB/EXP/evidence. Лабораторные,
+практические задания и student grading исключены. Для каждой лекции выполнить редакторскую вычитку,
+техническую перепроверку и повторную проверку исправлений с persistent review record.
 
-Gate: каждая практическая глава ссылается на реально воспроизводимый scenario и доказанное инженерное решение.
+Gate: каждая лекция даёт связную глубокую теорию, проверенные источники и корректно подписанные
+примеры; reviewed разрешён только после обоих проходов без существенных unresolved замечаний.
 
 ## 6. Общая Definition of Done
 
@@ -188,4 +195,28 @@ identities, zero-network/capability-derived filesystem boundary и request-bound
 sampling и строит metrics, Tempo/Prometheus ограничивают retention, а Grafana получает provisioned
 read-only dashboard. STEP-0024 реализует Phase K versioned offline benchmark (17 cases × 3), strict
 baseline, fingerprint и historical live provenance. Offline PASS не заменяет fresh model-quality
-sample при смене модели/prompts/tools. Далее — Phase L: практический курс из подтверждённых evidence.
+sample при смене модели/prompts/tools. Далее — Phase L: теоретический курс из подтверждённых evidence.
+
+Завершённый STEP-0025 реализует каркас Phase L: 26 core topics и extension 24,
+source-index, lecture/review templates, editorial Skills и Net Revenue как архитектурный пример. План учитывает исходный
+`init/init_cource_plan.md`, но не переносит неподтверждённые A2A/Kubernetes/CLV/merge promises.
+На 2026-09-15 созданы course documents, 27 outlines, templates, skills и offline checker;
+`make course-check` входит в `make check` (STEP-0025: 479 tests PASS). Тексты ещё не созданы;
+STEP-0026 реализует отдельный allowlisted SVG/HTML prototype с реальными browser checks,
+не publisher всех лекций. Дальше — пилотное authoring с обязательными per-lecture review gates.
+Уточнение пользователя и ADR-0034 отменяют прежние практические треки и оценку часов: цель
+каркаса — теория, обязательная вычитка и техническая перепроверка после каждой лекции.
+ADR-0035 добавляет равноценное рассмотрение code-owned workflow и agent-orchestrator и отдельное
+сравнение/гибрид. Созданы 27 todo-планов в `plan/steps/lections/`; тексты предназначены для
+`course/lectures/`. Карта topic ownership и первичные статьи подготовлены, лекции ещё не написаны.
+STEP-0027 принял Cyberpunk landing/roadmap/reader дизайн. STEP-0028 реализует его в локальном
+static prototype: страницы описаний тем из Markdown outlines, не публикация полных лекций.
+Программа сохраняет teaching_order manifest; roadmap/navigation/TOC не дублируют curriculum.
+STEP-0029 добавляет полную пилотную лекцию 00 с отдельными editorial/technical/recheck
+и diagram-render проверками. Остальные 26 текстов ещё не написаны. Публикационный
+gate реализован в STEP-0030: verified pinned renderer, isolated candidate,
+отдельные content/publication receipts, полный reader, фактический browser и visual review.
+AX semantics проверены, реальное взаимодействие с screen reader — нет; scope указан явно.
+STEP-0031 публикует лекцию 01 о role decomposition/task coupling/separation of duties
+после отдельных editorial/technical/recheck и reader passes. Лекции 00/01 доступны;
+25 прочих текстов ещё не написаны. Следующая тема по teaching_order — лекция 03.

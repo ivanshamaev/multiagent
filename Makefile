@@ -56,7 +56,7 @@ SCENARIO_DBT_PROJECT = $(SCENARIO_WORKSPACE)/platform/dbt
 SCENARIO_GRADER = SCENARIO_WORKSPACE_PATH="$(SCENARIO_WORKSPACE)" \
 	$(COMPOSE) run --rm --no-deps scenario-grader
 
-.PHONY: secure-env bootstrap lint format-check test plan-check check compose-validate \
+.PHONY: secure-env bootstrap lint format-check test plan-check course-check course-renderer-install course-build course-preview check compose-validate \
 	clickhouse-up platform-up platform-status platform-down seed platform-test \
 	clickhouse-test dbt-baseline-test dbt-image dbt-version dbt-debug \
 	dbt-parse dbt-compile dbt-build dbt-test airflow-version airflow-init \
@@ -85,13 +85,32 @@ test:
 	@mkdir -p .scenario-state
 	flock .scenario-state/offline-validation.lock $(UV) run pytest
 
+course-check:
+	$(UV) run python -m course.check
+
+course-renderer-install:
+	npm ci --prefix course --ignore-scripts
+	npm rebuild --prefix course node
+	PATH="$(CURDIR)/course/node_modules/node/bin:$$PATH" npm rebuild --prefix course puppeteer
+
+course-build: course-check
+	$(UV) run python -m course.build
+
+course-preview:
+	$(UV) run python -m course.preview
+
+COURSE_LECTURE ?= 0
+.PHONY: course-review
+course-review: course-check
+	$(UV) run python -m course.build --candidate $(COURSE_LECTURE) --output build/course-review-$(COURSE_LECTURE)
+
 plan-check:
 	$(UV) run python -m policies.plan_governance
 
 compose-validate:
 	$(COMPOSE) config --quiet
 
-check: lint format-check test plan-check compose-validate
+check: lint format-check test plan-check course-check compose-validate
 
 clickhouse-up:
 	$(COMPOSE) up -d --wait clickhouse

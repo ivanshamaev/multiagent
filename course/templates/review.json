@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "lecture_id": null,
+  "reviewer": "",
+  "checked_at": "",
+  "input_digest": "",
+  "skills": [
+    "technical-markdown-lectures",
+    "technical-editorial-review",
+    "technical-claim-verification"
+  ],
+  "passes": {
+    "editorial": false,
+    "technical": false,
+    "recheck": false,
+    "visual": false
+  },
+  "claims": [],
+  "findings": [],
+  "diagram_waiver": null
+}

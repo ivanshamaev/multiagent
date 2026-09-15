@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "lecture_id": 0,
+  "reviewer": "Codex, same-author separate passes; not independent review",
+  "checked_at": "2026-09-15T19:10:00Z",
+  "input_digest": "ac7707e23c135497e460e741b25facf1c37a5954a8fee1425d0860ebd6ae296a",
+  "content_sha256": "90423a7906a4312dfe02d8b1da63d3f8358edc617727e5db4be1d37b5373a634",
+  "skills": [
+    "technical-markdown-lectures",
+    "technical-editorial-review",
+    "technical-claim-verification"
+  ],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {
+    "editorial": true,
+    "technical": true,
+    "recheck": true,
+    "visual": true
+  },
+  "pass_scope": {
+    "editorial": "Complete draft read separately after authoring; definitions, causal continuity, captions, conclusion, questions, glossary and adjacent owner outlines 01/15/16 checked.",
+    "technical": "Primary ReAct section 2 and Anthropic definitions reread online; local PM code and historical STEP-0007 evidence checked. No fresh quality, model pricing or external API compatibility claims.",
+    "recheck": "Complete corrected lecture reread, including normative retry caveat and historical/current provenance separation. STEP-0031: corrected and reread only forward-link publication-status claim.",
+    "visual": "STEP-0031 actual candidate reader: desktop/360px mobile/light/dark/no-JS, keyboard zoom/pan/reset/fullscreen/Escape/focus, print clipping, AX main and named/described SVG, local subpath/CSP/links; all seven screenshots manually inspected. Actual assistive technology and printed PDF not tested.",
+    "not_checked": [
+      "Independent reviewer",
+      "Actual screen-reader interaction",
+      "Cross-browser and hardware touch interoperability"
+    ]
+  },
+  "claims": [
+    {
+      "location": "От генерации текста к выбору действия",
+      "assertion": "Agent terminology varies; Anthropic distinguishes predetermined workflow control and model-directed task handling.",
+      "source": "https://www.anthropic.com/engineering/building-effective-agents",
+      "anchor": "What are agents?",
+      "scope": "Article distinction, not a universal taxonomy",
+      "verdict": "verified"
+    },
+    {
+      "location": "От генерации текста к выбору действия: agency и таблица",
+      "assertion": "Agency and system units are explicitly working analytical definitions; API-call count is not an agent-count definition.",
+      "source": "course/lectures/LECTURE-0000-agentic-baseline.md#от-генерации-текста-к-выбору-действия",
+      "scope": "Author-defined model; consistency with owner 01, not an external standard",
+      "verdict": "verified"
+    },
+    {
+      "location": "Reasoning, действие и наблюдение: ReAct",
+      "assertion": "ReAct interleaves reasoning and acting; language-space steps update context without external observation feedback.",
+      "source": "https://arxiv.org/abs/2210.03629",
+      "anchor": "v3 PDF section 2, page 3, equations/context definition",
+      "scope": "Original paper mechanism only, no benchmark-transfer claim",
+      "verdict": "verified"
+    },
+    {
+      "location": "Reasoning, действие и наблюдение: определения",
+      "assertion": "Proposal, executed action and observation are distinguished; explanation is not claimed to expose full internal computation.",
+      "source": "course/lectures/LECTURE-0000-agentic-baseline.md#reasoning-действие-и-наблюдение",
+      "scope": "Explicit conceptual definitions; no provider-specific reasoning-trace claims",
+      "verdict": "verified"
+    },
+    {
+      "location": "Reasoning, действие и наблюдение: одинаковое описание",
+      "assertion": "Two compatible source states cannot be identified solely by rewriting an unchanged description; new information or an assumption is required.",
+      "source": "course/lectures/LECTURE-0000-agentic-baseline.md#reasoning-действие-и-наблюдение",
+      "scope": "Conditional indistinguishability argument, not an empirical model-quality result",
+      "verdict": "verified"
+    },
+    {
+      "location": "Среда видна частично",
+      "assertion": "History notation is illustrative, not an SDK schema or full-context storage claim; access failure does not entail table absence.",
+      "source": "course/lectures/LECTURE-0000-agentic-baseline.md#среда-видна-частично",
+      "scope": "Conceptual model and hypothetical incomplete-observation cases",
+      "verdict": "verified"
+    },
+    {
+      "location": "Диаграмма: где возникает обратная связь",
+      "assertion": "Only runtime-approved actions invoke the environment; refusal/error returns through observation; accepted final answer or limits stop the loop without asserting success.",
+      "source": "course/lectures/LECTURE-0000-agentic-baseline.md#диаграмма-где-возникает-обратная-связь",
+      "scope": "Author's sequential illustrative graph, not an implemented executor diagram",
+      "verdict": "verified"
+    },
+    {
+      "location": "Ограниченная рациональность и остановка",
+      "assertion": "Finite resource constraints and success conditions differ; bounded iteration count alone cannot bound a hanging individual call.",
+      "source": "course/lectures/LECTURE-0000-agentic-baseline.md#ограниченная-рациональность-и-остановка",
+      "scope": "Conditional engineering argument and explicitly normative design rules",
+      "verdict": "verified"
+    },
+    {
+      "location": "Контрпример: инструменты есть, знания не прибавилось",
+      "assertion": "Access error gives no basis for attributing Net Revenue to discounts; SQL execution and metric correctness are different questions.",
+      "source": "course/lectures/LECTURE-0000-agentic-baseline.md#контрпример-инструменты-есть-знания-не-прибавилось",
+      "scope": "Hypothetical counterexample, not a claimed repository incident",
+      "verdict": "verified"
+    },
+    {
+      "location": "Иллюстрация: tool-free PM в нашей системе",
+      "assertion": "SpecificationExecutor.specify makes one structured provider.generate invocation and has no executor-owned tool loop.",
+      "source": "runtime/agent_runtime.py#SpecificationExecutor.specify",
+      "scope": "Current code as inspected 2026-09-15; existing workflow test verifies no tools",
+      "verdict": "verified"
+    },
+    {
+      "location": "Иллюстрация: tool-free PM в нашей системе: READY",
+      "assertion": "accept_specification_draft rejects READY with unresolved Analyst questions and rejects replacing the unresolved questions.",
+      "source": "runtime/agent_runtime.py#accept_specification_draft",
+      "scope": "Current code and existing PM workflow/adversarial regression checks",
+      "verdict": "verified"
+    },
+    {
+      "location": "Иллюстрация: tool-free PM в нашей системе: historical-live",
+      "assertion": "STEP-0007 records a historical integration query yielding a blocked specification, not fresh model-quality evidence.",
+      "source": "plan/evidence/STEP-0007-local-agent-runtime.md",
+      "scope": "Historical STEP-0007 evidence dated 2026-09-06, distinct from current code",
+      "verdict": "verified"
+    }
+  ],
+  "findings": [
+    {
+      "location": "Reasoning, действие и наблюдение",
+      "severity": "minor",
+      "rationale": "Loop and runtime were used without explicit canonical short definitions.",
+      "disposition": "resolved",
+      "resolution": "Added definitions and narrowed them to the conceptual model; full recheck completed."
+    },
+    {
+      "location": "Диаграмма: абзац о повторе после отказа",
+      "severity": "minor",
+      "rationale": "Retry rule could be read as a universal SDK invariant.",
+      "disposition": "resolved",
+      "resolution": "Explicitly identified it as a design rule for the illustrated cycle."
+    },
+    {
+      "location": "Цель и исторический пример",
+      "severity": "minor",
+      "rationale": "Unnecessary English planning/integration jargon interrupts Russian exposition.",
+      "disposition": "resolved",
+      "resolution": "Replaced prerequisites and plumbing wording; reread affected sections and full final text."
+    }
+  ],
+  "diagram_waiver": null,
+  "diagram": {
+    "source_sha256": "38625b678183bc0e070facbf03e4c1c46ee278d7f5416c19cdf021afa4256f44",
+    "normalized_svg_sha256": "7c2e041be379574bc5b2e5244ac9f8dd0e18145a4ae8f889381d90039653124d",
+    "config_sha256": "bc12b7e5869cf9fea920a4ed5b52619096949dc7c1c3de2cef760e0d105cdd8d",
+    "toolchain": {
+      "node": "v22.22.0",
+      "cli": "11.17.0",
+      "mermaid": "11.16.1",
+      "browser": "153.0.8010.36",
+      "lock_sha256": "2e528e208a65c3ffd5c89446637e68812dc5c56f1e30762f24c2a2e3449fd928",
+      "builder_sha256": "dcbfeb2a7e38a1bd7257edcfbed373107d17059e9b08aab01616fbcb58990248",
+      "system_render_font_sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d"
+    },
+    "artifacts": "Ignored build/course-lecture00-preview/diagram-index.json and output/playwright/step29/ screenshots; persistent summary in STEP-0029 evidence"
+  },
+  "publication": "STEP-0030 per-lecture gate; actual publication fingerprint and reader artifact hashes recorded separately in PUBLICATION-0000.json"
+}

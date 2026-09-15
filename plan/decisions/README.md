@@ -37,3 +37,9 @@ ADR именуются `ADR-NNNN-short-name.md` и содержат status, cont
 | [ADR-0031](ADR-0031-bubblewrap-runners-and-local-mcp-auth.md) | Bubblewrap role runners and local MCP authentication | accepted |
 | [ADR-0032](ADR-0032-local-otel-operational-stack.md) | Local OpenTelemetry operational stack | accepted |
 | [ADR-0033](ADR-0033-two-layer-evaluation-benchmark.md) | Repeated offline regression plus provenanced live evaluation | accepted |
+| [ADR-0034](ADR-0034-theory-course-and-editorial-gates.md) | Theory-only course and mandatory per-lecture editorial verification | accepted |
+| [ADR-0035](ADR-0035-dual-orchestration-lecture-boundaries.md) | Dual orchestration theory and non-overlapping lecture plans | accepted |
+| [ADR-0036](ADR-0036-markdown-diagrams-static-svg.md) | Markdown diagram sources and build-time SVG for static HTML | accepted |
+| [ADR-0037](ADR-0037-local-static-course-prototype.md) | Locked Mermaid renderer and local static course prototype | accepted |
+| [ADR-0038](ADR-0038-course-landing-roadmap-reader-design.md) | Cyberpunk landing, SVG roadmap and course/lecture side navigation | accepted |
+| [ADR-0039](ADR-0039-per-lecture-publication-receipts.md) | Per-lecture publication receipts and isolated review candidates | accepted |

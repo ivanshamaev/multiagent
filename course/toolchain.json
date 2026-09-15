@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "markdown_parser": "markdown-it-py==4.0.0",
+  "markdown_profile": "commonmark+tables",
+  "mermaid_cli": "11.17.0",
+  "mermaid": "11.16.1",
+  "node": "22.22.0",
+  "puppeteer": "25.11.0",
+  "chromium": "153.0.8010.36",
+  "web_fonts": "@fontsource/noto-sans==5.2.8",
+  "css_parser": "tinycss2==1.4.0",
+  "static_generator": "repository-owned course.build",
+  "render_status": "verified",
+  "publication_status": "per-lecture-receipt-gated",
+  "verification_scope": "Pinned renderer and local reader checked in STEP-0030; each lecture still requires its own publication receipt; not all lectures verified",
+  "fingerprints": "generated diagram-index.json; STEP-0026 evidence",
+  "portability_limit": "CLI layout uses fingerprinted host Noto Sans; reproducibility verified locally only"
+}

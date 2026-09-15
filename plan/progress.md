@@ -1,6 +1,98 @@
 # Журнал прогресса
 
+## 2026-09-15 — STEP-0031 завершён: лекция 01 опубликована
+
+- Theory-only текст: ответственность и capability, ownership, task coupling,
+  цена координации и separation of duties; profiles и условный Net Revenue case.
+- Отдельные authoring/editorial/technical/recheck passes, primary sources и
+  browser/visual gate; две minor findings исправлены, финальный текст перечитан.
+  Лекция 00 перепроверена после уточнения статуса forward links.
+- `make check`: exit 0, 529 PASS. Обе lecture/content publication receipts актуальны;
+  82 files/6 diagrams, две обычные сборки побайтово идентичны.
+- [Evidence](evidence/STEP-0031-lecture-organization.md). Preview 8099 доступен;
+  actual AT/hardware touch/cross-browser не проверены. Далее — лекция 03.
+
+## 2026-09-15 — STEP-0030 завершён: local publication gate
+
+- Candidate build изолирован; обычный reader выбирает только reviewed с актуальными
+  content/publication receipts, actual renderer fingerprint и body+TOC hash.
+- Лекция 00 опубликована на стабильном topic URL; roadmap/sidebar/TOC различают
+  планы и тексты. Проверены renderer/SVG, keyboard/fullscreen/Escape/focus, print,
+  mobile/no-JS, AX names/descriptions, subpath/CSP/links и screenshots.
+- `make check`: 529 PASS; post-publication course suite: 78 PASS; две обычные сборки
+  побайтово идентичны. [Evidence](evidence/STEP-0030-lecture-publication-gate.md).
+- Actual Orca/NVDA/VoiceOver не запускались; AX не выдаётся за AT interaction.
+  Preview 8099 работает; следующий STEP-0031 — лекция 01 по утверждённому плану.
+
+## 2026-09-15 — STEP-0029 завершён: пилотная теоретическая лекция 00
+
+- Написан полный Markdown текст: agency, reasoning/action/observation, agent loop,
+  частичная видимость, bounded stopping, контрпример и tool-free PM illustration.
+  Нет лабораторных работ; соседние темы имеют forward references к primary owners.
+- Три обязательных skills применены автором в отдельных authoring/editorial/technical
+  проходах и полном recheck. ReAct/Anthropic сверены с primary sources; текущий PM
+  отделён от historical-live STEP-0007. Receipt связывает 12 claims с inputs/hashes.
+- Фактический render/sanitizer и browser diagram checks сохранены; полный graph
+  визуально проверен в print layout. Final lecture reader/screen-reader gate не выполнен:
+  статус technically-verified, не reviewed; полный текст пока не опубликован.
+- PRB-0058 исправляет hardcoded «не написан» для authored text без публикации draft.
+  Final `make check`: exit 0, 519 PASS; `make course-build`, governance и diff check PASS.
+- [Evidence](evidence/STEP-0029-pilot-lecture-agentic-baseline.md). Preview 8099 восстановлен,
+  HTTP 200; временный diagram-only сервер 8098 остановлен. Следующий этап — publication
+  gate пилотной лекции, затем лекция 01 по teaching_order.
+
+## 2026-09-15 — STEP-0028 завершён: Cyberpunk course prototype
+
+- Landing, linked SVG roadmap и каталог 27 тем; AST Markdown reader с программой слева,
+  TOC справа, canonical pager и mobile/no-JS disclosure navigation.
+- Изучен read-only `ai-agent-memory` builder; перенесены shared-shell/TOC/link-check идеи,
+  не CDN/аналитика. Outlines не объявлены лекциями; review gates сохранены.
+- `make check`: exit 0, 515 PASS; targeted course suite: 64 PASS. Две сборки идентичны,
+  browser/visual checks PASS, PRB-0056/0057 закрыты.
+- [Evidence](evidence/STEP-0028-cyberpunk-course-site-prototype.md). Preview оставлен доступным
+  на loopback 8099; следующая content работа требует отдельного authoring step.
+
+## 2026-09-15 — STEP-0027 завершён: фиксация дизайна сайта
+
+- Сохранены Cyberpunk / Glitch reference и [specification](../course/design/site-design.md), ADR-0038.
+- Главная landing; далее module/lecture pages; SVG roadmap; course menu слева, lecture TOC справа.
+- Определены tokens, typography, responsive layout и readability adaptations эффектов.
+- `make plan-check course-check` и `git diff --check`: exit 0.
+  [Evidence](evidence/STEP-0027-course-site-design-specification.md).
+- Это документационная фиксация, не реализация нового UI; существующий preview не менялся.
+
+## 2026-09-15 — STEP-0026 завершён: SVG/static HTML prototype
+
+- Locked Mermaid CLI и локальный Node, AST builder, SVG/CSS validation, allowlisted output,
+  строгий CSP и loopback preview; четыре диаграммы и три HTML-страницы.
+- Две сборки побайтово совпали; browser checks и визуальная проверка PASS.
+- `make check`: exit 0, 504 passed; targeted course tests: 53 passed.
+- [Evidence](evidence/STEP-0026-static-course-prototype.md); PRB-0053/0054/0055 исправлены.
+- Тексты лекций/publication gate не реализованы; следующий slice — пилотное authoring
+  с обязательными per-lecture вычиткой, technical verification и recheck.
+
 Записи добавляются по факту; планируемая работа сюда не попадает.
+
+## 2026-09-15 — STEP-0025 завершён: теоретический каркас
+
+- Созданы 27 outlines, manifest/syllabus/sources/glossary/templates и editorial skills.
+- AST/offline course checker включён в Make/check; 28 новых regression tests.
+- PyPI и источники восстановились; pinned parser установлен в .venv/uv.lock.
+- `make check`: exit 0, 479 passed. [Evidence](evidence/STEP-0025-theory-course-scaffold.md).
+- Полные лекции и SVG/HTML renderer не реализованы; публикационный review не заявляется.
+
+## 2026-09-15 — STEP-0025: технические требования к лекциям
+
+- ADR-0036: Mermaid в Markdown, SVG при сборке, общий HTML-компонент для просмотра.
+- Созданы `course/technical-requirements.md` и todo-проверки во всех 27 планах.
+- Проверены 32 документа/275 ссылок; plan governance PASS, 3 tests PASS.
+- [Evidence](evidence/STEP-0025-lecture-technical-requirements.md): build/render ещё не реализованы.
+
+## 2026-09-15 — STEP-0025: проверка индивидуальных todo-планов
+
+- Подготовлены 27 планов и отдельная директория `course/lectures/` с README; тексты не написаны.
+- Проверены 81 уникальная concept area, prerequisites и 259 ссылок; governance PASS, 3 tests PASS.
+- Сохранено [evidence](evidence/STEP-0025-lecture-todo-source-planning.md); STEP-0025 остаётся in progress.
 
 ## 2026-09-04 — Инициализация проекта
 
@@ -396,3 +488,37 @@
 - Evidence: `plan/evidence/STEP-0024-phase-k-evaluation-benchmark.md`; experiment EXP-0005.
   Далее Phase L — практический курс из подтверждённых engineering decisions/evidence. При смене
   модели/prompts/tools перед выводами о качестве нужен отдельный budgeted fresh live sample.
+
+## 2026-09-15 — STEP-0025: спланирован каркас Phase L
+
+- Полностью прочитан `init/init_cource_plan.md`; сохранены номера 0–25 и единый ecommerce project.
+  План: 24 core modules, extensions 16/24, 89 estimated student hours (25 theory / 64 practice),
+  source-index, manifest, glossary, templates, rubric/capstone и offline metadata checker.
+- Сопоставлены implementation/evidence anchors; отражены фактический Analyst-before-PM pipeline,
+  local Bubblewrap вместо agent containers, read-only QA/tool-free PM и отдельный Airflow trigger.
+- A2A/dynamic teams, Kubernetes, skills/memory, CLV и automated merge/release не объявлены
+  реализованными. Offline orchestration, platform и paid opt-in labs разделены; historical live
+  rates не выдаются за fresh model quality или live six-role READY.
+- Использован `technical-markdown-lectures` для будущего lesson template и педагогического цикла;
+  полные лекции и scaffold в этом запросе не создавались. STEP-0025 остаётся активным.
+- Следующее действие — реализовать каркас по checklist STEP-0025, начиная с ADR-0034, затем
+  проверить metadata/links/statuses. Planning evidence хранится отдельно от verification будущих labs.
+
+## 2026-09-15 — STEP-0025: theory-only revision по уточнению пользователя
+
+- Прежний practical plan superseded: убраны labs, student setup/assignments, grading, paid tracks
+  и capstone-задание; 89-hour theory/practice estimate снят. ID 25 — архитектурный синтез.
+- Цель — глубокая теория с нашей системой как примером. ADR-0034 сохраняет evidence-based принцип,
+  но заменяет учебные practice/grading требования ADR-0007; исходный `init/` не изменён.
+- Skills: доступный `technical-markdown-lectures`; planned `technical-editorial-review` и
+  `technical-claim-verification` требуют отдельной подготовки через `skill-creator` перед авторством;
+  `openai-docs` условно используется для утверждений именно об OpenAI. Новые skills не установлены.
+- После каждой лекции обязательны полная вычитка, technical verification, исправления и recheck.
+  Review records привязаны к content hash; stale/missing records не допускают reviewed.
+- Обновлены step/roadmap/status. Лекции/scaffold не создавались, другой reviewer не привлекался;
+  утверждение о независимой вычитке не делается. STEP-0025 остаётся активным.
+- 2026-09-15, дополнение: созданы 27 per-lecture todo-планов в `plan/steps/lections/`, index,
+  topic ownership/prerequisite map и 30 первичных статей. Тема 16 стала core manager-agent flow;
+  добавлена 26 — comparison/hybrid с десятью scenarios. Тексты будут в `course/lectures/`.
+  Skill `technical-markdown-lectures` помог согласовать структуру и переходы. Лекции не написаны,
+  semantic duplication review будущих текстов и применение отсутствующих skills не заявляются.
