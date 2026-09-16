@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "lecture_id": 3,
+  "reviewer": "Codex, same-author separate passes; not independent review",
+  "checked_at": "2026-09-16T16:45:58Z",
+  "input_digest": "2ad6ba7563cb7fd5c07a24986d8ae04ecbbc1226216fd2072b3adc07f50abeed",
+  "content_sha256": "8f691d54a7526e41aed80cbe9cd871e1ce81089d76f25b75089f0f7a175c083a",
+  "skills": [
+    "technical-markdown-lectures",
+    "technical-editorial-review",
+    "technical-claim-verification"
+  ],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {
+    "editorial": true,
+    "technical": true,
+    "recheck": true,
+    "visual": true
+  },
+  "pass_scope": {
+    "editorial": "Complete draft read separately after authoring; definitions, causal continuity, internal duplication and current owners 02/09/13/12/06/04/17/19/23 checked.",
+    "technical": "Primary Anthropic S07/S30 articles, current context/provider/PM code, unit tests and dated STEP-0007 inspected on 2026-09-16.",
+    "recheck": "Entire corrected lecture reread after narrowing file stability language and clarifying prompt delimiters are not a trust boundary. STEP-0034: complete renumbered text reread, links and ownership checked; technical claims unchanged.",
+    "visual": "STEP-0034 renumbered candidate reader: desktop and 360px mobile, light/dark, no-JS, keyboard zoom/pan/reset/fullscreen/Escape/focus, print clipping, AX main and named/described SVG, CSP/subpath/local links; seven new screenshots manually inspected. Actual AT, hardware touch, PDF and cross-browser not tested.",
+    "not_checked": [
+      "Independent reviewer",
+      "Actual assistive technology interaction",
+      "Fresh Data Platform or model execution"
+    ]
+  },
+  "claims": [
+    {
+      "location": "Что такое контекст одного хода",
+      "assertion": "Article broadens context engineering beyond system prompt to task data, tools and history at inference time; no local quality claim inferred.",
+      "source": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "anchor": "Introduction and just-in-time context",
+      "scope": "Verified 2026-09-16 within stated article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Релевантность не равна длине",
+      "assertion": "Article describes progressive loading of metadata, main skill file and supporting resources; used only as analogy.",
+      "source": "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills",
+      "anchor": "Progressive disclosure",
+      "scope": "Verified 2026-09-16 within stated article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Наш пример: bounded ContextBundle",
+      "assertion": "Explicit sorted file allowlist, protected path and symlink checks, UTF-8, stat-before/after checks, byte ceilings and content hashes; no semantic retrieval or token accounting.",
+      "source": "runtime/context.py",
+      "anchor": "build_context_bundle and ContextBundle.as_prompt",
+      "scope": "Verified against current implementation and unit tests",
+      "verdict": "verified"
+    },
+    {
+      "location": "Model-provider abstraction",
+      "assertion": "ModelInvocation contains validated value and safe metadata; generate and generate_with_tools follow distinct response-schema paths.",
+      "source": "runtime/model_provider.py",
+      "anchor": "ModelInvocation, StructuredModelProvider and MAFModelProvider",
+      "scope": "Verified against current implementation and unit tests",
+      "verdict": "verified"
+    },
+    {
+      "location": "Structured response — не готовое решение",
+      "assertion": "Parser requires one schema-valid JSON object; ambiguous objects and malformed output fail locally.",
+      "source": "runtime/model_provider.py",
+      "anchor": "_validate_structured_text",
+      "scope": "Verified against current implementation and unit tests",
+      "verdict": "verified"
+    },
+    {
+      "location": "PM boundary",
+      "assertion": "PM checks accepted Analyst handoff, keeps untrusted analysis separately labelled and rejects ready with unresolved questions.",
+      "source": "runtime/agent_runtime.py",
+      "anchor": "_user_prompt, SpecificationExecutor and accept_specification_draft",
+      "scope": "Verified against current implementation and workflow tests",
+      "verdict": "verified"
+    },
+    {
+      "location": "Historical scope",
+      "assertion": "STEP-0007 is dated historical-live evidence, not fresh model-quality proof.",
+      "source": "plan/evidence/STEP-0007-local-agent-runtime.md",
+      "anchor": "Recorded smoke",
+      "scope": "Verified 2026-09-16 as historical evidence only",
+      "verdict": "verified"
+    },
+    {
+      "location": "Diagram semantics",
+      "assertion": "Flowchart describes logical preparation, structural validation and separate workflow gate; not exact SDK internals or full tool loop.",
+      "source": "course/lectures/LECTURE-0003-harness-context.md",
+      "anchor": "Диаграмма: от допустимого входа к проверяемому выходу",
+      "scope": "Verified against prose and current implementation",
+      "verdict": "verified"
+    }
+  ],
+  "findings": [
+    {
+      "location": "Наш пример: bounded ContextBundle",
+      "severity": "minor",
+      "rationale": "Earlier wording implied more than before/after file stat comparison.",
+      "resolved": true,
+      "resolution": "Specified metadata stability while reading; corrected text reread."
+    },
+    {
+      "location": "Наш пример: bounded ContextBundle",
+      "severity": "minor",
+      "rationale": "Path markers could be mistaken for a trust boundary.",
+      "resolved": true,
+      "resolution": "Explicitly denied that markers make document content a trusted instruction; corrected text reread."
+    }
+  ],
+  "diagram_waiver": null
+}

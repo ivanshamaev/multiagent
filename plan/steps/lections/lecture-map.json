@@ -6,33 +6,33 @@
   "teaching_order": [
     0,
     1,
+    2,
     3,
     4,
-    17,
-    2,
-    15,
-    16,
     5,
     6,
     7,
     8,
-    11,
+    9,
     10,
+    11,
     12,
     13,
     14,
+    15,
+    16,
+    17,
     18,
-    9,
     19,
     20,
     21,
     22,
     23,
-    26,
+    24,
     25
   ],
   "optional_order": [
-    24
+    26
   ],
   "lectures": [
     {
@@ -64,8 +64,8 @@
       "example": "runtime/agent_runtime.py; STEP-0007",
       "related": [
         1,
-        15,
-        16
+        6,
+        7
       ],
       "track": "core",
       "filename": "LECTURE-0000-agentic-baseline.md",
@@ -101,11 +101,11 @@
       ],
       "example": "policies/profiles/; ADR-0003/0006; STEP-0008",
       "related": [
-        10,
-        11,
         13,
-        14,
-        26
+        12,
+        15,
+        16,
+        24
       ],
       "track": "core",
       "filename": "LECTURE-0001-organization.md",
@@ -113,45 +113,6 @@
     },
     {
       "id": 2,
-      "slug": "maf-executors",
-      "title": "MAF: executors, edges и runtime графа",
-      "prerequisites": [
-        3,
-        17
-      ],
-      "concepts": [
-        "executor semantics",
-        "edge message delivery",
-        "runtime graph signature"
-      ],
-      "todos": [
-        "Разобрать executor как runtime unit и edge как путь доставки, отдельно от бизнес-перехода.",
-        "Объяснить graph state/messages и границу adapter/domain reducer.",
-        "Показать typed JSON boundary в six-role graph и значение graph signature.",
-        "Сравнить framework abstractions без рейтинга stars, неподтверждённых API обещаний и SDK tutorial."
-      ],
-      "sources": [
-        {
-          "id": "S06",
-          "idea": "Agent/workflow runtime как разные orchestration возможности."
-        },
-        {
-          "id": "S05",
-          "idea": "Graph representation, без переобъяснения supervisor policy."
-        }
-      ],
-      "example": "runtime/role_pipeline.py; STEP-0019",
-      "related": [
-        3,
-        15,
-        18
-      ],
-      "track": "core",
-      "filename": "LECTURE-0002-maf-executors.md",
-      "target": "course/lectures/LECTURE-0002-maf-executors.md"
-    },
-    {
-      "id": 3,
       "slug": "contracts",
       "title": "Контракты, артефакты и границы доверия",
       "prerequisites": [
@@ -180,20 +141,20 @@
       ],
       "example": "contracts/artifacts.py; STEP-0006; ADR-0014",
       "related": [
-        10,
-        12,
-        15
+        13,
+        14,
+        6
       ],
       "track": "core",
-      "filename": "LECTURE-0003-contracts.md",
-      "target": "course/lectures/LECTURE-0003-contracts.md"
+      "filename": "LECTURE-0002-contracts.md",
+      "target": "course/lectures/LECTURE-0002-contracts.md"
     },
     {
-      "id": 4,
+      "id": 3,
       "slug": "harness-context",
       "title": "Harness и инженерия контекста одного вызова",
       "prerequisites": [
-        3
+        2
       ],
       "concepts": [
         "per-turn context selection",
@@ -218,406 +179,98 @@
       ],
       "example": "runtime/context.py; runtime/model_provider.py; STEP-0007",
       "related": [
+        4,
         17,
-        18,
         23
       ],
       "track": "core",
-      "filename": "LECTURE-0004-harness-context.md",
-      "target": "course/lectures/LECTURE-0004-harness-context.md"
+      "filename": "LECTURE-0003-harness-context.md",
+      "target": "course/lectures/LECTURE-0003-harness-context.md"
     },
     {
-      "id": 5,
-      "slug": "isolation",
-      "title": "Изоляция среды исполнения",
+      "id": 4,
+      "slug": "state-memory",
+      "title": "Context, durable state, artifacts и knowledge",
       "prerequisites": [
         3
       ],
       "concepts": [
-        "filesystem containment",
-        "network containment",
-        "process namespace boundary"
+        "state lifecycle",
+        "artifact visibility",
+        "durable vs ephemeral knowledge"
       ],
       "todos": [
-        "Развести prompt-level restrictions и физические границы исполнения.",
-        "Объяснить process/filesystem/network namespaces, scoped mounts и fail-closed behavior.",
-        "Показать five Bubblewrap role identities, trusted model transport и нулевой raw egress.",
-        "Разобрать ограничение shared kernel; authentication и Kubernetes вынести в отдельные лекции."
+        "Разделить conversation context, workflow snapshot, task artifact и long-term knowledge.",
+        "Объяснить lifetime/visibility/consistency и потерю информации при summarization.",
+        "Сопоставить shared scratchpad с accepted artifact handoff без повторения schemas.",
+        "Показать текущее context/state; long-term memory описать как альтернативу, не как установленный layer."
       ],
       "sources": [
         {
-          "id": "S10",
-          "idea": "Filesystem/network containment как отдельные boundaries."
+          "id": "S07",
+          "idea": "Compaction/structured notes как способы работы с контекстом."
         },
         {
-          "id": "S27",
-          "idea": "Разделение sandbox и harness."
+          "id": "S03",
+          "idea": "Контекст и согласованность implicit decisions."
         }
       ],
-      "example": "runtime/runner_isolation.py; STEP-0022",
+      "example": "runtime/context.py; contracts/artifacts.py; STEP-0019",
       "related": [
-        19,
-        24
+        2,
+        3,
+        12,
+        17
       ],
       "track": "core",
-      "filename": "LECTURE-0005-isolation.md",
-      "target": "course/lectures/LECTURE-0005-isolation.md"
+      "filename": "LECTURE-0004-state-memory.md",
+      "target": "course/lectures/LECTURE-0004-state-memory.md"
     },
     {
-      "id": 6,
-      "slug": "mcp-interface",
-      "title": "MCP как интерфейс, а не политика координации",
+      "id": 5,
+      "slug": "maf-executors",
+      "title": "MAF: executors, edges и runtime графа",
       "prerequisites": [
-        5,
+        2,
         4
       ],
       "concepts": [
-        "MCP host/client/server",
-        "protocol capability negotiation",
-        "tool interface ergonomics"
+        "executor semantics",
+        "edge message delivery",
+        "runtime graph signature"
       ],
       "todos": [
-        "Объяснить роли host/client/server, transport и negotiated capabilities.",
-        "Развести tool call, agent delegation и workflow transition.",
-        "Описать tool names/parameters/results как semantic interface, не произвольный API pass-through.",
-        "Разграничить protocol guarantees и repository-owned authorization; OAuth details сверять отдельно."
+        "Разобрать executor как runtime unit и edge как путь доставки, отдельно от бизнес-перехода.",
+        "Объяснить graph state/messages и границу adapter/domain reducer.",
+        "Показать typed JSON boundary в six-role graph и значение graph signature.",
+        "Сравнить framework abstractions без рейтинга stars, неподтверждённых API обещаний и SDK tutorial."
       ],
       "sources": [
         {
-          "id": "S11",
-          "idea": "Унифицированный интерфейс подключения данных."
+          "id": "S06",
+          "idea": "Agent/workflow runtime как разные orchestration возможности."
         },
         {
-          "id": "S08",
-          "idea": "Tool ergonomics и понятные boundaries."
+          "id": "S05",
+          "idea": "Graph representation, без переобъяснения supervisor policy."
         }
       ],
-      "example": "runtime/tools/mcp_gateway.py; runtime/tools/mcp_stdio.py; STEP-0008",
+      "example": "runtime/role_pipeline.py; STEP-0019",
       "related": [
-        7,
-        8,
-        9,
-        19
-      ],
-      "track": "core",
-      "filename": "LECTURE-0006-mcp-interface.md",
-      "target": "course/lectures/LECTURE-0006-mcp-interface.md"
-    },
-    {
-      "id": 7,
-      "slug": "analytical-sql",
-      "title": "Аналитический SQL и ограниченные data capabilities",
-      "prerequisites": [
-        6
-      ],
-      "concepts": [
-        "analytical query scope",
-        "SQL resource envelope",
-        "read capability composition"
-      ],
-      "todos": [
-        "Объяснить metadata/profile/aggregate access и минимально достаточный SQL surface.",
-        "Развести SELECT syntax, фактические side effects и использование функций/таблиц вне scope.",
-        "Показать AST/policy query checks, row/time/output bounds и read-only database identity.",
-        "Кратко связать materialization с видом наблюдаемых данных, не преподавать dbt или query tuning заново."
-      ],
-      "sources": [
-        {
-          "id": "S08",
-          "idea": "Специализированный tool вместо чрезмерно общего интерфейса."
-        },
-        {
-          "id": "S16",
-          "idea": "Materialized analytical result как контекст наблюдения."
-        }
-      ],
-      "example": "policies/tool_policy.py; platform/clickhouse/security/; STEP-0008",
-      "related": [
-        8,
-        11,
-        19
-      ],
-      "track": "core",
-      "filename": "LECTURE-0007-analytical-sql.md",
-      "target": "course/lectures/LECTURE-0007-analytical-sql.md"
-    },
-    {
-      "id": 8,
-      "slug": "dbt-semantics",
-      "title": "dbt, lineage и семантика аналитической модели",
-      "prerequisites": [
-        7
-      ],
-      "concepts": [
-        "model grain",
-        "transformation lineage",
-        "dbt validation stages"
-      ],
-      "todos": [
-        "Определить grain и зависимость staging/intermediate/marts без курса общего SQL.",
-        "Разобрать lineage и parse/compile/build/test: разные kinds of evidence.",
-        "Развести warehouse model graph, Airflow DAG и multi-agent control graph.",
-        "Показать Cosmos как интеграцию dbt в data orchestration, не писать инструкции развёртывания."
-      ],
-      "sources": [
-        {
-          "id": "S17",
-          "idea": "Analytics transformation как инженерная ответственность."
-        },
-        {
-          "id": "S18",
-          "idea": "Data assertions в transformation lifecycle."
-        }
-      ],
-      "example": "platform/dbt/; platform/airflow/dags/cosmos_pipeline.py; STEP-0004",
-      "related": [
-        9,
-        11,
-        12,
-        13
-      ],
-      "track": "core",
-      "filename": "LECTURE-0008-dbt-semantics.md",
-      "target": "course/lectures/LECTURE-0008-dbt-semantics.md"
-    },
-    {
-      "id": 9,
-      "slug": "airflow-operations",
-      "title": "Airflow API: наблюдение и контролируемые операции",
-      "prerequisites": [
+        2,
         6,
-        18
-      ],
-      "concepts": [
-        "data orchestration boundary",
-        "operation approval binding",
-        "observer/trigger separation"
-      ],
-      "todos": [
-        "Развести data-task scheduling и orchestration reasoning агентов.",
-        "Объяснить stable REST /api/v2 vs Task Execution API без смешения двух интерфейсов.",
-        "Показать observer GET scope и separate approved dev-DAG trigger identity.",
-        "Применить понятие operation identity из 18; не переобъяснять idempotency protocol и общий threat model."
-      ],
-      "sources": [
-        {
-          "id": "S28",
-          "idea": "API-first разделение исполнения data tasks."
-        },
-        {
-          "id": "S12",
-          "idea": "Operation identity применительно к repeated trigger."
-        }
-      ],
-      "example": "runtime/airflow_mcp_server.py; runtime/airflow_trigger_mcp_server.py; STEP-0014/0015",
-      "related": [
-        15,
-        18,
-        19
-      ],
-      "track": "core",
-      "filename": "LECTURE-0009-airflow-operations.md",
-      "target": "course/lectures/LECTURE-0009-airflow-operations.md"
-    },
-    {
-      "id": 10,
-      "slug": "pm-specification",
-      "title": "PM: формальная спецификация и пределы знания",
-      "prerequisites": [
-        11
-      ],
-      "concepts": [
-        "business metric definition",
-        "requirements readiness",
-        "needs-user semantics"
-      ],
-      "todos": [
-        "Развести business intent, data fact и проверяемое acceptance criterion.",
-        "Объяснить authority PM над semantics, но не над фактами/permissions.",
-        "Разобрать assumptions и material unknowns; почему NEEDS_USER — корректное решение.",
-        "Показать human-authored Net Revenue spec и реальный unresolved handoff; не обещать live READY."
-      ],
-      "sources": [
-        {
-          "id": "S15",
-          "idea": "Согласованность определений метрик."
-        },
-        {
-          "id": "S14",
-          "idea": "Потребительские требования к data product."
-        }
-      ],
-      "example": "runtime/specification.py; scenarios/net-revenue/specification.json; STEP-0013",
-      "related": [
-        11,
-        12,
-        15
-      ],
-      "track": "core",
-      "filename": "LECTURE-0010-pm-specification.md",
-      "target": "course/lectures/LECTURE-0010-pm-specification.md"
-    },
-    {
-      "id": 11,
-      "slug": "analyst-provenance",
-      "title": "Analyst: discovery, lineage и provenance фактов",
-      "prerequisites": [
-        8,
-        17
-      ],
-      "concepts": [
-        "data fact provenance",
-        "semantic discovery",
-        "facts/assumptions distinction"
-      ],
-      "todos": [
-        "Разобрать schema/lineage/profile как разные источники знания.",
-        "Объяснить evidence-backed fact и ограничение вывода из sampled/aggregate data.",
-        "Показать three fresh read phases и synthesis; не определять business metric вместо PM.",
-        "Сопоставить доступность данных и достаточность для требования; не обещать anomaly investigation corpus."
-      ],
-      "sources": [
-        {
-          "id": "S14",
-          "idea": "Discoverability/understandability данных."
-        },
-        {
-          "id": "S07",
-          "idea": "Отбор релевантной информации для synthesis."
-        }
-      ],
-      "example": "runtime/analyst.py; tests/fixtures/analyst_cases.json; STEP-0012",
-      "related": [
-        8,
-        10,
         17
       ],
       "track": "core",
-      "filename": "LECTURE-0011-analyst-provenance.md",
-      "target": "course/lectures/LECTURE-0011-analyst-provenance.md"
+      "filename": "LECTURE-0005-maf-executors.md",
+      "target": "course/lectures/LECTURE-0005-maf-executors.md"
     },
     {
-      "id": 12,
-      "slug": "data-engineer",
-      "title": "DE: ограниченная автономия изменения данных",
-      "prerequisites": [
-        10,
-        8
-      ],
-      "concepts": [
-        "implementation authority",
-        "candidate change boundary",
-        "semantic repair"
-      ],
-      "todos": [
-        "Разделить утверждённую спецификацию и пространство допустимых implementation choices.",
-        "Объяснить isolated candidate и authority только над editable dbt subtree.",
-        "Показать Net Revenue payment/refund attribution как применение grain/semantics из 08/10.",
-        "Рассмотреть semantic repair по validator evidence; не переобъяснять QA, reducer budget и checkpoint."
-      ],
-      "sources": [
-        {
-          "id": "S17",
-          "idea": "Transformation work как инженерная дисциплина."
-        },
-        {
-          "id": "S09",
-          "idea": "Инкрементальный прогресс без необоснованного completion."
-        }
-      ],
-      "example": "runtime/data_engineer.py; runtime/data_engineer_workflow.py; STEP-0009",
-      "related": [
-        8,
-        13,
-        15,
-        18
-      ],
-      "track": "core",
-      "filename": "LECTURE-0012-data-engineer.md",
-      "target": "course/lectures/LECTURE-0012-data-engineer.md"
-    },
-    {
-      "id": 13,
-      "slug": "qa-evidence",
-      "title": "QA: независимые проверки и принятие дефекта",
-      "prerequisites": [
-        12
-      ],
-      "concepts": [
-        "QA independent probes",
-        "mutation detection",
-        "accepted defect evidence"
-      ],
-      "todos": [
-        "Развести public validator success и независимую semantic probe.",
-        "Объяснить mutation/false pass и authority QA сообщать defect, не исправлять candidate.",
-        "Разобрать code-owned immutable SQL probes и fresh assessment.",
-        "Применить один QA mutation как case; механическое rework routing и статистику вынести владельцам."
-      ],
-      "sources": [
-        {
-          "id": "S18",
-          "idea": "Data assertions и доверие к результату."
-        },
-        {
-          "id": "S20",
-          "idea": "Несколько проверяющих аспектов результата."
-        }
-      ],
-      "example": "runtime/qa_workflow.py; tests/fixtures/qa_mutants/; STEP-0010; EXP-0003",
-      "related": [
-        14,
-        15,
-        21
-      ],
-      "track": "core",
-      "filename": "LECTURE-0013-qa-evidence.md",
-      "target": "course/lectures/LECTURE-0013-qa-evidence.md"
-    },
-    {
-      "id": 14,
-      "slug": "review-authority",
-      "title": "Reviewer: quality judgment и separation от автора",
-      "prerequisites": [
-        13
-      ],
-      "concepts": [
-        "review authority",
-        "false approval",
-        "maintainability judgment"
-      ],
-      "todos": [
-        "Развести semantic QA и architecture/maintainability review.",
-        "Объяснить право принять/отклонить изменение и запрет self-approval.",
-        "Показать fresh read-only reviewer context и четыре retained mutations.",
-        "Обсудить correlated blind spots: отдельная роль не гарантирует статистическую независимость."
-      ],
-      "sources": [
-        {
-          "id": "S19",
-          "idea": "Code health сверх бинарного test result."
-        },
-        {
-          "id": "S04",
-          "idea": "Дополнительный интеллектуальный review при сохранении single writer."
-        }
-      ],
-      "example": "runtime/reviewer_workflow.py; STEP-0011; EXP-0004",
-      "related": [
-        1,
-        13,
-        21
-      ],
-      "track": "core",
-      "filename": "LECTURE-0014-review-authority.md",
-      "target": "course/lectures/LECTURE-0014-review-authority.md"
-    },
-    {
-      "id": 15,
+      "id": 6,
       "slug": "strict-workflow",
       "title": "Жёсткий workflow: reducer, branching и convergence",
       "prerequisites": [
-        2
+        5
       ],
       "concepts": [
         "code-owned transition policy",
@@ -642,21 +295,21 @@
       ],
       "example": "runtime/role_pipeline.py; orchestrator/transitions.py; STEP-0020",
       "related": [
-        2,
-        16,
-        18,
-        26
+        5,
+        7,
+        17,
+        24
       ],
       "track": "core",
-      "filename": "LECTURE-0015-strict-workflow.md",
-      "target": "course/lectures/LECTURE-0015-strict-workflow.md"
+      "filename": "LECTURE-0006-strict-workflow.md",
+      "target": "course/lectures/LECTURE-0006-strict-workflow.md"
     },
     {
-      "id": 16,
+      "id": 7,
       "slug": "agent-orchestrator",
       "title": "Agent-orchestrator: planning, delegation и replanning",
       "prerequisites": [
-        15
+        6
       ],
       "concepts": [
         "model-directed delegation",
@@ -682,61 +335,369 @@
       ],
       "example": "External architecture only; ours remains code-owned workflow; ADR-0035",
       "related": [
+        9,
         6,
-        15,
+        19,
+        24
+      ],
+      "track": "core",
+      "filename": "LECTURE-0007-agent-orchestrator.md",
+      "target": "course/lectures/LECTURE-0007-agent-orchestrator.md"
+    },
+    {
+      "id": 8,
+      "slug": "isolation",
+      "title": "Изоляция среды исполнения",
+      "prerequisites": [
+        2
+      ],
+      "concepts": [
+        "filesystem containment",
+        "network containment",
+        "process namespace boundary"
+      ],
+      "todos": [
+        "Развести prompt-level restrictions и физические границы исполнения.",
+        "Объяснить process/filesystem/network namespaces, scoped mounts и fail-closed behavior.",
+        "Показать five Bubblewrap role identities, trusted model transport и нулевой raw egress.",
+        "Разобрать ограничение shared kernel; authentication и Kubernetes вынести в отдельные лекции."
+      ],
+      "sources": [
+        {
+          "id": "S10",
+          "idea": "Filesystem/network containment как отдельные boundaries."
+        },
+        {
+          "id": "S27",
+          "idea": "Разделение sandbox и harness."
+        }
+      ],
+      "example": "runtime/runner_isolation.py; STEP-0022",
+      "related": [
         19,
         26
       ],
       "track": "core",
-      "filename": "LECTURE-0016-agent-orchestrator.md",
-      "target": "course/lectures/LECTURE-0016-agent-orchestrator.md"
+      "filename": "LECTURE-0008-isolation.md",
+      "target": "course/lectures/LECTURE-0008-isolation.md"
     },
     {
-      "id": 17,
-      "slug": "state-memory",
-      "title": "Context, durable state, artifacts и knowledge",
+      "id": 9,
+      "slug": "mcp-interface",
+      "title": "MCP как интерфейс, а не политика координации",
       "prerequisites": [
-        4
+        8,
+        3
       ],
       "concepts": [
-        "state lifecycle",
-        "artifact visibility",
-        "durable vs ephemeral knowledge"
+        "MCP host/client/server",
+        "protocol capability negotiation",
+        "tool interface ergonomics"
       ],
       "todos": [
-        "Разделить conversation context, workflow snapshot, task artifact и long-term knowledge.",
-        "Объяснить lifetime/visibility/consistency и потерю информации при summarization.",
-        "Сопоставить shared scratchpad с accepted artifact handoff без повторения schemas.",
-        "Показать текущее context/state; long-term memory описать как альтернативу, не как установленный layer."
+        "Объяснить роли host/client/server, transport и negotiated capabilities.",
+        "Развести tool call, agent delegation и workflow transition.",
+        "Описать tool names/parameters/results как semantic interface, не произвольный API pass-through.",
+        "Разграничить protocol guarantees и repository-owned authorization; OAuth details сверять отдельно."
       ],
       "sources": [
         {
-          "id": "S07",
-          "idea": "Compaction/structured notes как способы работы с контекстом."
+          "id": "S11",
+          "idea": "Унифицированный интерфейс подключения данных."
         },
         {
-          "id": "S03",
-          "idea": "Контекст и согласованность implicit decisions."
+          "id": "S08",
+          "idea": "Tool ergonomics и понятные boundaries."
         }
       ],
-      "example": "runtime/context.py; contracts/artifacts.py; STEP-0019",
+      "example": "runtime/tools/mcp_gateway.py; runtime/tools/mcp_stdio.py; STEP-0008",
       "related": [
-        3,
-        4,
+        10,
         11,
-        18
+        18,
+        19
       ],
       "track": "core",
-      "filename": "LECTURE-0017-state-memory.md",
-      "target": "course/lectures/LECTURE-0017-state-memory.md"
+      "filename": "LECTURE-0009-mcp-interface.md",
+      "target": "course/lectures/LECTURE-0009-mcp-interface.md"
     },
     {
-      "id": 18,
+      "id": 10,
+      "slug": "analytical-sql",
+      "title": "Аналитический SQL и ограниченные data capabilities",
+      "prerequisites": [
+        9
+      ],
+      "concepts": [
+        "analytical query scope",
+        "SQL resource envelope",
+        "read capability composition"
+      ],
+      "todos": [
+        "Объяснить metadata/profile/aggregate access и минимально достаточный SQL surface.",
+        "Развести SELECT syntax, фактические side effects и использование функций/таблиц вне scope.",
+        "Показать AST/policy query checks, row/time/output bounds и read-only database identity.",
+        "Кратко связать materialization с видом наблюдаемых данных, не преподавать dbt или query tuning заново."
+      ],
+      "sources": [
+        {
+          "id": "S08",
+          "idea": "Специализированный tool вместо чрезмерно общего интерфейса."
+        },
+        {
+          "id": "S16",
+          "idea": "Materialized analytical result как контекст наблюдения."
+        }
+      ],
+      "example": "policies/tool_policy.py; platform/clickhouse/security/; STEP-0008",
+      "related": [
+        11,
+        12,
+        19
+      ],
+      "track": "core",
+      "filename": "LECTURE-0010-analytical-sql.md",
+      "target": "course/lectures/LECTURE-0010-analytical-sql.md"
+    },
+    {
+      "id": 11,
+      "slug": "dbt-semantics",
+      "title": "dbt, lineage и семантика аналитической модели",
+      "prerequisites": [
+        10
+      ],
+      "concepts": [
+        "model grain",
+        "transformation lineage",
+        "dbt validation stages"
+      ],
+      "todos": [
+        "Определить grain и зависимость staging/intermediate/marts без курса общего SQL.",
+        "Разобрать lineage и parse/compile/build/test: разные kinds of evidence.",
+        "Развести warehouse model graph, Airflow DAG и multi-agent control graph.",
+        "Показать Cosmos как интеграцию dbt в data orchestration, не писать инструкции развёртывания."
+      ],
+      "sources": [
+        {
+          "id": "S17",
+          "idea": "Analytics transformation как инженерная ответственность."
+        },
+        {
+          "id": "S18",
+          "idea": "Data assertions в transformation lifecycle."
+        }
+      ],
+      "example": "platform/dbt/; platform/airflow/dags/cosmos_pipeline.py; STEP-0004",
+      "related": [
+        18,
+        12,
+        14,
+        15
+      ],
+      "track": "core",
+      "filename": "LECTURE-0011-dbt-semantics.md",
+      "target": "course/lectures/LECTURE-0011-dbt-semantics.md"
+    },
+    {
+      "id": 12,
+      "slug": "analyst-provenance",
+      "title": "Analyst: discovery, lineage и provenance фактов",
+      "prerequisites": [
+        11,
+        4
+      ],
+      "concepts": [
+        "data fact provenance",
+        "semantic discovery",
+        "facts/assumptions distinction"
+      ],
+      "todos": [
+        "Разобрать schema/lineage/profile как разные источники знания.",
+        "Объяснить evidence-backed fact и ограничение вывода из sampled/aggregate data.",
+        "Показать three fresh read phases и synthesis; не определять business metric вместо PM.",
+        "Сопоставить доступность данных и достаточность для требования; не обещать anomaly investigation corpus."
+      ],
+      "sources": [
+        {
+          "id": "S14",
+          "idea": "Discoverability/understandability данных."
+        },
+        {
+          "id": "S07",
+          "idea": "Отбор релевантной информации для synthesis."
+        }
+      ],
+      "example": "runtime/analyst.py; tests/fixtures/analyst_cases.json; STEP-0012",
+      "related": [
+        11,
+        13,
+        4
+      ],
+      "track": "core",
+      "filename": "LECTURE-0012-analyst-provenance.md",
+      "target": "course/lectures/LECTURE-0012-analyst-provenance.md"
+    },
+    {
+      "id": 13,
+      "slug": "pm-specification",
+      "title": "PM: формальная спецификация и пределы знания",
+      "prerequisites": [
+        12
+      ],
+      "concepts": [
+        "business metric definition",
+        "requirements readiness",
+        "needs-user semantics"
+      ],
+      "todos": [
+        "Развести business intent, data fact и проверяемое acceptance criterion.",
+        "Объяснить authority PM над semantics, но не над фактами/permissions.",
+        "Разобрать assumptions и material unknowns; почему NEEDS_USER — корректное решение.",
+        "Показать human-authored Net Revenue spec и реальный unresolved handoff; не обещать live READY."
+      ],
+      "sources": [
+        {
+          "id": "S15",
+          "idea": "Согласованность определений метрик."
+        },
+        {
+          "id": "S14",
+          "idea": "Потребительские требования к data product."
+        }
+      ],
+      "example": "runtime/specification.py; scenarios/net-revenue/specification.json; STEP-0013",
+      "related": [
+        12,
+        14,
+        6
+      ],
+      "track": "core",
+      "filename": "LECTURE-0013-pm-specification.md",
+      "target": "course/lectures/LECTURE-0013-pm-specification.md"
+    },
+    {
+      "id": 14,
+      "slug": "data-engineer",
+      "title": "DE: ограниченная автономия изменения данных",
+      "prerequisites": [
+        13,
+        11
+      ],
+      "concepts": [
+        "implementation authority",
+        "candidate change boundary",
+        "semantic repair"
+      ],
+      "todos": [
+        "Разделить утверждённую спецификацию и пространство допустимых implementation choices.",
+        "Объяснить isolated candidate и authority только над editable dbt subtree.",
+        "Показать Net Revenue payment/refund attribution как применение grain/semantics из 08/10.",
+        "Рассмотреть semantic repair по validator evidence; не переобъяснять QA, reducer budget и checkpoint."
+      ],
+      "sources": [
+        {
+          "id": "S17",
+          "idea": "Transformation work как инженерная дисциплина."
+        },
+        {
+          "id": "S09",
+          "idea": "Инкрементальный прогресс без необоснованного completion."
+        }
+      ],
+      "example": "runtime/data_engineer.py; runtime/data_engineer_workflow.py; STEP-0009",
+      "related": [
+        11,
+        15,
+        6,
+        17
+      ],
+      "track": "core",
+      "filename": "LECTURE-0014-data-engineer.md",
+      "target": "course/lectures/LECTURE-0014-data-engineer.md"
+    },
+    {
+      "id": 15,
+      "slug": "qa-evidence",
+      "title": "QA: независимые проверки и принятие дефекта",
+      "prerequisites": [
+        14
+      ],
+      "concepts": [
+        "QA independent probes",
+        "mutation detection",
+        "accepted defect evidence"
+      ],
+      "todos": [
+        "Развести public validator success и независимую semantic probe.",
+        "Объяснить mutation/false pass и authority QA сообщать defect, не исправлять candidate.",
+        "Разобрать code-owned immutable SQL probes и fresh assessment.",
+        "Применить один QA mutation как case; механическое rework routing и статистику вынести владельцам."
+      ],
+      "sources": [
+        {
+          "id": "S18",
+          "idea": "Data assertions и доверие к результату."
+        },
+        {
+          "id": "S20",
+          "idea": "Несколько проверяющих аспектов результата."
+        }
+      ],
+      "example": "runtime/qa_workflow.py; tests/fixtures/qa_mutants/; STEP-0010; EXP-0003",
+      "related": [
+        16,
+        6,
+        21
+      ],
+      "track": "core",
+      "filename": "LECTURE-0015-qa-evidence.md",
+      "target": "course/lectures/LECTURE-0015-qa-evidence.md"
+    },
+    {
+      "id": 16,
+      "slug": "review-authority",
+      "title": "Reviewer: quality judgment и separation от автора",
+      "prerequisites": [
+        15
+      ],
+      "concepts": [
+        "review authority",
+        "false approval",
+        "maintainability judgment"
+      ],
+      "todos": [
+        "Развести semantic QA и architecture/maintainability review.",
+        "Объяснить право принять/отклонить изменение и запрет self-approval.",
+        "Показать fresh read-only reviewer context и четыре retained mutations.",
+        "Обсудить correlated blind spots: отдельная роль не гарантирует статистическую независимость."
+      ],
+      "sources": [
+        {
+          "id": "S19",
+          "idea": "Code health сверх бинарного test result."
+        },
+        {
+          "id": "S04",
+          "idea": "Дополнительный интеллектуальный review при сохранении single writer."
+        }
+      ],
+      "example": "runtime/reviewer_workflow.py; STEP-0011; EXP-0004",
+      "related": [
+        1,
+        15,
+        21
+      ],
+      "track": "core",
+      "filename": "LECTURE-0016-review-authority.md",
+      "target": "course/lectures/LECTURE-0016-review-authority.md"
+    },
+    {
+      "id": 17,
       "slug": "recovery-idempotency",
       "title": "Recovery: checkpoints, receipts и пределы exactly-once",
       "prerequisites": [
-        15,
-        17
+        6,
+        4
       ],
       "concepts": [
         "checkpoint commit boundary",
@@ -761,24 +722,63 @@
       ],
       "example": "runtime/checkpoints.py; runtime/role_receipts.py; STEP-0018/0024; PRB-0052",
       "related": [
-        9,
-        15,
-        17,
+        18,
+        6,
+        4,
         22
       ],
       "track": "core",
-      "filename": "LECTURE-0018-recovery-idempotency.md",
-      "target": "course/lectures/LECTURE-0018-recovery-idempotency.md"
+      "filename": "LECTURE-0017-recovery-idempotency.md",
+      "target": "course/lectures/LECTURE-0017-recovery-idempotency.md"
+    },
+    {
+      "id": 18,
+      "slug": "airflow-operations",
+      "title": "Airflow API: наблюдение и контролируемые операции",
+      "prerequisites": [
+        9,
+        17
+      ],
+      "concepts": [
+        "data orchestration boundary",
+        "operation approval binding",
+        "observer/trigger separation"
+      ],
+      "todos": [
+        "Развести data-task scheduling и orchestration reasoning агентов.",
+        "Объяснить stable REST /api/v2 vs Task Execution API без смешения двух интерфейсов.",
+        "Показать observer GET scope и separate approved dev-DAG trigger identity.",
+        "Применить понятие operation identity из 18; не переобъяснять idempotency protocol и общий threat model."
+      ],
+      "sources": [
+        {
+          "id": "S28",
+          "idea": "API-first разделение исполнения data tasks."
+        },
+        {
+          "id": "S12",
+          "idea": "Operation identity применительно к repeated trigger."
+        }
+      ],
+      "example": "runtime/airflow_mcp_server.py; runtime/airflow_trigger_mcp_server.py; STEP-0014/0015",
+      "related": [
+        6,
+        17,
+        19
+      ],
+      "track": "core",
+      "filename": "LECTURE-0018-airflow-operations.md",
+      "target": "course/lectures/LECTURE-0018-airflow-operations.md"
     },
     {
       "id": 19,
       "slug": "security-authority",
       "title": "Security: untrusted content, identity и enforcement",
       "prerequisites": [
-        5,
-        6,
+        8,
         9,
-        16
+        18,
+        7
       ],
       "concepts": [
         "indirect prompt injection",
@@ -804,11 +804,11 @@
       ],
       "example": "runtime/mcp_auth.py; tests/adversarial/; STEP-0022",
       "related": [
-        5,
-        6,
-        16,
-        24,
-        26
+        8,
+        9,
+        7,
+        26,
+        24
       ],
       "track": "core",
       "filename": "LECTURE-0019-security-authority.md",
@@ -819,9 +819,9 @@
       "slug": "observability",
       "title": "Observability: trace causality и границы наблюдения",
       "prerequisites": [
-        15,
-        16,
-        18
+        6,
+        7,
+        17
       ],
       "concepts": [
         "trace context propagation",
@@ -846,7 +846,7 @@
       ],
       "example": "runtime/telemetry.py; observability/; STEP-0021/0023",
       "related": [
-        18,
+        17,
         21,
         22
       ],
@@ -859,8 +859,8 @@
       "slug": "evaluation",
       "title": "Evaluation: outcome, baseline и статистическая неопределённость",
       "prerequisites": [
-        13,
-        14,
+        15,
+        16,
         20
       ],
       "concepts": [
@@ -886,12 +886,12 @@
       ],
       "example": "evals/phase_k/; STEP-0024; STEP-0009 sample",
       "related": [
-        13,
-        14,
+        15,
+        16,
         20,
         22,
         23,
-        26
+        24
       ],
       "track": "core",
       "filename": "LECTURE-0021-evaluation.md",
@@ -927,9 +927,9 @@
       ],
       "example": "plan/problems/PRB-0035/0051/0052; associated evidence",
       "related": [
-        15,
-        16,
-        18,
+        6,
+        7,
+        17,
         21
       ],
       "track": "core",
@@ -942,7 +942,7 @@
       "title": "Cost/performance: budgets, critical path и эффективность",
       "prerequisites": [
         21,
-        16
+        7
       ],
       "concepts": [
         "budget allocation",
@@ -967,10 +967,10 @@
       ],
       "example": "runtime/model_provider.py; STEP-0009 sample; EXP-0001",
       "related": [
-        4,
-        16,
+        3,
+        7,
         21,
-        26
+        24
       ],
       "track": "core",
       "filename": "LECTURE-0023-cost-performance.md",
@@ -978,92 +978,11 @@
     },
     {
       "id": 24,
-      "slug": "deployment-theory",
-      "title": "Deployment extension: Kubernetes и tenancy",
-      "prerequisites": [
-        5,
-        19
-      ],
-      "concepts": [
-        "tenancy deployment model",
-        "namespace vs tenant isolation",
-        "deployment resource governance"
-      ],
-      "todos": [
-        "Сравнить shared namespace/virtual control plane/cluster boundary как deployment alternatives.",
-        "Объяснить ServiceAccount, resource bounds/cgroups, network policy и seccomp на уровне theory.",
-        "Отделить orchestration policy от deployment substrate и shared kernel risks.",
-        "Показать наши host Bubblewrap/Compose boundaries; Kubernetes явно не реализован."
-      ],
-      "sources": [
-        {
-          "id": "S22",
-          "idea": "Сравнение tenancy models."
-        },
-        {
-          "id": "S10",
-          "idea": "Filesystem/network isolation как необходимая часть containment."
-        }
-      ],
-      "example": "Extension only; ADR-0001/0031",
-      "related": [
-        5,
-        19
-      ],
-      "track": "extension",
-      "filename": "LECTURE-0024-deployment-theory.md",
-      "target": "course/lectures/LECTURE-0024-deployment-theory.md"
-    },
-    {
-      "id": 25,
-      "slug": "architecture-synthesis",
-      "title": "Итоговый синтез: наш мультиагент как система",
-      "prerequisites": [
-        26,
-        22,
-        10,
-        12
-      ],
-      "concepts": [
-        "integrated architecture rationale",
-        "evidence-bounded system claims",
-        "cross-layer change impact"
-      ],
-      "todos": [
-        "Собрать существующие concepts в четыре слоя и один Net Revenue architecture walkthrough.",
-        "Проследить known facts → requirements → implementation → independent quality → terminal outcome.",
-        "Отдельно показать доказанное offline/live, NEEDS_USER и оставшиеся integration gaps.",
-        "Сформулировать последствия смены одного layer, не повторяя определения/сравнение из 26."
-      ],
-      "sources": [
-        {
-          "id": "S04",
-          "idea": "Согласованность действий при расширении интеллектуальной команды."
-        },
-        {
-          "id": "S09",
-          "idea": "Прогресс и evidence завершения как итоговое чтение."
-        }
-      ],
-      "example": "STEP-0010/0013/0020/0024; ADR/PRB/EXP anchors",
-      "related": [
-        10,
-        15,
-        16,
-        21,
-        26
-      ],
-      "track": "core",
-      "filename": "LECTURE-0025-architecture-synthesis.md",
-      "target": "course/lectures/LECTURE-0025-architecture-synthesis.md"
-    },
-    {
-      "id": 26,
       "slug": "orchestration-comparison",
       "title": "Workflow vs agent-orchestrator: сценарии, trade-offs и гибрид",
       "prerequisites": [
-        15,
-        16,
+        6,
+        7,
         19,
         21,
         23
@@ -1101,16 +1020,97 @@
       "example": "Our workflow as implemented baseline; dynamic/hybrid variants explicitly hypothetical; ADR-0035",
       "related": [
         1,
-        15,
-        16,
+        6,
+        7,
         19,
         21,
         23,
         25
       ],
       "track": "core",
-      "filename": "LECTURE-0026-orchestration-comparison.md",
-      "target": "course/lectures/LECTURE-0026-orchestration-comparison.md"
+      "filename": "LECTURE-0024-orchestration-comparison.md",
+      "target": "course/lectures/LECTURE-0024-orchestration-comparison.md"
+    },
+    {
+      "id": 25,
+      "slug": "architecture-synthesis",
+      "title": "Итоговый синтез: наш мультиагент как система",
+      "prerequisites": [
+        24,
+        22,
+        13,
+        14
+      ],
+      "concepts": [
+        "integrated architecture rationale",
+        "evidence-bounded system claims",
+        "cross-layer change impact"
+      ],
+      "todos": [
+        "Собрать существующие concepts в четыре слоя и один Net Revenue architecture walkthrough.",
+        "Проследить known facts → requirements → implementation → independent quality → terminal outcome.",
+        "Отдельно показать доказанное offline/live, NEEDS_USER и оставшиеся integration gaps.",
+        "Сформулировать последствия смены одного layer, не повторяя определения/сравнение из 26."
+      ],
+      "sources": [
+        {
+          "id": "S04",
+          "idea": "Согласованность действий при расширении интеллектуальной команды."
+        },
+        {
+          "id": "S09",
+          "idea": "Прогресс и evidence завершения как итоговое чтение."
+        }
+      ],
+      "example": "STEP-0010/0013/0020/0024; ADR/PRB/EXP anchors",
+      "related": [
+        13,
+        6,
+        7,
+        21,
+        24
+      ],
+      "track": "core",
+      "filename": "LECTURE-0025-architecture-synthesis.md",
+      "target": "course/lectures/LECTURE-0025-architecture-synthesis.md"
+    },
+    {
+      "id": 26,
+      "slug": "deployment-theory",
+      "title": "Deployment extension: Kubernetes и tenancy",
+      "prerequisites": [
+        8,
+        19
+      ],
+      "concepts": [
+        "tenancy deployment model",
+        "namespace vs tenant isolation",
+        "deployment resource governance"
+      ],
+      "todos": [
+        "Сравнить shared namespace/virtual control plane/cluster boundary как deployment alternatives.",
+        "Объяснить ServiceAccount, resource bounds/cgroups, network policy и seccomp на уровне theory.",
+        "Отделить orchestration policy от deployment substrate и shared kernel risks.",
+        "Показать наши host Bubblewrap/Compose boundaries; Kubernetes явно не реализован."
+      ],
+      "sources": [
+        {
+          "id": "S22",
+          "idea": "Сравнение tenancy models."
+        },
+        {
+          "id": "S10",
+          "idea": "Filesystem/network isolation как необходимая часть containment."
+        }
+      ],
+      "example": "Extension only; ADR-0001/0031",
+      "related": [
+        8,
+        19
+      ],
+      "track": "extension",
+      "filename": "LECTURE-0026-deployment-theory.md",
+      "target": "course/lectures/LECTURE-0026-deployment-theory.md"
     }
   ]
 }

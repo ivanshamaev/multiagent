@@ -8,7 +8,7 @@ Track: core
 
 ## Место и prerequisites
 
-[21](../../modules/module-21-evaluation/README.md), [16](../../modules/module-16-agent-orchestrator/README.md)
+[21](../../modules/module-21-evaluation/README.md), [07](../../modules/module-07-agent-orchestrator/README.md)
 
 ## Теоретические outcomes
 

@@ -8,7 +8,7 @@ Track: core
 
 ## Место и prerequisites
 
-[5](../../modules/module-05-isolation/README.md), [6](../../modules/module-06-mcp-interface/README.md), [9](../../modules/module-09-airflow-operations/README.md), [16](../../modules/module-16-agent-orchestrator/README.md)
+[08](../../modules/module-08-isolation/README.md), [09](../../modules/module-09-mcp-interface/README.md), [18](../../modules/module-18-airflow-operations/README.md), [07](../../modules/module-07-agent-orchestrator/README.md)
 
 ## Теоретические outcomes
 

@@ -13,7 +13,7 @@ Track: core; исходная тема init: 19.
 Объяснить indirect prompt injection; authentication/authorization distinction; capability escalation control: модель, условия применимости, ограничения и контрпримеры.
 Эта лекция — primary owner указанных concepts; определения из других лекций не повторять.
 
-Prerequisites: [05](LECTURE-0005-isolation.md), [06](LECTURE-0006-mcp-interface.md), [09](LECTURE-0009-airflow-operations.md), [16](LECTURE-0016-agent-orchestrator.md).
+Prerequisites: [08](LECTURE-0008-isolation.md), [09](LECTURE-0009-mcp-interface.md), [18](LECTURE-0018-airflow-operations.md), [07](LECTURE-0007-agent-orchestrator.md).
 
 ## Что писать — todo
 
@@ -27,7 +27,7 @@ Prerequisites: [05](LECTURE-0005-isolation.md), [06](LECTURE-0006-mcp-interface.
 
 ## Границы и согласованность
 
-Не пересказывать theory владельцев: [05](LECTURE-0005-isolation.md), [06](LECTURE-0006-mcp-interface.md), [16](LECTURE-0016-agent-orchestrator.md), [24](LECTURE-0024-deployment-theory.md), [26](LECTURE-0026-orchestration-comparison.md).
+Не пересказывать theory владельцев: [08](LECTURE-0008-isolation.md), [09](LECTURE-0009-mcp-interface.md), [07](LECTURE-0007-agent-orchestrator.md), [26](LECTURE-0026-deployment-theory.md), [24](LECTURE-0024-orchestration-comparison.md).
 Перед использованием заимствованного термина ссылаться на его primary owner из [карты](README.md).
 Повторный case разрешён только с новым аналитическим вопросом; заново объяснять предыдущий case нельзя.
 Лекция theory-only: нет student setup, coding tasks, обязательного запуска команд или сдачи работы.

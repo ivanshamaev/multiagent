@@ -26,7 +26,7 @@ Prerequisites: [00](LECTURE-0000-agentic-baseline.md).
 
 ## Границы и согласованность
 
-Не пересказывать theory владельцев: [10](LECTURE-0010-pm-specification.md), [11](LECTURE-0011-analyst-provenance.md), [13](LECTURE-0013-qa-evidence.md), [14](LECTURE-0014-review-authority.md), [26](LECTURE-0026-orchestration-comparison.md).
+Не пересказывать theory владельцев: [13](LECTURE-0013-pm-specification.md), [12](LECTURE-0012-analyst-provenance.md), [15](LECTURE-0015-qa-evidence.md), [16](LECTURE-0016-review-authority.md), [24](LECTURE-0024-orchestration-comparison.md).
 Перед использованием заимствованного термина ссылаться на его primary owner из [карты](README.md).
 Повторный case разрешён только с новым аналитическим вопросом; заново объяснять предыдущий case нельзя.
 Лекция theory-only: нет student setup, coding tasks, обязательного запуска команд или сдачи работы.

@@ -53,14 +53,14 @@ Terminal panel показывает структуру курса, не имит
 Desktop от 1280px: shell до 1600px, левая колонка около 260px, текст 680–820px,
 правое TOC около 220px, gutters 24px. Это layout targets, не жёсткая ширина viewport.
 Sidebars sticky с собственным scroll при необходимости; не перекрывают header/anchors.
-Внизу — предыдущая/следующая в canonical teaching_order, а не по числовому ID лекции.
+Внизу — предыдущая/следующая в canonical teaching_order; core ID совпадают с порядком.
 
 ## SVG roadmap курса
 
 Roadmap генерируется при build из [manifest](../manifest.json), не поддерживается вручную
 как второй curriculum. Узлы: lecture ID, краткая тема, track и реальный editorial status.
 Группы показывают тематические блоки; соответствие групп фиксируется отдельно, без
-перенумерации 27 существующих outlines. Core включает 26 тем, extension 24 отделён визуально.
+повторной перенумерации outlines. Core включает 26 тем, extension 26 отделён визуально.
 
 Сплошной маршрут — рекомендованный teaching_order; пунктирные prerequisites — другой тип
 связи с явной легендой. Если dependency edges перегружают обзор, показать их в текстовом

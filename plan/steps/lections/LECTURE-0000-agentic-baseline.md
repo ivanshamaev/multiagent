@@ -26,7 +26,7 @@ Prerequisites: нет; начальная лекция курса.
 
 ## Границы и согласованность
 
-Не пересказывать theory владельцев: [01](LECTURE-0001-organization.md), [15](LECTURE-0015-strict-workflow.md), [16](LECTURE-0016-agent-orchestrator.md).
+Не пересказывать theory владельцев: [01](LECTURE-0001-organization.md), [06](LECTURE-0006-strict-workflow.md), [07](LECTURE-0007-agent-orchestrator.md).
 Перед использованием заимствованного термина ссылаться на его primary owner из [карты](README.md).
 Повторный case разрешён только с новым аналитическим вопросом; заново объяснять предыдущий case нельзя.
 Лекция theory-only: нет student setup, coding tasks, обязательного запуска команд или сдачи работы.

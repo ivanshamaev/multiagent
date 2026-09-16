@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "lecture_id": 2,
+  "reviewer": "Codex, same-author separate passes; not independent review",
+  "checked_at": "2026-09-16T16:45:58Z",
+  "input_digest": "ccef13d1e2c3251df89030307e86650b365579c87366835fa3a118c8fa1ccfcd",
+  "content_sha256": "066b2dff9e3f3e207eab6b35d8de34f3887054731cc443133fb5b2e2eee3a63b",
+  "skills": [
+    "technical-markdown-lectures",
+    "technical-editorial-review",
+    "technical-claim-verification"
+  ],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {
+    "editorial": true,
+    "technical": true,
+    "recheck": true,
+    "visual": true
+  },
+  "pass_scope": {
+    "editorial": "Complete draft read separately after authoring; definitions, causal continuity, internal duplication and current owners 01/03/13/12/14/06/04/17/19/21 checked.",
+    "technical": "S08/S20 primary articles, Pydantic models documentation, current contracts/reducer/tests, ADR-0014 and dated STEP-0006 inspected on 2026-09-16.",
+    "recheck": "Entire corrected lecture reread after narrowing TransitionCommand provenance and Russian error terminology. STEP-0034: complete renumbered text reread, links and ownership checked; technical claims unchanged.",
+    "visual": "STEP-0034 renumbered candidate reader: desktop/360px mobile/light/dark/no-JS; keyboard zoom/pan/reset/fullscreen/Escape/focus; print clipping; AX main and named/described SVG; CSP/subpath/local links; seven new screenshots manually inspected. Actual AT, hardware touch, PDF and cross-browser not tested.",
+    "not_checked": [
+      "Independent reviewer",
+      "Actual assistive technology interaction",
+      "Fresh Data Platform or model execution"
+    ]
+  },
+  "claims": [
+    {
+      "location": "Артефакт и контракт",
+      "assertion": "Author working definitions explicitly scoped; compatibility does not entail truth.",
+      "source": "course/lectures/LECTURE-0002-contracts.md",
+      "anchor": "Артефакт и контракт",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Ясные интерфейсы",
+      "assertion": "Article recommends explicit, unambiguous inputs/outputs; transferred only as interface principle.",
+      "source": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+      "anchor": "Ясные интерфейсы",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Artifact discriminator",
+      "assertion": "Artifact is a discriminated union on artifact_type; schema_version comes from VersionedModel.",
+      "source": "contracts/artifacts.py",
+      "anchor": "Artifact discriminator",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Closed/frozen models",
+      "assertion": "extra=forbid and frozen=True; lecture explicitly denies absolute/deep immutability.",
+      "source": "contracts/common.py",
+      "anchor": "Closed/frozen models",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Pydantic frozen limitation",
+      "assertion": "Official docs state frozen blocks attribute assignment but does not ensure deep Python immutability.",
+      "source": "https://docs.pydantic.dev/latest/concepts/models/#faux-immutability",
+      "anchor": "Pydantic frozen limitation",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Pydantic model_construct",
+      "assertion": "Official docs state model_construct bypasses validation; trust-boundary use is not inferred safe.",
+      "source": "https://docs.pydantic.dev/latest/concepts/models/#creating-models-without-validation",
+      "anchor": "Pydantic model_construct",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Artifact invariants",
+      "assertion": "Evidence task/time/uniqueness and decision-specific validators described within exact code scope.",
+      "source": "contracts/artifacts.py",
+      "anchor": "Artifact invariants",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Cross-task binding",
+      "assertion": "Reducer compares task, actor/producer, accepted artifact identity and creation/command times.",
+      "source": "orchestrator/transitions.py",
+      "anchor": "Cross-task binding",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Evidence representation",
+      "assertion": "Fields, succeeded property and ArtifactReference constraints described exactly; no storage verification inferred.",
+      "source": "contracts/evidence.py",
+      "anchor": "Evidence representation",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Outcome distinction",
+      "assertion": "Article distinguishes transcript/final claim from environment outcome; evaluation theory remains owner 21.",
+      "source": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents",
+      "anchor": "Outcome distinction",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "ImplementationResult and ValidationResult",
+      "assertion": "Completed requires changed files and evidence references; Validation PASS rejects failed attached evidence.",
+      "source": "contracts/artifacts.py",
+      "anchor": "ImplementationResult and ValidationResult",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Regression coverage",
+      "assertion": "Current tests cover extra fields, frozen assignment, UTC, paths and evidence/task relations.",
+      "source": "tests/unit/test_contracts.py",
+      "anchor": "Regression coverage",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Unvalidated construction guard",
+      "assertion": "AST regression forbids model_construct in production contracts/orchestrator/runtime.",
+      "source": "tests/adversarial/test_workflow_guards.py",
+      "anchor": "Unvalidated construction guard",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Historical scope",
+      "assertion": "Dated STEP-0006 checks are historical evidence, not fresh six-role/model quality proof.",
+      "source": "plan/evidence/STEP-0006-contracts-state-machine.md",
+      "anchor": "Historical scope",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Design intent",
+      "assertion": "Accepted decision specifies version/adapters and trusted code-owned commands; ADR is distinct from behavior proof.",
+      "source": "plan/decisions/ADR-0014-domain-contracts-and-workflow-events.md",
+      "anchor": "Design intent",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    },
+    {
+      "location": "Diagram semantics",
+      "assertion": "Logical acceptance dependencies only, not exact runtime sequence or full workflow.",
+      "source": "course/lectures/LECTURE-0002-contracts.md",
+      "anchor": "Diagram semantics",
+      "scope": "Verified 2026-09-16 within stated code/article boundary",
+      "verdict": "verified"
+    }
+  ],
+  "findings": [
+    {
+      "location": "Cross-task binding",
+      "severity": "minor",
+      "rationale": "The earlier wording could imply that the TransitionCommand model proves trusted construction.",
+      "disposition": "resolved",
+      "resolution": "Made trusted creation an explicit architecture premise and denied provenance proof by the model; full final text reread."
+    },
+    {
+      "location": "Контрпример и классы отказа",
+      "severity": "minor",
+      "rationale": "Two unnecessary English labels interrupted otherwise Russian classification.",
+      "disposition": "resolved",
+      "resolution": "Replaced them with Russian terms and reread the complete lecture."
+    }
+  ],
+  "diagram_waiver": null
+}

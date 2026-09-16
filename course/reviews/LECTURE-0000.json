@@ -2,9 +2,9 @@
   "schema_version": 1,
   "lecture_id": 0,
   "reviewer": "Codex, same-author separate passes; not independent review",
-  "checked_at": "2026-09-15T19:10:00Z",
-  "input_digest": "ac7707e23c135497e460e741b25facf1c37a5954a8fee1425d0860ebd6ae296a",
-  "content_sha256": "90423a7906a4312dfe02d8b1da63d3f8358edc617727e5db4be1d37b5373a634",
+  "checked_at": "2026-09-16T16:45:58Z",
+  "input_digest": "15f28d41cc4ee7c7dc48364ec30747fd0e18569c2797853e26e35df49e000d06",
+  "content_sha256": "60ac0e6b3f08345aa559f8528cf53d40e3cdbad2a4b8dba7564ed14cfa18af1c",
   "skills": [
     "technical-markdown-lectures",
     "technical-editorial-review",
@@ -24,8 +24,8 @@
   "pass_scope": {
     "editorial": "Complete draft read separately after authoring; definitions, causal continuity, captions, conclusion, questions, glossary and adjacent owner outlines 01/15/16 checked.",
     "technical": "Primary ReAct section 2 and Anthropic definitions reread online; local PM code and historical STEP-0007 evidence checked. No fresh quality, model pricing or external API compatibility claims.",
-    "recheck": "Complete corrected lecture reread, including normative retry caveat and historical/current provenance separation. STEP-0031: corrected and reread only forward-link publication-status claim.",
-    "visual": "STEP-0031 actual candidate reader: desktop/360px mobile/light/dark/no-JS, keyboard zoom/pan/reset/fullscreen/Escape/focus, print clipping, AX main and named/described SVG, local subpath/CSP/links; all seven screenshots manually inspected. Actual assistive technology and printed PDF not tested.",
+    "recheck": "Complete corrected lecture reread, including normative retry caveat and historical/current provenance separation. STEP-0031: corrected and reread forward-link publication-status claim. STEP-0034: complete renumbered text reread, links and ownership checked; technical claims unchanged.",
+    "visual": "STEP-0034 renumbered candidate reader: desktop/360px mobile/light/dark/no-JS, keyboard zoom/pan/reset/fullscreen/Escape/focus, print clipping, AX main and named/described SVG, local subpath/CSP/links; seven new screenshots manually inspected. Actual assistive technology and printed PDF not tested.",
     "not_checked": [
       "Independent reviewer",
       "Actual screen-reader interaction",

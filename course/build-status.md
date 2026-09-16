@@ -58,3 +58,26 @@ Renderer теперь verified, а не гарантия проверки все
 Отдельные editorial/technical/recheck, actual render и browser/visual gates выполнены.
 AX semantics не выданы за реальную проверку screen-reader взаимодействия.
 Следующий текст по teaching order — 03: контракты и границы доверия.
+
+## STEP-0032: лекция 03
+
+Полный текст 03 опубликован после отдельных editorial/technical/recheck и
+actual browser/visual passes. Reader содержит 00/01/03; другие 24 темы — outlines.
+Schema validity, contextual binding и product correctness намеренно не смешиваются.
+Следующая тема по teaching order — 04: harness и контекст одного вызова.
+
+## STEP-0033: лекция 04
+
+Полный текст 04 опубликован после отдельных editorial/technical/recheck и
+actual browser/visual passes. Reader содержит 00/01/03/04; другие 23 темы — outlines.
+Byte-лимиты ContextBundle не выданы за token accounting или semantic retrieval;
+проверка структуры ответа не выдана за business acceptance. Реальное AT не тестировалось.
+Следующая тема по teaching order — 17: state и memory.
+
+## STEP-0034: последовательная нумерация
+
+Нынешние core IDs 00–25 совпадают с порядком чтения; optional Kubernetes — 26.
+Исторические записи выше используют номера, действовавшие в момент соответствующих
+шагов. Опубликованные тексты теперь 00/01/02/03, следующая тема — 04 (state/memory).
+Content/publication receipts переназначены после повторной вычитки и browser gate;
+старые локальные `topic-NNNN.html` не считаются стабильными публичными ссылками.

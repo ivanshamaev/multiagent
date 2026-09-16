@@ -13,7 +13,7 @@ Track: core; исходная тема init: 23.
 Объяснить budget allocation; critical-path cost trade-off; tool context overhead: модель, условия применимости, ограничения и контрпримеры.
 Эта лекция — primary owner указанных concepts; определения из других лекций не повторять.
 
-Prerequisites: [21](LECTURE-0021-evaluation.md), [16](LECTURE-0016-agent-orchestrator.md).
+Prerequisites: [21](LECTURE-0021-evaluation.md), [07](LECTURE-0007-agent-orchestrator.md).
 
 ## Что писать — todo
 
@@ -26,7 +26,7 @@ Prerequisites: [21](LECTURE-0021-evaluation.md), [16](LECTURE-0016-agent-orchest
 
 ## Границы и согласованность
 
-Не пересказывать theory владельцев: [04](LECTURE-0004-harness-context.md), [16](LECTURE-0016-agent-orchestrator.md), [21](LECTURE-0021-evaluation.md), [26](LECTURE-0026-orchestration-comparison.md).
+Не пересказывать theory владельцев: [03](LECTURE-0003-harness-context.md), [07](LECTURE-0007-agent-orchestrator.md), [21](LECTURE-0021-evaluation.md), [24](LECTURE-0024-orchestration-comparison.md).
 Перед использованием заимствованного термина ссылаться на его primary owner из [карты](README.md).
 Повторный case разрешён только с новым аналитическим вопросом; заново объяснять предыдущий case нельзя.
 Лекция theory-only: нет student setup, coding tasks, обязательного запуска команд или сдачи работы.

@@ -13,7 +13,7 @@ Track: core; исходная тема init: 21.
 Объяснить task/trial distinction; quality vs invariant evaluation; baseline comparison uncertainty: модель, условия применимости, ограничения и контрпримеры.
 Эта лекция — primary owner указанных concepts; определения из других лекций не повторять.
 
-Prerequisites: [13](LECTURE-0013-qa-evidence.md), [14](LECTURE-0014-review-authority.md), [20](LECTURE-0020-observability.md).
+Prerequisites: [15](LECTURE-0015-qa-evidence.md), [16](LECTURE-0016-review-authority.md), [20](LECTURE-0020-observability.md).
 
 ## Что писать — todo
 
@@ -26,7 +26,7 @@ Prerequisites: [13](LECTURE-0013-qa-evidence.md), [14](LECTURE-0014-review-autho
 
 ## Границы и согласованность
 
-Не пересказывать theory владельцев: [13](LECTURE-0013-qa-evidence.md), [14](LECTURE-0014-review-authority.md), [20](LECTURE-0020-observability.md), [22](LECTURE-0022-failure-taxonomy.md), [23](LECTURE-0023-cost-performance.md), [26](LECTURE-0026-orchestration-comparison.md).
+Не пересказывать theory владельцев: [15](LECTURE-0015-qa-evidence.md), [16](LECTURE-0016-review-authority.md), [20](LECTURE-0020-observability.md), [22](LECTURE-0022-failure-taxonomy.md), [23](LECTURE-0023-cost-performance.md), [24](LECTURE-0024-orchestration-comparison.md).
 Перед использованием заимствованного термина ссылаться на его primary owner из [карты](README.md).
 Повторный case разрешён только с новым аналитическим вопросом; заново объяснять предыдущий case нельзя.
 Лекция theory-only: нет student setup, coding tasks, обязательного запуска команд или сдачи работы.

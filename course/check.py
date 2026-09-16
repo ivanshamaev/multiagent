@@ -251,7 +251,12 @@ def collect_issues(root: Path) -> list[str]:
         if len(ids) != 27 or set(ids) != set(range(27)):
             raise ValueError("duplicate/missing lecture ID")
         order = m["teaching_order"] + m["optional_order"]
-        if len(order) != 27 or set(order) != set(ids) or m["optional_order"] != [24]:
+        if (
+            len(order) != 27
+            or set(order) != set(ids)
+            or m["teaching_order"] != list(range(26))
+            or m["optional_order"] != [26]
+        ):
             raise ValueError("invalid teaching order")
         sources = load_json(root, "course/sources.json")["sources"]
         source_ids = {s["id"] for s in sources}
@@ -271,7 +276,7 @@ def collect_issues(root: Path) -> list[str]:
                     or not lecture.get("known_gaps")
                 ):
                     raise ValueError("invalid status/missing outcomes or gaps")
-                if lecture["track"] != ("extension" if lecture["id"] == 24 else "core"):
+                if lecture["track"] != ("extension" if lecture["id"] == 26 else "core"):
                     raise ValueError("invalid track")
                 planned = next(x for x in planning["lectures"] if x["id"] == lecture["id"])
                 if any(
@@ -289,7 +294,7 @@ def collect_issues(root: Path) -> list[str]:
                 expected = f"course/lectures/LECTURE-{lecture['id']:04d}-{lecture['slug']}.md"
                 if lecture["path"] != expected or lecture["path"] in paths:
                     raise ValueError("invalid/duplicate lecture path")
-                directory = "extensions" if lecture["id"] == 24 else "modules"
+                directory = "extensions" if lecture["id"] == 26 else "modules"
                 module = f"module-{lecture['id']:02d}-{lecture['slug']}"
                 if lecture["outline"] != f"course/{directory}/{module}/README.md":
                     raise ValueError("invalid module outline path")

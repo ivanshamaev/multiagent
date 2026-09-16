@@ -106,6 +106,22 @@ def test_repository_course_scaffold_is_consistent() -> None:
     assert collect_issues(ROOT) == []
 
 
+def test_core_lecture_ids_follow_reading_order() -> None:
+    m = manifest(ROOT)
+    assert m["teaching_order"] == list(range(26))
+    assert m["optional_order"] == [26]
+    assert [m["lectures"][lecture_id]["id"] for lecture_id in m["teaching_order"]] == list(
+        range(26)
+    )
+
+
+def test_rejects_nonsequential_core_order(checkout: Path) -> None:
+    m = manifest(checkout)
+    m["teaching_order"][2:4] = [3, 2]
+    save(checkout, m)
+    assert "course: invalid teaching order" in collect_issues(checkout)
+
+
 @pytest.mark.parametrize("change", ["cycle", "concept"])
 def test_rejects_consistently_corrupted_planning_map(checkout: Path, change: str) -> None:
     m = manifest(checkout)
@@ -154,7 +170,7 @@ def test_rejects_invalid_manifest(checkout: Path, change: str) -> None:
     elif change == "format":
         m["student_tasks"] = ["deploy a pipeline"]
     else:
-        m["lectures"][24]["track"] = "core"
+        m["lectures"][26]["track"] = "core"
     save(checkout, m)
     assert collect_issues(checkout)
 

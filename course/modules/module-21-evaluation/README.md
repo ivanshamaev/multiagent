@@ -8,7 +8,7 @@ Track: core
 
 ## Место и prerequisites
 
-[13](../../modules/module-13-qa-evidence/README.md), [14](../../modules/module-14-review-authority/README.md), [20](../../modules/module-20-observability/README.md)
+[15](../../modules/module-15-qa-evidence/README.md), [16](../../modules/module-16-review-authority/README.md), [20](../../modules/module-20-observability/README.md)
 
 ## Теоретические outcomes
 

@@ -8,7 +8,7 @@ Track: core
 
 ## Место и prerequisites
 
-[26](../../modules/module-26-orchestration-comparison/README.md), [22](../../modules/module-22-failure-taxonomy/README.md), [10](../../modules/module-10-pm-specification/README.md), [12](../../modules/module-12-data-engineer/README.md)
+[24](../../modules/module-24-orchestration-comparison/README.md), [22](../../modules/module-22-failure-taxonomy/README.md), [13](../../modules/module-13-pm-specification/README.md), [14](../../modules/module-14-data-engineer/README.md)
 
 ## Теоретические outcomes
 

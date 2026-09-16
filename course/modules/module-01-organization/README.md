@@ -8,7 +8,7 @@ Track: core
 
 ## Место и prerequisites
 
-[0](../../modules/module-00-agentic-baseline/README.md)
+[00](../../modules/module-00-agentic-baseline/README.md)
 
 ## Теоретические outcomes
 

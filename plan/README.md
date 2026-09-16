@@ -53,3 +53,12 @@
 - [STEP-0031](steps/STEP-0031-lecture-organization.md) добавляет лекцию 01, отдельную вычитку,
   primary-source verification и browser gate. Лекции 00/01 доступны в локальном reader;
   остальные 25 тем — outlines. Далее по teaching order — лекция 03, не 02.
+- [STEP-0032](steps/STEP-0032-lecture-contracts.md) публикует лекцию 03 о schema,
+  invariants, cross-task binding и пределах evidence. Лекции 00/01/03 доступны;
+  остальные 24 темы — outlines. Далее по teaching order — лекция 04.
+- [STEP-0033](steps/STEP-0033-lecture-harness-context.md) публикует лекцию 04 о harness,
+  per-turn context selection и structured response boundary. Лекции 00/01/03/04
+  доступны; остальные 23 темы — outlines. Далее по teaching order — лекция 17.
+- [STEP-0034](steps/STEP-0034-course-sequential-numbering.md) перенумеровывает курс
+  по порядку обучения: core 00–25, optional Kubernetes 26. Записи STEP-0031–0033
+  выше исторические; текущие опубликованные ID — 00/01/02/03, далее 04.

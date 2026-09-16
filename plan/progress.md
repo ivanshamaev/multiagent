@@ -1,5 +1,38 @@
 # Журнал прогресса
 
+## 2026-09-16 — STEP-0034 завершён: последовательная нумерация курса
+
+- Основной маршрут получил ID 00–25 по порядку обучения; Kubernetes extension — 26.
+  Историческое соответствие — [STEP-0034](steps/STEP-0034-course-sequential-numbering.md).
+- Четыре опубликованных текста теперь 00/01/02/03. Проверены cross-links,
+  prerequisites, исходные планы, четыре content/publication gates и новые URL.
+- Старые локальные `topic-NNNN.html` меняют смысл; следующий текст по маршруту —
+  04 о состоянии и памяти. [Evidence](evidence/STEP-0034-course-sequential-numbering.md).
+- `make check`: 531 PASS; course policy: 80 PASS. Четыре browser gates и 28
+  просмотренных screenshots PASS; обычные сборки 86 files/8 diagrams идентичны.
+
+## 2026-09-16 — STEP-0033 завершён: лекция 04 опубликована
+
+- Theory-only текст объясняет harness, отбор и представление контекста одного
+  вызова, provider abstraction и границу structured response.
+- Separate authoring/editorial/technical/recheck и actual browser/visual gates
+  PASS; восемь claims и две исправленные minor findings записаны в receipts.
+- `make check`: exit 0, 529 PASS; targeted runtime 40 PASS, course policy 78 PASS.
+  Две обычные сборки: 86 files/8 diagrams, побайтово идентичны.
+- [Evidence](evidence/STEP-0033-lecture-harness-context.md). Preview 8099 доступен;
+  actual AT остаётся непроверенным. Следующая по teaching order — лекция 17.
+
+## 2026-09-16 — STEP-0032 завершён: лекция 03 опубликована
+
+- Theory-only текст разделяет syntax/schema/invariants/context/product correctness,
+  объясняет versioning, immutability, evidence и пределы task/actor binding.
+- Separate authoring/editorial/technical/recheck и actual browser/visual gates PASS;
+  16 claims, две исправленные minor findings и честный actual-AT gap в receipts.
+- Targeted contracts/workflow/adversarial: 36 PASS. Две обычные сборки: 84 files,
+  7 diagrams, одинаковый SHA256; final `make check` и course suite — в evidence.
+- [Evidence](evidence/STEP-0032-lecture-contracts.md). Preview 8099 сохранён;
+  следующий текст — 04, harness и контекст одного вызова.
+
 ## 2026-09-15 — STEP-0031 завершён: лекция 01 опубликована
 
 - Theory-only текст: ответственность и capability, ownership, task coupling,

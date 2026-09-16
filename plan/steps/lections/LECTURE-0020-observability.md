@@ -13,7 +13,7 @@ Track: core; исходная тема init: 20.
 Объяснить trace context propagation; telemetry cardinality; sampling/retention design: модель, условия применимости, ограничения и контрпримеры.
 Эта лекция — primary owner указанных concepts; определения из других лекций не повторять.
 
-Prerequisites: [15](LECTURE-0015-strict-workflow.md), [16](LECTURE-0016-agent-orchestrator.md), [18](LECTURE-0018-recovery-idempotency.md).
+Prerequisites: [06](LECTURE-0006-strict-workflow.md), [07](LECTURE-0007-agent-orchestrator.md), [17](LECTURE-0017-recovery-idempotency.md).
 
 ## Что писать — todo
 
@@ -26,7 +26,7 @@ Prerequisites: [15](LECTURE-0015-strict-workflow.md), [16](LECTURE-0016-agent-or
 
 ## Границы и согласованность
 
-Не пересказывать theory владельцев: [18](LECTURE-0018-recovery-idempotency.md), [21](LECTURE-0021-evaluation.md), [22](LECTURE-0022-failure-taxonomy.md).
+Не пересказывать theory владельцев: [17](LECTURE-0017-recovery-idempotency.md), [21](LECTURE-0021-evaluation.md), [22](LECTURE-0022-failure-taxonomy.md).
 Перед использованием заимствованного термина ссылаться на его primary owner из [карты](README.md).
 Повторный case разрешён только с новым аналитическим вопросом; заново объяснять предыдущий case нельзя.
 Лекция theory-only: нет student setup, coding tasks, обязательного запуска команд или сдачи работы.

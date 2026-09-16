@@ -2,10 +2,12 @@
 
 Глубокая теоретическая база для Data Engineers с Python/SQL и знанием pipelines.
 Наша Agentic Data Platform — иллюстрация подтверждённых решений, не student lab.
-Подготовлены 26 core outlines и optional Kubernetes extension. Написаны и опубликованы лекции 00/01;
-остальные 25 текстов ещё не написаны. Для каждого текста действует отдельный publication gate;
+Подготовлены 26 core outlines и optional Kubernetes extension. Написаны и опубликованы лекции 00/01/02/03;
+остальные 23 текста ещё не написаны. Для каждого текста действует отдельный publication gate;
 полный текст выбирается reader только по reviewed и актуальным receipts.
 Manager/Kubernetes не объявляются реализованными.
+В core номер 00–25 равен позиции в маршруте; optional Kubernetes — 26.
+Соответствие прежним тематическим IDs зафиксировано в [STEP-0034](../plan/steps/STEP-0034-course-sequential-numbering.md).
 
 - [Syllabus](syllabus.md) и [canonical manifest](manifest.json)
 - [Todo-планы](../plan/steps/lections/README.md) и [директория текстов](lectures/README.md)

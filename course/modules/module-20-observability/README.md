@@ -8,7 +8,7 @@ Track: core
 
 ## Место и prerequisites
 
-[15](../../modules/module-15-strict-workflow/README.md), [16](../../modules/module-16-agent-orchestrator/README.md), [18](../../modules/module-18-recovery-idempotency/README.md)
+[06](../../modules/module-06-strict-workflow/README.md), [07](../../modules/module-07-agent-orchestrator/README.md), [17](../../modules/module-17-recovery-idempotency/README.md)
 
 ## Теоретические outcomes
 

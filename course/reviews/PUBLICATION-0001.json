@@ -2,8 +2,8 @@
   "schema_version": 1,
   "lecture_id": 1,
   "reviewer": "Codex; same-author separate browser/visual passes, not independent review",
-  "checked_at": "2026-09-15T19:10:25Z",
-  "publication_digest": "d5ba735e2690f21a913667515798c16d41f65fd1d7398e47abfe714583fcc580",
+  "checked_at": "2026-09-16T16:49:28.238873Z",
+  "publication_digest": "759b2cbcede5b91c8196d88ae2a77f74e34ec1b2b63b5616ff55a83112ccd874",
   "passes": {
     "desktop": true,
     "mobile": true,
@@ -36,16 +36,16 @@
     "node": "v22.22.0",
     "system_render_font_sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d"
   },
-  "rendered_sha256": "179fda48235be8d98aaa80cb6d886911e486864667fdc2d5390ae3e6d01f5a60",
+  "rendered_sha256": "07a451de1d6c8ae8c4662ca4186e5b4aaaf86fd4320f294a19910f91447de74b",
   "artifacts_sha256": {
-    "output/playwright/step31/lecture-1/dark.png": "089c09f71bcc286d78c819f82256050e95b9421594fc53741b41db2a86792fc5",
-    "output/playwright/step31/lecture-1/desktop.png": "7154a40b125fb8830ece59c73dfdb8d1eaecf76a6115210acd79b62270a15a1f",
-    "output/playwright/step31/lecture-1/mobile-diagram.png": "506f4635d0e0c5746b6c6520ef625be16e27060cc0a35e0481799b582bc49927",
-    "output/playwright/step31/lecture-1/mobile.png": "b05537841a5cbf228a57def3da8665fecc02679da16025e31751eed3057ff10a",
-    "output/playwright/step31/lecture-1/no-js.png": "b05537841a5cbf228a57def3da8665fecc02679da16025e31751eed3057ff10a",
-    "output/playwright/step31/lecture-1/print-diagram.png": "38cae9d6cef47379d65b4cf24691164358ca8a2c58fe9405eeb5147e445f1cda",
-    "output/playwright/step31/lecture-1/print-top.png": "0581d12853dc475744c3e619f4f2f00d428566ca7013ecfd27e5ebca83da599a"
+    "output/playwright/step34/lecture-1/dark.png": "089c09f71bcc286d78c819f82256050e95b9421594fc53741b41db2a86792fc5",
+    "output/playwright/step34/lecture-1/desktop.png": "50c0408b112f923083836298b337caa887c849ae63b9c3a0daa298e8f2400753",
+    "output/playwright/step34/lecture-1/mobile-diagram.png": "506f4635d0e0c5746b6c6520ef625be16e27060cc0a35e0481799b582bc49927",
+    "output/playwright/step34/lecture-1/mobile.png": "b05537841a5cbf228a57def3da8665fecc02679da16025e31751eed3057ff10a",
+    "output/playwright/step34/lecture-1/no-js.png": "b05537841a5cbf228a57def3da8665fecc02679da16025e31751eed3057ff10a",
+    "output/playwright/step34/lecture-1/print-diagram.png": "38cae9d6cef47379d65b4cf24691164358ca8a2c58fe9405eeb5147e445f1cda",
+    "output/playwright/step34/lecture-1/print-top.png": "dd44be9f1faebb8e16bfd03f67937cec73cad2e903daa6e64c79d93d21cede44"
   },
-  "scope": "Complete local reader candidate, 360px and desktop, light/dark browser preferences with fixed dark site palette, no-JS, keyboard/fullscreen focus, print geometry and screenshot inspection. No actual AT, paper/PDF, hardware touch or cross-browser audit.",
-  "evidence": "plan/evidence/STEP-0031-lecture-organization.md"
+  "scope": "STEP-0034 actual renumbered candidate reader on /course/: desktop/360px, light/dark, no-JS, keyboard/fullscreen focus, print, AX, CSP/subpath/links and seven inspected screenshots. No actual AT, paper/PDF, touch or cross-browser audit.",
+  "evidence": "plan/evidence/STEP-0034-course-sequential-numbering.md"
 }

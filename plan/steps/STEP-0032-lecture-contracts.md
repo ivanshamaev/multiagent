@@ -1,6 +1,6 @@
 # STEP-0032 — Phase L: лекция 03, контракты и границы доверия
 
-Status: in progress
+Status: completed
 
 Owner: Codex
 
@@ -23,15 +23,15 @@ authentication 19, storage/recovery 17/18 и evaluation methodology 21.
 
 ## Skills и checklist
 
-- [ ] Прочитать планы/requirements/glossary/owners, source caveats и первичные статьи S08/S20.
-- [ ] Проверить current contracts/reducer, ADR-0014 и dated STEP-0006.
-- [ ] Написать модель границы, определения, причинность, versioning/immutability,
+- [x] Прочитать планы/requirements/glossary/owners, source caveats и первичные статьи S08/S20.
+- [x] Проверить current contracts/reducer, ADR-0014 и dated STEP-0006.
+- [x] Написать модель границы, определения, причинность, versioning/immutability,
   cross-task/actor binding, нарушения, контрпример, Mermaid и пять вопросов.
-- [ ] technical-editorial-review: отдельная полная вычитка после authoring
+- [x] technical-editorial-review: отдельная полная вычитка после authoring
   с technical-markdown-lectures; technical-claim-verification: отдельные claims/source anchors.
-- [ ] Исправить findings, перечитать; сохранить версии skills и актуальный content receipt.
-- [ ] Candidate render и playwright browser/visual gate; честный AX/actual AT scope.
-- [ ] Sealing publication receipt, reviewed, build/repeat и final checks/evidence.
+- [x] Исправить findings, перечитать; сохранить версии skills и актуальный content receipt.
+- [x] Candidate render и playwright browser/visual gate; честный AX/actual AT scope.
+- [x] Sealing publication receipt, reviewed, build/repeat и final checks/evidence.
 
 ## Acceptance, риски и verification
 
@@ -51,3 +51,11 @@ Publication только после реальных passes. Preview 8099 ост
 2026-09-15: изучены scope/owners, current contracts и ADR-0014; внешние primary
 articles и Pydantic models проверяются перед авторством. Новое ADR не требуется:
 используется принятый STEP-0030 publication gate без изменения архитектуры.
+
+2026-09-16: лекция написана, отдельно вычитана/проверена/перечитана и опубликована.
+Targeted: 36 PASS. Candidate и browser/visual gates PASS; actual AT не запускалась.
+Обычная и repeat-сборка: 84 files, 7 diagrams, одинаковый site SHA256
+`5f4eb873dcfd596a589958d230c8f66b2f903f5cf9b99084f28fde39667a4eff`;
+`diff -qr` PASS. Full `make check`: 529 PASS in 81.04s; post-publication
+course suite: 78 PASS in 47.35s. Остаточные риски записаны в evidence.
+Следующая тема teaching order — лекция 04.

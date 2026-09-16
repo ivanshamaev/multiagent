@@ -1,6 +1,6 @@
 # Per-lecture receipts
 
-Подготовлен `LECTURE-0000.json`: отдельные проверки автором пилотной лекции 00.
-Это не независимое рецензирование и не завершённый publication gate.
+Для опубликованных лекций 00–03 подготовлены отдельные content и publication receipts.
+Проверки выполнены автором, не являются независимым рецензированием.
 [Schema](../templates/review.json), [guide](../templates/review.md).
 Manifest содержит receipt path только после actual review. Missing/stale не PASS.

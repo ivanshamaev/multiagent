@@ -219,7 +219,7 @@ def test_landing_reader_and_roadmap_follow_manifest(source_root: Path) -> None:
     assert 'aria-current="page"' in reader and "Fixture outline only" in reader
     assert 'href="topic-0001.html">Следующая' in reader
     reader = (dest / "topic-0001.html").read_text()
-    assert 'href="topic-0003.html">Следующая' in reader  # Canonical order, not numeric ID.
+    assert 'href="topic-0002.html">Следующая' in reader  # Canonical order matches numeric ID.
     assert 'href="topic-0000.html">← Предыдущая' in reader
 
 

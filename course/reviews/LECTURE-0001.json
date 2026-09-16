@@ -2,9 +2,9 @@
   "schema_version": 1,
   "lecture_id": 1,
   "reviewer": "Codex, same-author separate passes; not independent review",
-  "checked_at": "2026-09-15T19:10:00Z",
-  "input_digest": "9cb4caca2b14bb019f34695bc3e0e1ca0d66d9c2a4d6c5e4e1438c88240b507c",
-  "content_sha256": "2d83508798862daa185191d6adebbbe5d57903a34b979cfd3d3c73c51e99724a",
+  "checked_at": "2026-09-16T16:45:58Z",
+  "input_digest": "baf93d35d2654f1498afd119f37155cef36d801b913f58be118fe58f68d35613",
+  "content_sha256": "b53f0cc54f9221aa3bc700c23b18b2f21796eb28372478719ef9be6aba8e7887",
   "skills": [
     "technical-markdown-lectures",
     "technical-editorial-review",
@@ -22,10 +22,10 @@
     "visual": true
   },
   "pass_scope": {
-    "editorial": "Separate complete read; glossary and owners 00/03/04/10/11/13/14/19/26 checked; no laboratory work.",
+    "editorial": "Separate complete read; glossary and current owners 00/02/03/13/12/15/16/19/24 checked; no laboratory work.",
     "technical": "Three primary articles reread; four current profiles, ADR-0003/0006 and dated STEP-0008 evidence inspected. Author definitions/counterexample explicitly scoped.",
-    "recheck": "Entire corrected lecture reread after narrowing classification and replacing unnecessary English; diagram edges/caption/text-equivalent matched.",
-    "visual": "STEP-0031 actual candidate reader: desktop/360px mobile/light/dark/no-JS, keyboard zoom/pan/reset/fullscreen/Escape/focus, print clipping, AX main and named/described SVG, local subpath/CSP/links; all seven screenshots manually inspected. Actual assistive technology and printed PDF not tested.",
+    "recheck": "Entire corrected lecture reread after narrowing classification and replacing unnecessary English; diagram edges/caption/text-equivalent matched. STEP-0034: complete renumbered text reread, links and ownership checked; technical claims unchanged.",
+    "visual": "STEP-0034 renumbered candidate reader: desktop/360px mobile/light/dark/no-JS, keyboard zoom/pan/reset/fullscreen/Escape/focus, print clipping, AX main and named/described SVG, local subpath/CSP/links; seven new screenshots manually inspected. Actual assistive technology and printed PDF not tested.",
     "not_checked": [
       "Independent review",
       "Actual assistive technology interaction",

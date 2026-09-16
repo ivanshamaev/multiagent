@@ -3,8 +3,11 @@
 Отдельная директория для текстов лекций `LECTURE-NNNN-<topic>.md`.
 Написана [лекция 00](LECTURE-0000-agentic-baseline.md): agency, обратная связь
 и ограниченный agent loop. [Лекция 01](LECTURE-0001-organization.md) объясняет разделение
-ответственности, связность задач и цену координации. Обе опубликованы в локальном reader
-после отдельных content/publication gates; остальные 25 тем остаются планами.
+ответственности, связность задач и цену координации. [Лекция 02](LECTURE-0002-contracts.md)
+разделяет schema, invariants, contextual binding и предметную корректность.
+[Лекция 03](LECTURE-0003-harness-context.md) рассматривает harness, контекст одного
+вызова и provider boundary. Все четыре опубликованы после отдельных
+content/publication gates; остальные 23 темы — планы.
 Для остальных тем подготовлены [индивидуальные todo-планы](../../plan/steps/lections/README.md)
 и [реестр источников](../../plan/steps/lections/SOURCES.md).
 

@@ -220,3 +220,14 @@ AX semantics проверены, реальное взаимодействие �
 STEP-0031 публикует лекцию 01 о role decomposition/task coupling/separation of duties
 после отдельных editorial/technical/recheck и reader passes. Лекции 00/01 доступны;
 25 прочих текстов ещё не написаны. Следующая тема по teaching_order — лекция 03.
+STEP-0032 публикует лекцию 03 о contracts/artifacts/trust boundaries после
+content и actual reader gates. Reader содержит 00/01/03; 24 текста остаются outlines.
+Следующая тема по teaching_order — лекция 04 о harness/context одного вызова.
+STEP-0033 публикует лекцию 04: отбор и представление контекста одного вызова,
+provider abstraction и границы structured response. История памяти, recovery и
+стоимость остались за владельцами 17/18/23. Reader содержит 00/01/03/04;
+23 текста остаются outlines. Следующая тема по teaching_order — лекция 17.
+STEP-0034 сохраняет те же темы и порядок, но синхронизирует ID с позицией:
+core 00–25 и optional Kubernetes 26. Прежние IDs остаются в таблице миграции;
+четыре опубликованных текста после перепроверки теперь имеют ID 00/01/02/03.
+Следующая тема — 04, state/memory.
