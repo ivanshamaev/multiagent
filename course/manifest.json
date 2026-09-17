@@ -277,7 +277,7 @@
     {
       "id": 4,
       "slug": "state-memory",
-      "title": "Context, durable state, artifacts и knowledge",
+      "title": "Состояние и память мультиагентной системы",
       "prerequisites": [
         3
       ],
@@ -315,7 +315,7 @@
       "plan": "plan/steps/lections/LECTURE-0004-state-memory.md",
       "path": "course/lectures/LECTURE-0004-state-memory.md",
       "outline": "course/modules/module-04-state-memory/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить state lifecycle, предпосылки и ограничения.",
         "Объяснить artifact visibility, предпосылки и ограничения.",
@@ -335,7 +335,7 @@
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge.",
         "Long-term semantic memory не реализована."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0004.json"
     },
     {
       "id": 5,
@@ -378,7 +378,7 @@
       "plan": "plan/steps/lections/LECTURE-0005-maf-executors.md",
       "path": "course/lectures/LECTURE-0005-maf-executors.md",
       "outline": "course/modules/module-05-maf-executors/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить executor semantics, предпосылки и ограничения.",
         "Объяснить edge message delivery, предпосылки и ограничения.",
@@ -396,7 +396,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0005.json"
     },
     {
       "id": 6,
@@ -439,7 +439,7 @@
       "plan": "plan/steps/lections/LECTURE-0006-strict-workflow.md",
       "path": "course/lectures/LECTURE-0006-strict-workflow.md",
       "outline": "course/modules/module-06-strict-workflow/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить code-owned transition policy, предпосылки и ограничения.",
         "Объяснить terminal convergence, предпосылки и ограничения.",
@@ -458,7 +458,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0006.json"
     },
     {
       "id": 7,
@@ -502,7 +502,7 @@
       "plan": "plan/steps/lections/LECTURE-0007-agent-orchestrator.md",
       "path": "course/lectures/LECTURE-0007-agent-orchestrator.md",
       "outline": "course/modules/module-07-agent-orchestrator/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить model-directed delegation, предпосылки и ограничения.",
         "Объяснить task/progress ledger, предпосылки и ограничения.",
@@ -516,7 +516,7 @@
       "known_gaps": [
         "Model-directed manager не реализован в нашем runtime."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0007.json"
     },
     {
       "id": 8,
@@ -557,7 +557,7 @@
       "plan": "plan/steps/lections/LECTURE-0008-isolation.md",
       "path": "course/lectures/LECTURE-0008-isolation.md",
       "outline": "course/modules/module-08-isolation/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить filesystem containment, предпосылки и ограничения.",
         "Объяснить network containment, предпосылки и ограничения.",
@@ -575,7 +575,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0008.json"
     },
     {
       "id": 9,
@@ -619,7 +619,7 @@
       "plan": "plan/steps/lections/LECTURE-0009-mcp-interface.md",
       "path": "course/lectures/LECTURE-0009-mcp-interface.md",
       "outline": "course/modules/module-09-mcp-interface/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить MCP host/client/server, предпосылки и ограничения.",
         "Объяснить protocol capability negotiation, предпосылки и ограничения.",
@@ -638,7 +638,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0009.json"
     },
     {
       "id": 10,
@@ -680,7 +680,7 @@
       "plan": "plan/steps/lections/LECTURE-0010-analytical-sql.md",
       "path": "course/lectures/LECTURE-0010-analytical-sql.md",
       "outline": "course/modules/module-10-analytical-sql/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить analytical query scope, предпосылки и ограничения.",
         "Объяснить SQL resource envelope, предпосылки и ограничения.",
@@ -698,7 +698,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0010.json"
     },
     {
       "id": 11,
@@ -741,7 +741,7 @@
       "plan": "plan/steps/lections/LECTURE-0011-dbt-semantics.md",
       "path": "course/lectures/LECTURE-0011-dbt-semantics.md",
       "outline": "course/modules/module-11-dbt-semantics/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить model grain, предпосылки и ограничения.",
         "Объяснить transformation lineage, предпосылки и ограничения.",
@@ -759,7 +759,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0011.json"
     },
     {
       "id": 12,
@@ -802,7 +802,7 @@
       "plan": "plan/steps/lections/LECTURE-0012-analyst-provenance.md",
       "path": "course/lectures/LECTURE-0012-analyst-provenance.md",
       "outline": "course/modules/module-12-analyst-provenance/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить data fact provenance, предпосылки и ограничения.",
         "Объяснить semantic discovery, предпосылки и ограничения.",
@@ -821,7 +821,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0012.json"
     },
     {
       "id": 13,

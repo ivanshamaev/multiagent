@@ -1,10 +1,10 @@
 # STEP-0035 — Phase L: лекция 04, состояние и память
 
-Status: in progress
+Status: complete
 
 Owner: Codex
 
-Updated: 2026-09-16
+Updated: 2026-09-17
 
 ## Goal, scope и non-goals
 
@@ -21,16 +21,16 @@ requirements/skills/toolchain не менять. Нет labs, paid LLM и Docker
 
 ## Acceptance checklist
 
-- [ ] Прочитать S07/S03, owners, glossary, текущие code/tests и dated STEP-0019.
-- [ ] Написать глубокую теорию, условия применимости, сравнение четырёх видов
+- [x] Прочитать S07/S03, owners, glossary, текущие code/tests и dated STEP-0019.
+- [x] Написать глубокую теорию, условия применимости, сравнение четырёх видов
   информации, причинный контрпример и одну содержательную Mermaid-схему.
-- [ ] Явно отделить `offline-proven` от `historical-live` и не реализованную
+- [x] Явно отделить `offline-proven` от `historical-live` и не реализованную
   long-term semantic memory от текущего state/context.
-- [ ] Выполнить separate authoring, editorial, claim verification, corrections
+- [x] Выполнить separate authoring, editorial, claim verification, corrections
   и recheck; сохранить актуальный content receipt и skill versions.
-- [ ] Собрать candidate, проверить browser desktop/mobile/light/dark/no-JS,
+- [x] Собрать candidate, проверить browser desktop/mobile/light/dark/no-JS,
   keyboard/print/AX/CSP/links и вручную осмотреть screenshots.
-- [ ] Создать publication receipt, перевести manifest в reviewed, проверить
+- [x] Создать publication receipt, перевести manifest в reviewed, проверить
   deterministic builds, `make check`, политику курса и зафиксировать evidence.
 
 ## Risks и verification
@@ -49,3 +49,10 @@ isolated candidate `build/course-step35-review-0004`; Playwright reader gate;
 ## Work log
 
 2026-09-16: план создан до авторства; четыре соответствующих skills прочитаны.
+
+2026-09-17: лекция 04 опубликована. После первого visual pass исправлена
+несогласованность canonical названия; candidate собран и проверен снова.
+Separate editorial/technical/recheck записаны с восемью verified claims.
+Targeted 17 PASS, `make check` 531 PASS, две обычные сборки совпали побайтово
+(88 files/9 diagrams); `git diff --check`, plan/course gates и основной preview
+8099 PASS. Actual AT не проверялось. [Evidence](../evidence/STEP-0035-lecture-state-memory.md).

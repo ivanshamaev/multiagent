@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "lecture_id": 8,
+  "reviewer": "Codex; same-author separate passes, not independent review",
+  "checked_at": "2026-09-16T22:20:00Z",
+  "input_digest": "022d74d6591c2ac846e9343d01b8889be93c749b1ef7cc936a8eedc1997af077",
+  "content_sha256": "5df45bbd1a9c7f7308f27d57090d96f094f8e80b47f16ba29a268c4cc8197e38",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "visual": true},
+  "pass_scope": {
+    "editorial": "Full theory-only text reread for causal sequence, terminology, diagram text equivalence, owner separation 02/07/19/26 and transition to 09.",
+    "technical": "Original Anthropic S10/S27 and Linux man-pages; current launcher, five profiles, integration test and dated STEP-0022 evidence checked 2026-09-17.",
+    "recheck": "Corrected heading count, narrowed .env claim to workspace root and replaced directory source link with a concrete profile file; browser-discovered subgraph ambiguity fixed by explicit inside/host labels. Affected prose and diagram semantics rechecked.",
+    "visual": "STEP-0039 final candidate: seven screenshots individually inspected; corrected diagram semantics and desktop/mobile, dark, no-JS, print, keyboard, AX, CSP, subpath and links rechecked.",
+    "not_checked": ["Independent reviewer", "Actual assistive technology interaction", "All possible kernel/egress escape paths", "Fully-live role-pipeline readiness"]
+  },
+  "claims": [
+    {"location": "Инструкция не является границей процесса", "assertion": "Anthropic presents filesystem and network restrictions as complementary sandbox boundaries; its example uses an outside proxy for allowed destinations.", "source": "https://www.anthropic.com/engineering/claude-code-sandboxing", "anchor": "Sandboxing: a safer and more autonomous approach; Sandboxed bash tool", "scope": "Original article checked 2026-09-17; no product metric transferred", "verdict": "verified"},
+    {"location": "Четыре границы видимости", "assertion": "Linux mount, network, PID and user namespaces isolate distinct resources rather than a whole kernel.", "source": "https://man7.org/linux/man-pages/man7/namespaces.7.html", "anchor": "Namespace types", "scope": "Linux man-pages checked 2026-09-17", "verdict": "verified"},
+    {"location": "Отдельные жизненные циклы harness и sandbox", "assertion": "Anthropic Managed Agents describes separate session, harness and sandbox interfaces.", "source": "https://www.anthropic.com/engineering/managed-agents", "anchor": "Decouple the brain from the hands", "scope": "Original article checked 2026-09-17; external operational outcomes excluded", "verdict": "verified"},
+    {"location": "Наши пять role identities", "assertion": "Five allowlisted runner profiles have distinct runner, actor and namespace UID values; PM has no workspace and DE two writable dbt roots.", "source": "runtime/runner_isolation.py", "anchor": "RUNNER_PROFILE_NAMES, load_all_runner_profiles, IsolatedRunner._workspace_mount_args", "scope": "Current launcher and policies/runner_profiles/*.json plus policies/profiles/data_engineer_v1.json checked 2026-09-17", "verdict": "verified"},
+    {"location": "Наши пять role identities", "assertion": "Dated STEP-0022 integration probe launched five namespace processes and checked UID, file visibility, one external connection and write boundaries.", "source": "tests/integration/test_runner_namespace_isolation.py", "anchor": "test_five_role_processes_have_distinct_uid_zero_network_and_scoped_filesystem", "scope": "Current test executed 2026-09-17 (7 targeted tests passed); dated plan/evidence/STEP-0022-runner-and-mcp-isolation.md also checked", "verdict": "verified"},
+    {"location": "Fail closed — свойство пути запуска", "assertion": "Runner requires /usr/bin/bwrap and /usr/bin/setpriv, validates profiles/paths/argv and has no unsandboxed fallback.", "source": "runtime/runner_isolation.py", "anchor": "IsolatedRunner.__init__, command, _validate_argv, _safe_workspace", "scope": "Current implementation and unit/adversarial tests checked 2026-09-17", "verdict": "verified"},
+    {"location": "Схема границы исполнения", "assertion": "Diagram is a simplified depiction of the scoped local runner, not a complete security proof or an implemented model proxy.", "source": "course/lectures/LECTURE-0008-isolation.md", "anchor": "Схема границы исполнения", "scope": "Diagram/prose/text alternative compared 2026-09-17", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Четыре границы видимости", "severity": "minor", "rationale": "Initial heading counted three boundaries while the table listed four.", "resolved": true, "resolution": "Heading corrected and section reread."},
+    {"location": "Наши пять role identities", "severity": "minor", "rationale": "Initial .env claim was too broad for the observed root-file probe.", "resolved": true, "resolution": "Limited wording to root .env and rechecked test assertions."},
+    {"location": "Наши пять role identities", "severity": "minor", "rationale": "Initial source link targeted a directory rather than a concrete profile.", "resolved": true, "resolution": "Linked data_engineer_v1.json and rechecked local target."},
+    {"location": "Схема границы исполнения", "severity": "major", "rationale": "Initial subgraph layout visually placed host-side validation inside the shaded sandbox boundary.", "resolved": true, "resolution": "Removed misleading drawn subgraph, labeled inner resources explicitly, retained host-side validation outside the runner, and scheduled new browser/image review."}
+  ],
+  "diagram_waiver": null
+}

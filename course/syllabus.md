@@ -11,7 +11,7 @@ Prerequisites: Python/SQL и data/software pipelines. Kubernetes не требу
 | 2 | [01 — Декомпозиция ответственности и организация команды](modules/module-01-organization/README.md) | 0 |
 | 3 | [02 — Контракты, артефакты и границы доверия](modules/module-02-contracts/README.md) | 1 |
 | 4 | [03 — Harness и инженерия контекста одного вызова](modules/module-03-harness-context/README.md) | 2 |
-| 5 | [04 — Context, durable state, artifacts и knowledge](modules/module-04-state-memory/README.md) | 3 |
+| 5 | [04 — Состояние и память мультиагентной системы](modules/module-04-state-memory/README.md) | 3 |
 | 6 | [05 — MAF: executors, edges и runtime графа](modules/module-05-maf-executors/README.md) | 2, 4 |
 | 7 | [06 — Жёсткий workflow: reducer, branching и convergence](modules/module-06-strict-workflow/README.md) | 5 |
 | 8 | [07 — Agent-orchestrator: planning, delegation и replanning](modules/module-07-agent-orchestrator/README.md) | 6 |

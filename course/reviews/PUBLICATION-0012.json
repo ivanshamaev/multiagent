@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "lecture_id": 12,
+  "reviewer": "Codex; same-author separate browser/visual passes, not independent review",
+  "checked_at": "2026-09-17T19:41:18Z",
+  "publication_digest": "66c893737cc2715f0a3a87a83234d9a0c63754776033e92c5a7de55e90043f01",
+  "passes": {"desktop": true, "mobile": true, "light": true, "dark": true, "no_js": true, "keyboard": true, "print": true, "accessibility_tree": true, "subpath": true, "csp": true, "links": true, "visual": true},
+  "assistive_technology": {"tested": false, "scope": "Chrome AX main landmark and named/described SVG checked; actual Orca/NVDA/VoiceOver interaction not tested."},
+  "renderer": {
+    "browser_version": "Google Chrome for Testing 153.0.8010.36",
+    "builder_sha256": "095fa29ffe2926bea7999900eee5f269a02376c9ef09c8e4e723a2c62d85f994",
+    "cli": "11.17.0",
+    "diagram_config_sha256": "bc12b7e5869cf9fea920a4ed5b52619096949dc7c1c3de2cef760e0d105cdd8d",
+    "font_sha256": {"cyrillic": "05af9e705d3b63aedba67197d19fb448b97353e1386930716c7e835b08f126ba", "latin": "0d352d8a993d3f79d860e44d74ee3e132649253f2af24caad088c3aed6ec08c8"},
+    "lock_sha256": "2e528e208a65c3ffd5c89446637e68812dc5c56f1e30762f24c2a2e3449fd928",
+    "mermaid": "11.16.1",
+    "node": "v22.22.0",
+    "system_render_font_sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d"
+  },
+  "rendered_sha256": "f782c1f4c5aacb53aa6b09f7a966a6ef284c490baf7bdf65de79ec4a3092316e",
+  "artifacts_sha256": {
+    "output/playwright/step43/lecture-12/dark.png": "e83309769c070fc7770f0fb7bab8e33408209a0f9501fbf373dd34ee62cca6e6",
+    "output/playwright/step43/lecture-12/desktop.png": "03dfff176a44cbb1a53916081c5bddc0dd9f51d690d126a8a7f7d87eeb2b0315",
+    "output/playwright/step43/lecture-12/mobile-diagram.png": "9cba31b7156a327e6dea1c064a778eef18feb5fc3cfc18b2cba40695fc69221e",
+    "output/playwright/step43/lecture-12/mobile.png": "1f28e8808c4585a5389edf63867878decb909e2260b9b0d48f5af2b4fa3e7844",
+    "output/playwright/step43/lecture-12/no-js.png": "1f28e8808c4585a5389edf63867878decb909e2260b9b0d48f5af2b4fa3e7844",
+    "output/playwright/step43/lecture-12/print-diagram.png": "850b06f3e66efa2e058fc30558eef45a73f007bda64384c35e00a0d981e6e6ef",
+    "output/playwright/step43/lecture-12/print-top.png": "96bb2b83f8b4fff8f21221e3a3fbfd0af568801262b0a9f34826cd1d41ac8f7b"
+  },
+  "scope": "STEP-0043 final candidate reader on /course/: desktop/360px, light/dark, no-JS, keyboard/fullscreen focus, print, AX, CSP/subpath/links and seven inspected screenshots. No actual AT, paper/PDF, hardware touch or cross-browser audit.",
+  "evidence": "plan/evidence/STEP-0043-lecture-analyst-provenance.md"
+}

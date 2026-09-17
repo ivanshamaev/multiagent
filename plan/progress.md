@@ -1,5 +1,45 @@
 # Журнал прогресса
 
+## 2026-09-17 — STEP-0042: лекция 11 опубликована
+
+- Написана теория grain, dbt lineage, уровней parse/compile/build/test и
+  различия dbt/Airflow/agent-графов; пример сверён с кодом и STEP-0004.
+- Separate editorial/technical/recheck и фактический browser gate завершены;
+  семь скриншотов осмотрены. Same-author review, actual AT не заявлен.
+- Две идентичные сборки (102 файла, 16 SVG); reader содержит 00–11, далее
+  лекция 12. Evidence: `plan/evidence/STEP-0042-lecture-dbt-semantics.md`.
+
+## 2026-09-17 — STEP-0037: лекция 06 опубликована
+
+- Объяснены code-owned transition relation, safety/liveness, terminal
+  convergence и bounded rework; graph v2 evidence не выдан за текущий live v3.
+- Same-author editorial/technical/recheck и browser/visual gate PASS; семь
+  screenshots просмотрены, actual AT не заявлен. Targeted workflow tests:
+  30 PASS. Две обычные сборки и полный `make check` — в
+  [evidence](evidence/STEP-0037-lecture-strict-workflow.md). Далее 07.
+
+## 2026-09-17 — STEP-0036: лекция 05 опубликована
+
+- Теория executor/edge/typed boundary/graph signature отделена от бизнес-transition
+  лекции 06. Источники Microsoft/LangChain применены только в границах статей,
+  STEP-0019 помечен как historical offline evidence.
+- Same-author editorial/technical/recheck и browser/visual gates PASS; seven screenshots
+  осмотрены, actual AT не заявлен. Targeted pipeline tests: 11 PASS.
+- Две обычные сборки и полный `make check` — в
+  [evidence](evidence/STEP-0036-lecture-maf-executors.md). Далее 06.
+
+## 2026-09-17 — STEP-0035: лекция 04 опубликована
+
+- Theory-only текст различает контекст вызова, workflow state, accepted artifact и
+  не реализованный long-term memory layer; контрпример показывает потерю
+  неявной оговорки при summarization.
+- Separate editorial/technical/recheck и browser/visual passes; семь screenshots,
+  исправлена несогласованность canonical заголовка. Контент и публикация имеют
+  актуальные receipts; independent review и actual AT не заявлены.
+- Targeted context/pipeline tests: 17 PASS. Две обычные сборки: 88 files/9 diagrams,
+  идентичный SHA256. Полный `make check` и preview gate — в
+  [evidence](evidence/STEP-0035-lecture-state-memory.md). Следующая лекция — 05.
+
 ## 2026-09-16 — STEP-0034 завершён: последовательная нумерация курса
 
 - Основной маршрут получил ID 00–25 по порядку обучения; Kubernetes extension — 26.
@@ -555,3 +595,37 @@
   добавлена 26 — comparison/hybrid с десятью scenarios. Тексты будут в `course/lectures/`.
   Skill `technical-markdown-lectures` помог согласовать структуру и переходы. Лекции не написаны,
   semantic duplication review будущих текстов и применение отсутствующих skills не заявляются.
+
+## 2026-09-17 — STEP-0038: лекция 07
+
+Опубликована theory-only лекция об agent-orchestrator после отдельной вычитки,
+source/code verification и визуального publication gate. Manager-flow прямо
+обозначен как не реализованный в платформе. Две сборки совпали побайтно,
+`make check` — 531 passed. Reader содержит 00–07; далее 08.
+
+## 2026-09-17 — STEP-0039: лекция 08
+
+Опубликована теория локальной изоляции после отдельной вычитки и проверки
+исходных статей, кода и offline evidence. Визуальная ошибка в схеме была
+выявлена браузерным gate, исправлена и перепроверена. Две сборки совпали,
+`make check` — 531 passed. Reader содержит 00–08; далее 09.
+
+## 2026-09-17 — STEP-0040: лекция 09
+
+Опубликована theory-only лекция о MCP host/client/server, lifecycle и
+semantic tool surface. Текущая нормативная спецификация 2026-07-28 не
+приравнена к установленному SDK 2025-11-25. После вычитки и source/code
+verification визуальная ошибка в диаграмме исправлена и повторно проверена
+в браузере. Content/publication receipts актуальны; две сборки совпали,
+`make check` — 531 passed. Reader содержит 00–09; далее 10.
+
+## 2026-09-17 — STEP-0041: лекция 10
+
+Опубликована theory-only лекция об аналитическом read scope и составном
+SQL resource envelope. Текст прошёл отдельные editorial/technical/recheck,
+а финальная LR-схема — actual browser/visual gate после исправления
+мобильного layout. Content/publication receipts актуальны, две сборки
+совпали побайтно; 53 профильных теста и `make check` (531 tests) PASS.
+Во время проверки временно не хватало места на разделе; после очистки
+восстановимого npm-кэша browser gate повторно прошёл. Reader содержит
+00–10; далее 11, dbt semantics.

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "lecture_id": 10,
+  "reviewer": "Codex; same-author separate passes, not independent review",
+  "checked_at": "2026-09-17T19:10:00Z",
+  "input_digest": "8fd102fe8eb5bcefcd571da885506ed7fbdef8c7182951d20ad32f29b97fa6e0",
+  "content_sha256": "c556d24b1d8d5f9a87a703ca66697819f234d7fa416c8a3fad5357b29c7dce09",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "visual": true},
+  "pass_scope": {
+    "editorial": "Entire theory-only draft reread after authoring against todo 10, technical requirements, glossary, prior lecture 09 and owners 11/12/19. Terminology, causal order, counterexample, table and diagram textual equivalent checked.",
+    "technical": "Anthropic S08, ClickHouse S16 and official url() docs checked online 2026-09-17; current policy/profile/Compose/grants/Analyst/gateway code and dated STEP-0008 compared. 53 targeted policy/gateway tests passed.",
+    "recheck": "Narrowed claims about server-side resource limits, catalog column detail, role scope, database fallback identity and AST coverage; separated raw-query cost from stale-derived-table example. Initial visual gate showed off-screen first node on mobile, so flowchart orientation changed TD to LR and diagram semantics rechecked. Affected sections reread against code.",
+    "visual": "Final candidate in Chrome: desktop, 360px mobile, dark, print and no-JS; all seven screenshots inspected, including first SQL node visible on mobile, DENY/error arrows, Cyrillic labels and print. AX named SVG checked; actual assistive technology not tested.",
+    "not_checked": ["Independent reviewer", "Actual assistive technology interaction", "Current live ClickHouse grants under all environment overrides", "Full SQL dialect bypass audit", "Fully-live six-role readiness"]
+  },
+  "claims": [
+    {"location": "От вопроса к минимальной поверхности чтения", "assertion": "Anthropic recommends agent-facing, distinct and task-relevant tools rather than mechanical API wrappers or huge responses.", "source": "https://www.anthropic.com/engineering/writing-tools-for-agents", "anchor": "Choosing the right tools for agents", "scope": "Original article checked 2026-09-17; profile_orders is a hypothetical design, not implementation", "verdict": "verified"},
+    {"location": "Почему SELECT и LIMIT не равны безопасному чтению", "assertion": "ClickHouse url() table function can read external URL sources in SELECT.", "source": "https://clickhouse.com/docs/reference/functions/table-functions/url", "anchor": "Examples, SELECT FROM url()", "scope": "Official documentation checked 2026-09-17; local policy intends to deny AST-recognized table functions", "verdict": "verified"},
+    {"location": "Почему SELECT и LIMIT не равны безопасному чтению", "assertion": "A small result row count does not bound source work; the ClickHouse article shows count with LIMIT 5 processing many source rows.", "source": "https://clickhouse.com/blog/using-materialized-views-in-clickhouse", "anchor": "Validating and filtering data, count(*) LIMIT 5 example", "scope": "Official original article checked 2026-09-17; generalized as a query-cost principle, not a measured workload here", "verdict": "verified"},
+    {"location": "Иллюстрация нашей системой", "assertion": "Policy parses one ClickHouse query expression, rejects query SETTINGS, checks table/function AST shapes and requires bounded literal top-level LIMIT for clickhouse.run_query.", "source": "policies/tool_policy.py", "anchor": "_query_denial and authorize_tool_call", "scope": "Current checkout 2026-09-17; 53 targeted tests passed; not a complete SQL security proof", "verdict": "verified"},
+    {"location": "Иллюстрация нашей системой", "assertion": "Analyst profile permits read tools in raw/analytics with max_query_rows 50, max_tool_calls 6, max_wall_time_seconds 240 and max_output_bytes 400000.", "source": "policies/profiles/analyst_v1.json", "anchor": "allowed_tools, allowed_databases and max_*", "scope": "Current checkout 2026-09-17", "verdict": "verified"},
+    {"location": "Иллюстрация нашей системой", "assertion": "mcp_reader grants SELECT raw/analytics while dbt_agent has additional analytics write/DDL rights; Compose defaults ClickHouse MCP user to mcp_reader but allows override.", "source": "platform/clickhouse/security/001_mcp_users.sql", "anchor": "GRANT and REVOKE; docker-compose.yml clickhouse-mcp CLICKHOUSE_USER", "scope": "Current configuration 2026-09-17; actual environment override not inspected", "verdict": "verified"},
+    {"location": "Иллюстрация нашей системой", "assertion": "Analyst's fixed profile query aggregates order count, currencies, missing currency and date bounds from raw.orders with LIMIT 1.", "source": "runtime/analyst.py", "anchor": "ANALYST_PROFILE_SQL", "scope": "Current checkout 2026-09-17; value quality not implied", "verdict": "verified"},
+    {"location": "Иллюстрация нашей системой", "assertion": "Gateway reauthorizes requests, applies elapsed wall-time and output-byte budgets to MCP results, with byte check after text result returns.", "source": "runtime/tools/mcp_gateway.py", "anchor": "_execute async timeout and len(output) branch", "scope": "Current checkout 2026-09-17; remote cancellation and server CPU/memory limits not proven", "verdict": "verified"},
+    {"location": "Иллюстрация нашей системой", "assertion": "STEP-0008 recorded one pre-execution DDL denial and local mcp_reader SELECT 1 success/INSERT failure.", "source": "plan/evidence/STEP-0008-tool-policy-layer.md", "anchor": "Commands and outcomes", "scope": "Historical evidence dated 2026-09-11, not a current live probe", "verdict": "verified"},
+    {"location": "Материализация меняет вид знания", "assertion": "ClickHouse article describes incremental materialized views as insert-triggered writes to a target table; local dbt marts are configured as table, not that mechanism.", "source": "https://clickhouse.com/blog/using-materialized-views-in-clickhouse", "anchor": "What is a Materialized View?; platform/dbt/dbt_project.yml models marts", "scope": "Original article and local configuration checked 2026-09-17; no all-materializations equivalence", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Read capability — пересечение разрешений", "severity": "minor", "rationale": "Initial resource wording could imply current server-side CPU/memory limits are set by the local policy.", "resolved": true, "resolution": "Separated local time/output budgets from additional server-side CPU/memory/scan controls; reread section."},
+    {"location": "От вопроса к минимальной поверхности чтения", "severity": "minor", "rationale": "Catalog metadata description did not mention detailed-column option; conceptual time-window scope could be mistaken for an implemented constraint.", "resolved": true, "resolution": "Qualified list_tables detail and explicitly marked unenforced dimensions; rechecked current contract."},
+    {"location": "Иллюстрация нашей системой", "severity": "minor", "rationale": "Initial prose implied an unconditional mcp_reader runtime identity and complete table-function rejection.", "resolved": true, "resolution": "Described Compose default/override and AST-recognized constructs, not universal guarantees; rechecked code."},
+    {"location": "Контрпример и пределы подхода", "severity": "minor", "rationale": "Initial stale materialization scenario was joined to a raw.orders count query with no derived table.", "resolved": true, "resolution": "Separated this into another case and reread causal chain."},
+    {"location": "Диаграмма: составная граница запроса", "severity": "minor", "rationale": "First TD browser render placed starting SQL proposal off-screen to the right of an empty mobile canvas.", "resolved": true, "resolution": "Changed flowchart orientation to LR; rerendered and inspected all seven final screenshots, including mobile and print."}
+  ],
+  "diagram_waiver": null
+}

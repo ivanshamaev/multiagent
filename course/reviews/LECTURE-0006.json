@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "lecture_id": 6,
+  "reviewer": "Codex; same-author separate passes, not independent review",
+  "checked_at": "2026-09-16T21:48:59Z",
+  "input_digest": "f77445676a930cbbea9ae50491dcaf4ea1339e9721aad0331c07e26dce81402c",
+  "content_sha256": "bbd180334383455ab440a5ee9af6d35cdb3c59c84598152f205b4b809a5efac2",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "visual": true},
+  "pass_scope": {
+    "editorial": "Whole draft reread after authoring; owner overlap 05/07/17/24, terminology, causal loop and counterexample checked.",
+    "technical": "Anthropic S01 and LangChain S05 originals, current transition/state/role graph code and tests, dated STEP-0020 v2 evidence checked 2026-09-17.",
+    "recheck": "Full lecture reread after technical pass; no substantial corrective rewrite required.",
+    "visual": "Actual candidate reader: desktop/360px mobile, light/dark, no-JS, keyboard zoom/pan/reset/fullscreen/Escape/focus, print clipping, AX main/named SVG, CSP/subpath/links; seven screenshots manually inspected. Actual AT, hardware touch and cross-browser not tested.",
+    "not_checked": ["Independent reviewer", "Actual assistive technology interaction", "Fresh paid model or Data Platform execution"]
+  },
+  "claims": [
+    {"location": "Transition relation: кто владеет решением", "assertion": "Anthropic distinguishes predefined code-path workflows from model-directed agents and notes age of some tooling details.", "source": "https://www.anthropic.com/engineering/building-effective-agents", "anchor": "What are agents? and updated note", "scope": "Primary original checked 2026-09-17", "verdict": "verified"},
+    {"location": "Жёсткий граф может ветвиться и содержать цикл", "assertion": "LangGraph article describes graph multi-agent workflows with cycles and multiple connection patterns; not MAF API evidence.", "source": "https://www.langchain.com/blog/langgraph-multi-agent-workflows", "anchor": "Introduction and Multi-agent examples", "scope": "Primary original checked 2026-09-17", "verdict": "verified"},
+    {"location": "Transition relation: кто владеет решением", "assertion": "Local reducer checks allowed stage pairs, task/producer/artifact gates, budgets and returns a new WorkflowState.", "source": "orchestrator/transitions.py", "anchor": "ALLOWED_TRANSITIONS, _validate_artifact_gate, apply_transition", "scope": "Current code/tests checked 2026-09-17", "verdict": "verified"},
+    {"location": "Safety и liveness — разные требования", "assertion": "DONE/BLOCKED/FAILED are terminal stages; valid terminal states require stage-specific gates/reasons.", "source": "orchestrator/state.py", "anchor": "Stage.terminal and WorkflowState.validate_state", "scope": "Current code checked with orchestrator/transitions.py 2026-09-17", "verdict": "verified"},
+    {"location": "Почему повторная проверка обязательна", "assertion": "On REWORK the DE role moves prior attempt artifacts into gate_history, clears downstream current gates and routes through validation again.", "source": "runtime/role_pipeline.py", "anchor": "_RoleExecutor._validate_result and build_role_pipeline", "scope": "Current code/workflow tests checked 2026-09-17", "verdict": "verified"},
+    {"location": "Ограничение числа возвратов", "assertion": "Requested REWORK charges one attempt or converges to FAILED if none remain; workflow builder separately caps iterations.", "source": "orchestrator/transitions.py", "anchor": "TransitionCommand and _charge_rework_or_fail", "scope": "Current code checked with runtime/role_pipeline.py 2026-09-17", "verdict": "verified"},
+    {"location": "Historical scope", "assertion": "STEP-0020 records offline v2 branching/rework/terminal tests without GateLLM or Data Platform mutation.", "source": "plan/evidence/STEP-0020-branching-rework-idempotency.md", "anchor": "Proven behavior and residual risk", "scope": "Dated 2026-09-14, not current live v3 proof", "verdict": "verified"},
+    {"location": "Diagram semantics", "assertion": "Flowchart is an explicit simplified projection of quality branches with omitted paths named in caption.", "source": "course/lectures/LECTURE-0006-strict-workflow.md", "anchor": "Где сходятся ветви нашей системы", "scope": "Compared against transitions/role graph 2026-09-17", "verdict": "verified"}
+  ],
+  "findings": [],
+  "diagram_waiver": null
+}

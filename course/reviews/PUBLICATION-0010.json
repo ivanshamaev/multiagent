@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "lecture_id": 10,
+  "reviewer": "Codex; same-author separate browser/visual passes, not independent review",
+  "checked_at": "2026-09-17T19:10:30Z",
+  "publication_digest": "aac4f7b7057e0978b6dd2994c730788551db79c204943411094826e4d4d17bbc",
+  "passes": {"desktop": true, "mobile": true, "light": true, "dark": true, "no_js": true, "keyboard": true, "print": true, "accessibility_tree": true, "subpath": true, "csp": true, "links": true, "visual": true},
+  "assistive_technology": {"tested": false, "scope": "Chrome AX main landmark and named/described SVG checked; actual Orca/NVDA/VoiceOver interaction not tested."},
+  "renderer": {
+    "browser_version": "Google Chrome for Testing 153.0.8010.36",
+    "builder_sha256": "095fa29ffe2926bea7999900eee5f269a02376c9ef09c8e4e723a2c62d85f994",
+    "cli": "11.17.0",
+    "diagram_config_sha256": "bc12b7e5869cf9fea920a4ed5b52619096949dc7c1c3de2cef760e0d105cdd8d",
+    "font_sha256": {"cyrillic": "05af9e705d3b63aedba67197d19fb448b97353e1386930716c7e835b08f126ba", "latin": "0d352d8a993d3f79d860e44d74ee3e132649253f2af24caad088c3aed6ec08c8"},
+    "lock_sha256": "2e528e208a65c3ffd5c89446637e68812dc5c56f1e30762f24c2a2e3449fd928",
+    "mermaid": "11.16.1",
+    "node": "v22.22.0",
+    "system_render_font_sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d"
+  },
+  "rendered_sha256": "7cc912b38b722ef311f97dcbbf2c8a87b0b0e6c7bb3f50fd834a6e98b2d61e21",
+  "artifacts_sha256": {
+    "output/playwright/step41/lecture-10/dark.png": "150ae3632ea1ff6df0ce9e54110b1e5b8f88402d7c555c38889c573e5f923ecd",
+    "output/playwright/step41/lecture-10/desktop.png": "eba32a18cb918f80cfb7901e27746394ba24e4726ff7b581611578f8582508bf",
+    "output/playwright/step41/lecture-10/mobile-diagram.png": "e0c5fb37ad5cf7ac888d4b8fc3ba1d4454e16233fcf23b25c0dd6fb9bc7932a7",
+    "output/playwright/step41/lecture-10/mobile.png": "09619bf836a34669b1c3ecc55aa5db6dac4720bc24181734f93aaed19bd81804",
+    "output/playwright/step41/lecture-10/no-js.png": "09619bf836a34669b1c3ecc55aa5db6dac4720bc24181734f93aaed19bd81804",
+    "output/playwright/step41/lecture-10/print-diagram.png": "bdc8bd63763f570f0f3ff02cdf50372f380cc82662dd1f0de825cbdf5c906182",
+    "output/playwright/step41/lecture-10/print-top.png": "93e033d61f6dc27220ebbcf02398eb0c1f77eb9ff3999f382b6c0e53d5bc3b3d"
+  },
+  "scope": "STEP-0041 final candidate reader on /course/: desktop/360px, light/dark, no-JS, keyboard/fullscreen focus, print, AX, CSP/subpath/links and seven inspected screenshots after diagram orientation correction. No actual AT, paper/PDF, hardware touch or cross-browser audit.",
+  "evidence": "plan/evidence/STEP-0041-lecture-analytical-sql.md"
+}

@@ -1,8 +1,8 @@
 # Todo-планы лекций: маршрут, ownership и согласованность
 
-Updated: 2026-09-16
+Updated: 2026-09-17
 
-Status: planning reviewed; lectures 00/01/02/03 published; other 23 lecture texts not written
+Status: planning reviewed; lectures 00–12 published; other 14 lecture texts not written
 
 ## Размещение и формат
 
@@ -35,7 +35,7 @@ Core IDs совпадают с порядком изучения. Основно
 | [01 Декомпозиция ответственности и организация команды](LECTURE-0001-organization.md) | role decomposition; task coupling; separation of duties | 13, 12, 15, 16, 24 |
 | [02 Контракты, артефакты и границы доверия](LECTURE-0002-contracts.md) | artifact schema; contract invariants; cross-task binding | 13, 14, 06 |
 | [03 Harness и инженерия контекста одного вызова](LECTURE-0003-harness-context.md) | per-turn context selection; model-provider abstraction; structured response boundary | 04, 17, 23 |
-| [04 Context, durable state, artifacts и knowledge](LECTURE-0004-state-memory.md) | state lifecycle; artifact visibility; durable vs ephemeral knowledge | 02, 03, 12, 17 |
+| [04 Состояние и память мультиагентной системы](LECTURE-0004-state-memory.md) | state lifecycle; artifact visibility; durable vs ephemeral knowledge | 02, 03, 12, 17 |
 | [05 MAF: executors, edges и runtime графа](LECTURE-0005-maf-executors.md) | executor semantics; edge message delivery; runtime graph signature | 02, 06, 17 |
 | [06 Жёсткий workflow: reducer, branching и convergence](LECTURE-0006-strict-workflow.md) | code-owned transition policy; terminal convergence; bounded rework routing | 05, 07, 17, 24 |
 | [07 Agent-orchestrator: planning, delegation и replanning](LECTURE-0007-agent-orchestrator.md) | model-directed delegation; task/progress ledger; planner/executor separation | 09, 06, 19, 24 |

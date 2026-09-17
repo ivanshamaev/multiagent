@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "lecture_id": 7,
+  "reviewer": "Codex; same-author separate passes, not independent review",
+  "checked_at": "2026-09-16T21:57:44Z",
+  "input_digest": "d640a17493e9bac61423cd967014f6d9717262a5fe98080cc2b866654dbcb21f",
+  "content_sha256": "7853d27ffa3a2ff4fec33bdc9a0d2a5bbb1aff7998cb4d2b2a27119968f8686e",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "visual": true},
+  "pass_scope": {
+    "editorial": "Entire theory-only draft reread; causal sequence and terminology, status distinction, imagined example and owner separation 06/09/19/24 checked.",
+    "technical": "Original Microsoft Research/Anthropic articles, official A2A specification, current runtime code scope and accepted ADR-0035 checked 2026-09-17.",
+    "recheck": "Corrected grammatical case, broken ADR filename and over-narrow A2A wording; corrected sections reread and local link checked.",
+    "visual": "STEP-0038 candidate: seven screenshots individually inspected for text, diagram, desktop/mobile, dark and print; Playwright keyboard, AX, no-JS, CSP, subpath and links passed.",
+    "not_checked": ["Independent reviewer", "Actual assistive technology interaction", "Model-directed manager run (not implemented)"]
+  },
+  "claims": [
+    {"location": "Задача, план и прогресс — разные записи", "assertion": "Magentic-One Orchestrator uses task and progress ledgers and replans when progress stalls.", "source": "https://www.microsoft.com/en-us/research/articles/magentic-one-a-generalist-multi-agent-system-for-solving-complex-tasks/", "anchor": "How it works", "scope": "Original article checked 2026-09-17; no benchmark transfer", "verdict": "verified"},
+    {"location": "Контракт ограниченного worker", "assertion": "Anthropic's lead research agent delegates focused subtasks and reports duplicated/gapped work from vague assignments.", "source": "https://www.anthropic.com/engineering/multi-agent-research-system", "anchor": "Architecture overview and Teach the orchestrator how to delegate", "scope": "Original article checked 2026-09-17; research setting only", "verdict": "verified"},
+    {"location": "Dynamic routing, workers-as-tools и transport", "assertion": "A2A specifies interaction/interoperability between independent agent systems; it is not a manager-planning policy.", "source": "https://a2a-protocol.org/latest/specification/", "anchor": "Introduction and key goals", "scope": "Official current specification checked 2026-09-17; no versioned API detail", "verdict": "verified"},
+    {"location": "Мысленный пример для инженерии данных", "assertion": "Our current role graph routes predefined executors; no model-directed manager or ledgers exist in scoped runtime.", "source": "runtime/role_pipeline.py", "anchor": "build_role_pipeline and route_*", "scope": "Current code and scoped runtime search checked 2026-09-17", "verdict": "verified"},
+    {"location": "Мысленный пример для инженерии данных", "assertion": "ADR-0035 makes manager a curriculum alternative, explicitly not a runtime implementation.", "source": "plan/decisions/ADR-0035-dual-orchestration-lecture-boundaries.md", "anchor": "Decision and Consequences", "scope": "Accepted ADR checked 2026-09-17", "verdict": "verified"},
+    {"location": "Цикл manager → worker → synthesis", "assertion": "Diagram is a hypothetical bounded orchestration pattern with external policy/acceptance, not an implemented platform flow.", "source": "course/lectures/LECTURE-0007-agent-orchestrator.md", "anchor": "Цикл manager → worker → synthesis", "scope": "Diagram/prose semantics checked 2026-09-17", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Цель и предварительные знания", "severity": "minor", "rationale": "Russian case agreement was incorrect.", "resolved": true, "resolution": "Changed to 'другого владельца'; section reread."},
+    {"location": "Мысленный пример для инженерии данных", "severity": "minor", "rationale": "ADR link pointed to a nonexistent filename.", "resolved": true, "resolution": "Linked actual ADR-0035 path and rechecked."},
+    {"location": "Dynamic routing, workers-as-tools и transport", "severity": "minor", "rationale": "A2A was over-narrowly called a transport.", "resolved": true, "resolution": "Described it as interaction protocol for independent agent systems and linked official specification."}
+  ],
+  "diagram_waiver": null
+}

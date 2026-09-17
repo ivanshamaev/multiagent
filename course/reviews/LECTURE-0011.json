@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "lecture_id": 11,
+  "reviewer": "Codex; same-author separate passes, not independent review",
+  "checked_at": "2026-09-17T19:24:06Z",
+  "input_digest": "7346c9b5d4f4be3b13f003ddfc6fff7743bcd8e6af639b69b10e46e43e3f96c2",
+  "content_sha256": "c0056c6e903934432ef3dcfac71c2d29199b188e2bbb3d5616052c8e2e50c535",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "visual": true},
+  "pass_scope": {
+    "editorial": "Entire theory-only lecture reread after drafting against todo 11, glossary, lecture 10 and neighboring owner boundaries 12/14/15/18. Grain, causal order, three-graph comparison, counterexample, table, diagram and transition checked.",
+    "technical": "Primary dbt Labs S17/S18, dbt command/ref documentation and official Cosmos testing documentation checked online 2026-09-17; current SQL/YAML/Airflow DAG and dated STEP-0004 compared.",
+    "recheck": "Corrected intermediate grain from any payment attempts to successful payment attempts; scoped model definition to this SQL project and reread affected sections.",
+    "visual": "Chrome candidate on /course/: desktop, 360px mobile, light/dark, print, no-JS; seven screenshots inspected, including arrow direction, Cyrillic labels, full print and first mobile node. Keyboard zoom/pan/reset/fullscreen, AX named/described SVG, CSP, subpath and links passed; actual AT not tested.",
+    "not_checked": ["Independent reviewer", "Actual assistive technology interaction", "Current live ClickHouse data", "Fully-live six-role readiness"]
+  },
+  "claims": [
+    {"location": "Цель", "assertion": "Analytics engineering connects transformations, testing and documentation to analysis-ready datasets.", "source": "https://www.getdbt.com/blog/what-is-analytics-engineering", "anchor": "What is an analytics engineer?", "scope": "Source concept paraphrased; not an implementation claim", "verdict": "verified"},
+    {"location": "Grain", "assertion": "Project describes payment staging as one row per payment and successful-payment intermediate as one row per qualifying order.", "source": "platform/dbt/models/models.yml", "anchor": "stg_payments and int_order_payments descriptions", "scope": "Current repository code 2026-09-17; SQL filter and joins also inspected", "verdict": "verified"},
+    {"location": "Grain", "assertion": "Successful-payment intermediate filters succeeded rows and groups by order_id.", "source": "platform/dbt/models/intermediate/int_order_payments.sql", "anchor": "where and group by", "scope": "Current repository code 2026-09-17", "verdict": "verified"},
+    {"location": "Grain", "assertion": "Fact orders left-joins payment aggregate and supplies zero for absent components.", "source": "platform/dbt/models/marts/fct_orders.sql", "anchor": "left join and ifNull", "scope": "Current repository code 2026-09-17", "verdict": "verified"},
+    {"location": "Grain", "assertion": "Fact source-count test compares total row counts and does not compare key sets.", "source": "platform/dbt/tests/assert_fct_orders_matches_source_count.sql", "anchor": "fact_count != source_count", "scope": "Current repository code 2026-09-17", "verdict": "verified"},
+    {"location": "Lineage", "assertion": "ref resolves model references and constructs dependencies; hidden conditional refs may be missed during parse.", "source": "https://docs.getdbt.com/reference/dbt-jinja-functions/ref", "anchor": "ref(), Forcing dependencies", "scope": "Official documentation checked 2026-09-17", "verdict": "verified"},
+    {"location": "Four checks", "assertion": "Parse validates project syntax and creates an uncompiled manifest without warehouse connection.", "source": "https://docs.getdbt.com/reference/commands/parse", "anchor": "About dbt parse command", "scope": "Official documentation checked 2026-09-17", "verdict": "verified"},
+    {"location": "Four checks", "assertion": "Compile may run introspective queries against the data platform.", "source": "https://docs.getdbt.com/reference/commands/compile", "anchor": "Introspective queries", "scope": "Official documentation checked 2026-09-17", "verdict": "verified"},
+    {"location": "Four checks", "assertion": "Build acts on selected resources and includes selected tests.", "source": "https://docs.getdbt.com/reference/commands/build", "anchor": "Selecting resources and Tests", "scope": "Official documentation checked 2026-09-17", "verdict": "verified"},
+    {"location": "Four checks", "assertion": "Test runs selected assertions on already created resources.", "source": "https://docs.getdbt.com/reference/commands/test", "anchor": "About dbt test command", "scope": "Official documentation checked 2026-09-17", "verdict": "verified"},
+    {"location": "Tests", "assertion": "Data tests record project assumptions.", "source": "https://www.getdbt.com/blog/data-testing", "anchor": "Why is testing necessary?", "scope": "Original article checked 2026-09-17; model-specific assertions inspected in code", "verdict": "verified"},
+    {"location": "Three graphs", "assertion": "Local DAG embeds a Cosmos DbtTaskGroup with AFTER_ALL between load_raw and publish.", "source": "platform/airflow/dags/cosmos_pipeline.py", "anchor": "_render_config and build_ecommerce_dag", "scope": "Current repository code 2026-09-17; Cosmos behavior verified against official documentation", "verdict": "verified"},
+    {"location": "Three graphs", "assertion": "STEP-0004 observed eight models, 68 tests, successful 11-task Cosmos runs and failed test blocking publish.", "source": "plan/evidence/STEP-0004-airflow-cosmos.md", "anchor": "Acceptance results", "scope": "Historical 2026-09-05 evidence only", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Grain", "severity": "minor", "rationale": "Initial prose described intermediate grain as orders with any payment attempts, but SQL filters for successful attempts.", "resolved": true, "resolution": "Qualified as successful attempts; reread SQL and paragraph."},
+    {"location": "Lineage", "severity": "minor", "rationale": "Generic SQL-only definition of a dbt model could obscure other dbt model types.", "resolved": true, "resolution": "Scoped definition to this SQL project; reread paragraph."}
+  ],
+  "diagram_waiver": null
+}

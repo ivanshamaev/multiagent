@@ -1,5 +1,9 @@
 # План разработки Agentic Data Platform
 
+Текущий Phase L slice: [STEP-0035](steps/STEP-0035-lecture-state-memory.md)
+опубликовал лекцию 04; дальше последовательно готовятся 05–08, каждая со
+своими вычиткой, verification и browser publication gate.
+
 ## 1. Цель и граница проекта
 
 Сначала строим и проверяем работающую multi-agent систему для инженерии данных. По уточнению
@@ -231,3 +235,29 @@ STEP-0034 сохраняет те же темы и порядок, но синх
 core 00–25 и optional Kubernetes 26. Прежние IDs остаются в таблице миграции;
 четыре опубликованных текста после перепроверки теперь имеют ID 00/01/02/03.
 Следующая тема — 04, state/memory.
+
+STEP-0035–0039 последовательно публикуют лекции 04–08 с отдельными
+content/publication receipts, редакторской и технической вычиткой,
+фактической браузерной проверкой схем и детерминированной сборкой. Reader
+содержит 00–08; 18 core/extension тем остаются outlines. Следующая — 09,
+MCP как интерфейс.
+
+STEP-0040 публикует лекцию 09 о MCP и различии protocol interface, semantic
+tool design и code-owned authorization. При проверке источников выявлено
+изменение MCP lifecycle в нормативной версии 2026-07-28; локальный SDK
+соответствует прежнему поколению, что указано в тексте. Content и actual
+browser publication gates завершены, reader содержит 00–09. Следующая — 10,
+ограниченные SQL capabilities.
+
+STEP-0041 публикует лекцию 10: область аналитического наблюдения,
+составной read capability и несовпадающие гарантии SQL syntax, AST policy,
+grants БД, `LIMIT` и output/time budgets. Пример привязан к текущему коду
+и датированному STEP-0008 без заявления о полноте SQL security или свежем
+live запуске. Content и browser publication gates завершены; reader содержит
+00–10. Следующая — 11, dbt и семантика аналитической модели.
+
+STEP-0042 публикует лекцию 11: grain, зависимости моделей, значения
+parse/compile/build/test, Cosmos и три несводимых друг к другу графа.
+Сверка с `platform/dbt/`, Airflow DAG и историческим STEP-0004 ограничивает
+claims; content и browser publication gates завершены. Reader содержит
+00–11. Следующая — 12, Analyst provenance.

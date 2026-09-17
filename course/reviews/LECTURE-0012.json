@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "lecture_id": 12,
+  "reviewer": "Codex; same-author separate passes, not independent review",
+  "checked_at": "2026-09-17T19:38:48Z",
+  "input_digest": "f64b7cfebb3a316df0d7c4b4ab69798f1d7e2d3e859ac60753b9a688a22cd7e1",
+  "content_sha256": "80c3e9596eacb4a8be33f3f8330beea4e81037d463ba8dbac987bf3e8ebd9adc",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "visual": true},
+  "pass_scope": {
+    "editorial": "Entire theory-only lecture reread after authoring against todo 12, glossary, lecture 11 and owner boundaries 04/13. Definitions, causal order, counterexample, table, Mermaid text equivalent and transition checked.",
+    "technical": "Primary Dehghani S14 and Anthropic S07 read online 2026-09-17. Current Analyst workflow/boundary/contract/fixture code and historical STEP-0012 compared. Diagram order checked against code.",
+    "recheck": "Separated resource inventory from field schema; narrowed output provenance to retained artifact reference and corrected diagram to sequential reads, tool-free synthesis, then report acceptance. Affected sections reread against code.",
+    "visual": "Chrome candidate on /course/: desktop, 360px mobile, light/dark, print, no-JS; seven screenshots inspected, including first mobile node, full print route, denial branch and Cyrillic. Keyboard zoom/pan/reset/fullscreen, AX named/described SVG, CSP, subpath and links passed; actual AT not tested.",
+    "not_checked": ["Independent reviewer", "Actual assistive technology interaction", "Current live GateLLM/ClickHouse/Airflow", "Fully-live six-role readiness"]
+  },
+  "claims": [
+    {"location": "Semantic discovery", "assertion": "Data-as-product discussion distinguishes discoverability, understandability and trustworthiness of analytical data.", "source": "https://martinfowler.com/articles/data-mesh-principles.html", "anchor": "Data as a product", "scope": "Original 2020 article checked 2026-09-17; not a claim that local platform implements Data Mesh", "verdict": "verified"},
+    {"location": "Provenance", "assertion": "AnalysisFact carries fact kind, statement and evidence IDs; report rejects missing or unsuccessful referenced evidence.", "source": "contracts/artifacts.py", "anchor": "AnalysisFact and RequirementsAnalysisReport.validate_facts", "scope": "Current repository code 2026-09-17", "verdict": "verified"},
+    {"location": "Provenance", "assertion": "Analyst boundary requires three phase outcomes, same task, allowed fact categories, exact output substring and attaches same-phase evidence.", "source": "runtime/analyst.py", "anchor": "accept_analyst_drafts", "scope": "Current repository code 2026-09-17; no source-truth guarantee", "verdict": "verified"},
+    {"location": "Provenance", "assertion": "ToolCallEvidence records argument hash, timestamps and retained output reference.", "source": "contracts/tools.py", "anchor": "ToolCallEvidence fields", "scope": "Current repository code 2026-09-17", "verdict": "verified"},
+    {"location": "Limited Analyst", "assertion": "Anthropic discusses progressive just-in-time retrieval of relevant context and its tradeoffs.", "source": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents", "anchor": "Context retrieval and agentic search", "scope": "Original article checked 2026-09-17; local plan is code-owned, not autonomous browsing", "verdict": "verified"},
+    {"location": "Limited Analyst", "assertion": "Executor uses dbt list, fixed fct_orders lineage and fixed raw.orders profile in three model calls; then a tool-free synthesis; tool evidence name/hash/number are verified.", "source": "runtime/analyst_workflow.py", "anchor": "phase_specs, expected and discover", "scope": "Current repository code 2026-09-17", "verdict": "verified"},
+    {"location": "Limited Analyst", "assertion": "PM handoff is formed only for accepted same-workflow/task report at ANALYSIS_READY.", "source": "runtime/analyst.py", "anchor": "build_pm_requirements_handoff", "scope": "Current repository code 2026-09-17", "verdict": "verified"},
+    {"location": "Limited Analyst", "assertion": "STEP-0012 recorded two live canonical/ambiguous cases with unresolved questions in the latter.", "source": "plan/evidence/STEP-0012-analyst-requirements-discovery.md", "anchor": "Verification and residual risk", "scope": "Historical evidence dated 2026-09-13; not a current live probe or reliability estimate", "verdict": "verified"},
+    {"location": "Counterexample", "assertion": "Local profile aggregates orders only; it does not query payments or refunds.", "source": "runtime/analyst.py", "anchor": "ANALYST_PROFILE_SQL", "scope": "Current repository code 2026-09-17; hypothetical requirement example", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Semantic discovery", "severity": "minor", "rationale": "Initial table could imply dbt_list exposes fields/types in the current metadata phase.", "resolved": true, "resolution": "Separated resource inventory from schema-if-available; reread local facade and section."},
+    {"location": "Provenance", "severity": "minor", "rationale": "Initial wording suggested raw output embedded in evidence rather than retained artifact reference.", "resolved": true, "resolution": "Specified reference and timestamps/argument hash; rechecked contracts/tools.py."},
+    {"location": "Diagram", "severity": "minor", "rationale": "Initial parallel-looking reads and pre-synthesis fact acceptance disagreed with sequential code.", "resolved": true, "resolution": "Changed diagram and textual equivalent to sequential reads, synthesis, then acceptance; rechecked runtime/analyst_workflow.py."}
+  ],
+  "diagram_waiver": null
+}

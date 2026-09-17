@@ -62,3 +62,22 @@
 - [STEP-0034](steps/STEP-0034-course-sequential-numbering.md) перенумеровывает курс
   по порядку обучения: core 00–25, optional Kubernetes 26. Записи STEP-0031–0033
   выше исторические; текущие опубликованные ID — 00/01/02/03, далее 04.
+- [STEP-0035](steps/STEP-0035-lecture-state-memory.md) публикует лекцию 04 о
+  состоянии и памяти после content/browser gates. Опубликованы 00–04; далее 05.
+- [STEP-0036](steps/STEP-0036-lecture-maf-executors.md) публикует лекцию 05 о
+  MAF executors/edges и typed graph boundary. Опубликованы 00–05; далее 06.
+- [STEP-0037](steps/STEP-0037-lecture-strict-workflow.md) публикует лекцию 06
+  о code-owned transitions и bounded rework. Опубликованы 00–06; далее 07.
+- [STEP-0038](steps/STEP-0038-lecture-agent-orchestrator.md) публикует лекцию 07
+  о model-directed manager как альтернативе, не реализации. Опубликованы 00–07; далее 08.
+- [STEP-0039](steps/STEP-0039-lecture-isolation.md) публикует лекцию 08 об
+  изоляции исполнения и границах offline evidence. Опубликованы 00–08; далее 09.
+- [STEP-0040](steps/STEP-0040-lecture-mcp-interface.md) публикует лекцию 09
+  о MCP, semantic tool surface и границе protocol/policy. Опубликованы 00–09;
+  далее 10, аналитический SQL.
+- [STEP-0041](steps/STEP-0041-lecture-analytical-sql.md) публикует лекцию 10
+  о read capability, SQL AST/resource envelope и границах materialization.
+  Опубликованы 00–10; далее 11, dbt semantics.
+- [STEP-0042](steps/STEP-0042-lecture-dbt-semantics.md) публикует лекцию 11
+  о grain, lineage и границах dbt validation, отличая dbt-граф от Airflow DAG
+  и агентского workflow. Опубликованы 00–11; далее 12, Analyst provenance.

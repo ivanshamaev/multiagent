@@ -190,7 +190,7 @@
     {
       "id": 4,
       "slug": "state-memory",
-      "title": "Context, durable state, artifacts и knowledge",
+      "title": "Состояние и память мультиагентной системы",
       "prerequisites": [
         3
       ],

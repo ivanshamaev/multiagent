@@ -81,3 +81,67 @@ Byte-лимиты ContextBundle не выданы за token accounting или s
 шагов. Опубликованные тексты теперь 00/01/02/03, следующая тема — 04 (state/memory).
 Content/publication receipts переназначены после повторной вычитки и browser gate;
 старые локальные `topic-NNNN.html` не считаются стабильными публичными ссылками.
+
+## STEP-0035: лекция 04 — состояние и память
+
+Полный theory-only текст опубликован после separate editorial/technical/recheck и
+actual browser/visual passes. Показаны разные сроки жизни контекста, workflow state,
+accepted artifact и возможного long-term knowledge; последний слой не реализован.
+Reader содержит 00–04; 22 темы остаются outlines. Следующая — 05, MAF executors.
+Actual AT/hardware touch/cross-browser audit не выполнен.
+
+## STEP-0036: лекция 05 — MAF executors
+
+Theory-only текст опубликован после отдельной вычитки, source/code verification
+и actual browser/visual gate. Typed JSON boundary, executor/edge и проектное
+понятие graph signature отделены от бизнес-перехода. Reader содержит 00–05;
+21 тема остаётся outline. Следующая — 06, жёсткий workflow.
+
+## STEP-0037: лекция 06 — жёсткий workflow
+
+Theory-only текст опубликован после separate editorial/technical/recheck
+и actual browser/visual gate. Safety/liveness и terminal convergence
+отделены от executor delivery; rework не выдаётся за бесконечный retry.
+Reader содержит 00–06, 20 тем остаются outlines. Следующая — 07,
+model-directed agent-orchestrator.
+
+## STEP-0038: лекция 07 — agent-orchestrator
+
+Theory-only текст прошёл separate editorial/source/code/recheck и actual
+browser/visual gate. Manager, task/progress ledgers и replanning описаны как
+архитектурная альтернатива, не реализованный runtime. Reader содержит 00–07,
+19 тем остаются outlines. Следующая — 08, изоляция среды исполнения.
+
+## STEP-0039: лекция 08 — изоляция исполнения
+
+Theory-only текст прошёл separate editorial/technical/recheck и actual
+browser/visual gate. Визуальная неточность sandbox-схемы исправлена и
+перепроверена. Reader содержит 00–08, 18 тем остаются outlines. Следующая —
+09, MCP как интерфейс.
+
+## STEP-0040: лекция 09 — MCP как интерфейс
+
+Theory-only текст прошёл separate editorial/technical/recheck и actual
+browser/visual gate. Нормативная версия MCP 2026-07-28 отделена от локального
+SDK, объявляющего 2025-11-25; negotiation не назван авторизацией. После
+визуальной ошибки flowchart схема заменена на sequence diagram и проверена
+повторно. Reader содержит 00–09, 17 тем остаются outlines. Следующая — 10,
+ограниченные аналитические SQL capabilities.
+
+## STEP-0041: лекция 10 — ограниченный аналитический SQL
+
+Theory-only текст прошёл separate editorial/technical/recheck и actual
+browser/visual gate. Показаны границы metadata/profile/aggregate, AST policy,
+права пользователя БД и несовпадение `LIMIT` с ценой исполнения. Первую
+TD-схему заменили на LR после проверки mobile; финальные семь скриншотов
+просмотрены. Reader содержит 00–10, 16 тем остаются outlines. Следующая —
+11, dbt, lineage и семантика аналитической модели.
+
+## STEP-0042: лекция 11 — dbt и семантика аналитической модели
+
+Theory-only текст объясняет grain, dbt lineage, разные свидетельства
+parse/compile/build/test и различие dbt-, Airflow- и agent-графов.
+Content review и browser/visual gate завершены; семь скриншотов осмотрены.
+Reader содержит 00–11, 15 тем остаются outlines. Следующая — 12,
+Analyst и provenance фактов. Фактическое взаимодействие с screen reader
+не проверено.

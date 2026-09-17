@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "lecture_id": 4,
+  "reviewer": "Codex; same-author separate passes, not independent review",
+  "checked_at": "2026-09-16T21:32:20Z",
+  "input_digest": "fe37e99ca8d59a716083bac9d7ff46e27699a7349e0bd4a2266f35d8678cd5dd",
+  "content_sha256": "125cce6256ff9b7236f30efdf6fd0ae46b5a974d5a9facceaafa0140e5b13d33",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "visual": true},
+  "pass_scope": {
+    "editorial": "Complete text read after authoring; definitions, causal order, diagram, counterexample, Russian terminology, and owners 02/03/05/12/17 compared.",
+    "technical": "Primary Anthropic and Cognition articles, current context/artifact/pipeline code and dated STEP-0019 evidence inspected 2026-09-17.",
+    "recheck": "Full text reread after technical pass; canonical title/nav mismatch corrected after initial browser review, metadata and complete page rechecked.",
+    "visual": "Initial candidate: desktop, 360px mobile, light/dark, no-JS, keyboard zoom/pan/reset/fullscreen/Escape/focus, print, AX main and named/described SVG, CSP/subpath/local links. Seven screenshots manually inspected. Final retest after title correction recorded in STEP-0035 evidence; actual AT, touch hardware and cross-browser not tested.",
+    "not_checked": ["Independent reviewer", "Actual assistive technology interaction", "Fresh LLM or platform run"]
+  },
+  "claims": [
+    {"location": "Почему «помнит» — опасно неточный глагол", "assertion": "Per-call context is supplied by the application; stored state does not automatically enter every model call.", "source": "runtime/context.py", "anchor": "ContextBundle.as_prompt and build_context_bundle", "scope": "Current code and conceptual model checked 2026-09-17", "verdict": "verified"},
+    {"location": "Четыре времени жизни информации", "assertion": "Workflow state and accepted artifact fields are distinct from bounded input documents.", "source": "runtime/role_pipeline.py", "anchor": "RolePipelineSnapshot and validate_accepted_tip", "scope": "Current implementation checked 2026-09-17", "verdict": "verified"},
+    {"location": "Видимость и согласованность между ролями", "assertion": "Cognition argues that actions carry implicit decisions and separated workers can make incompatible choices; not a universal prohibition.", "source": "https://cognition.com/blog/dont-build-multi-agents", "anchor": "Principles of Context Engineering; Applying the Principles", "scope": "Primary article checked 2026-09-17", "verdict": "verified"},
+    {"location": "Сжатие истории и цена потери деталей", "assertion": "Anthropic describes compaction, structured notes and possible loss of later-important nuance during aggressive compaction.", "source": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents", "anchor": "Context engineering for long-horizon tasks; Compaction; Structured note-taking", "scope": "Primary article checked 2026-09-17", "verdict": "verified"},
+    {"location": "Что действительно реализовано в нашем примере", "assertion": "ContextBundle contains explicitly selected, bounded, ordered files with content hashes, not semantic memory.", "source": "runtime/context.py", "anchor": "ContextDocument; ContextBundle; build_context_bundle", "scope": "Current implementation checked 2026-09-17", "verdict": "verified"},
+    {"location": "Что действительно реализовано в нашем примере", "assertion": "Typed artifacts and RolePipelineSnapshot validate task identity, event chain, artifact ledger and stage shape.", "source": "runtime/role_pipeline.py", "anchor": "RolePipelineSnapshot.validate_accepted_tip and _validate_stage_shape", "scope": "Current implementation checked 2026-09-17", "verdict": "verified"},
+    {"location": "Historical scope", "assertion": "STEP-0019 records an offline checkpoint/restart proof without GateLLM or Data Platform mutation.", "source": "plan/evidence/STEP-0019-checkpointable-role-pipeline.md", "anchor": "Proven behavior and residual risk", "scope": "Dated evidence from 2026-09-13, not fresh live quality", "verdict": "verified"},
+    {"location": "Diagram semantics", "assertion": "The flowchart is a conceptual observation-to-accepted-artifact path with a rejection branch; it does not depict implemented semantic memory.", "source": "course/lectures/LECTURE-0004-state-memory.md", "anchor": "Жизненный цикл: от наблюдения до принятых данных", "scope": "Compared with prose and local code 2026-09-17", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Canonical title and reader navigation", "severity": "minor", "rationale": "Manifest retained English outline title while authored lecture uses Russian title.", "resolved": true, "resolution": "Manifest, plan map, syllabus, module and plan labels aligned; final candidate browser recheck required."}
+  ],
+  "diagram_waiver": null
+}

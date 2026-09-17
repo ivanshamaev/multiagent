@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "lecture_id": 9,
+  "reviewer": "Codex; same-author separate passes, not independent review",
+  "checked_at": "2026-09-17T04:10:00Z",
+  "input_digest": "3938c985b00e3a945b69ff1279e2cb2f5943f7bb206175831b1add0a8ecc083f",
+  "content_sha256": "7b2df49aa3f0f6a7b06bdf0bc655c58ebf3206418153d947127e2a9fb0195a11",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "visual": true},
+  "pass_scope": {
+    "editorial": "Entire theory-only draft reread after authoring; definitions, causal order, diagram text equivalent, version-era distinction and owner separation 06/07/08/10/18/19 checked.",
+    "technical": "Anthropic original S11/S08 articles, normative MCP 2026-07-28 architecture/versioning/basic/transports/tools, current code/installed mcp SDK constant and dated STEP-0008 checked 2026-09-17.",
+    "recheck": "Rewrote ambiguous policy table cell, narrowed container wording and added an explicit tool/delegation/transition comparison. Browser-discovered arrow-label collision was corrected by sequenceDiagram; a Mermaid parse failure from a semicolon in a message was corrected. Affected prose and diagram semantics reread.",
+    "visual": "Final candidate in Chrome: desktop, 360px mobile, dark, print and no-JS; all seven screenshots inspected, including corrected sequence arrows, Cyrillic labels, scrollable mobile SVG and print. AX named SVG checked; actual assistive technology not tested.",
+    "not_checked": ["Independent reviewer", "Actual assistive technology interaction", "Negotiated protocol version of each live MCP server", "MCP 2026 compatibility of local adapters", "Fully-live six-role readiness"]
+  },
+  "claims": [
+    {"location": "Зачем нужен общий интерфейс", "assertion": "Anthropic's 2024 announcement motivated MCP as a common connection interface for AI applications and data/tools.", "source": "https://www.anthropic.com/news/model-context-protocol", "anchor": "Model Context Protocol", "scope": "Original historical announcement checked 2026-09-17; not normative current specification", "verdict": "verified"},
+    {"location": "Host, client, server — разные обязанности", "assertion": "Current MCP architecture identifies host, per-server client and server roles; server may expose tools, resources and prompts.", "source": "https://modelcontextprotocol.io/specification/2026-07-28/architecture", "anchor": "Core Components", "scope": "Normative revision 2026-07-28 checked 2026-09-17", "verdict": "verified"},
+    {"location": "Версия протокола меняет жизненный цикл", "assertion": "2026-07-28 removes mandatory initialize sessions, carries version and client capabilities per request, and offers optional prior server/discover.", "source": "https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning", "anchor": "Protocol Version Negotiation and Backward Compatibility", "scope": "Normative revision checked 2026-09-17; legacy 2025-11-25 distinguished", "verdict": "verified"},
+    {"location": "Версия протокола меняет жизненный цикл", "assertion": "Self-reported clientInfo is not authenticated identity or authorization.", "source": "https://modelcontextprotocol.io/specification/2026-07-28/basic", "anchor": "Per-request protocol fields", "scope": "Normative revision checked 2026-09-17", "verdict": "verified"},
+    {"location": "Версия протокола меняет жизненный цикл", "assertion": "Repository pins mcp==1.26.0, whose installed LATEST_PROTOCOL_VERSION constant is 2025-11-25.", "source": "pyproject.toml", "anchor": "mcp dependency", "scope": "Current checkout and installed package constant read 2026-09-17; no live negotiation attested", "verdict": "verified"},
+    {"location": "Transport не является бизнес-семантикой", "assertion": "Modern MCP standard transports are stdio and Streamable HTTP; transport binds message delivery rather than business meaning.", "source": "https://modelcontextprotocol.io/specification/2026-07-28/basic/transports", "anchor": "Overview and Request Metadata", "scope": "Normative revision checked 2026-09-17", "verdict": "verified"},
+    {"location": "Tool surface — смысловой контракт для агента", "assertion": "Current tool definition uses name/description/inputSchema and optional outputSchema; tools/call and tools/list are distinct, tool execution error differs from protocol error.", "source": "https://modelcontextprotocol.io/specification/2026-07-28/server/tools", "anchor": "Tool, Calling Tools, Error Handling", "scope": "Normative revision checked 2026-09-17; details not ascribed to pinned local SDK", "verdict": "verified"},
+    {"location": "Tool surface — смысловой контракт для агента", "assertion": "Anthropic recommends distinct agent-facing tools and concise, task-relevant results instead of mechanical endpoint wrappers.", "source": "https://www.anthropic.com/engineering/writing-tools-for-agents", "anchor": "Principles for writing effective tools", "scope": "Original article checked 2026-09-17; no quantitative transfer", "verdict": "verified"},
+    {"location": "Как запрос проходит через нашу систему", "assertion": "Gateway re-authorizes each typed request before known adapter calls, records denial, bounds time/output and accepts only text content.", "source": "runtime/tools/mcp_gateway.py", "anchor": "MCPToolGateway._execute, _route, _text_result", "scope": "Current code and 19 targeted unit/policy tests checked 2026-09-17", "verdict": "verified"},
+    {"location": "Статус примера и пределы evidence", "assertion": "STEP-0008 records dated ClickHouse/dbt MCP observations including a pre-execution DDL denial; it does not prove MCP 2026 support or model quality.", "source": "plan/evidence/STEP-0008-tool-policy-layer.md", "anchor": "Verified result and Commands and outcomes", "scope": "Historical 2026-09-11 evidence; current code checked separately", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Host, client, server — разные обязанности", "severity": "minor", "rationale": "Policy-layer comparison row implied a protocol-capability status might replace identity checking.", "resolved": true, "resolution": "Reworded as absence of authority from capability advertisement and reread table."},
+    {"location": "Transport не является бизнес-семантикой", "severity": "minor", "rationale": "Initial 'fixed container' wording was stronger than the factory itself proved.", "resolved": true, "resolution": "Described the Docker Compose service container without pinning claim; section rechecked."},
+    {"location": "Tool call, делегирование и переход состояния", "severity": "minor", "rationale": "Distinction required by lecture plan was too compressed in the initial counterexample.", "resolved": true, "resolution": "Added a separate three-way ownership/result table and reread adjacent sections."},
+    {"location": "Как запрос проходит через нашу систему", "severity": "minor", "rationale": "Browser render placed opposing request/response arrow labels too close together in the first flowchart.", "resolved": true, "resolution": "Converted to sequenceDiagram with explicit DENY/ALLOW paths; syntax, arrows and text equivalent to be rechecked in a fresh browser gate."},
+    {"location": "Как запрос проходит через нашу систему", "severity": "minor", "rationale": "Pinned Mermaid parser rejected a semicolon in the sequence message text.", "resolved": true, "resolution": "Removed semicolon from that message; rerender required before visual PASS."}
+  ],
+  "diagram_waiver": null
+}

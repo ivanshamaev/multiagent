@@ -1,10 +1,10 @@
-# 04 — Context, durable state, artifacts и knowledge
+# 04 — Состояние и память мультиагентной системы
 
-Status: outline; lecture not written
+Status: reviewed lecture published
 
 Track: core
 
-[Todo-план](../../../plan/steps/lections/LECTURE-0004-state-memory.md) · [Manifest](../../manifest.json) · [Технические требования](../../technical-requirements.md)
+[Лекция](../../lectures/LECTURE-0004-state-memory.md) · [Todo-план](../../../plan/steps/lections/LECTURE-0004-state-memory.md) · [Manifest](../../manifest.json) · [Технические требования](../../technical-requirements.md)
 
 ## Место и prerequisites
 
@@ -56,7 +56,7 @@ Offline/code evidence ограничено своей областью. Proposed
 
 ## Авторство и проверка
 
-Будущий текст: `course/lectures/LECTURE-0004-state-memory.md`; outline не лекция.
+Текст: `course/lectures/LECTURE-0004-state-memory.md`; content/publication receipts проверены.
 [Editorial guidelines](../../editorial-guidelines.md), [lecture template](../../templates/lecture.md),
 [review schema](../../templates/review.json) требуют вычитку, technical verification и recheck.
 Missing/stale receipt запрещает reviewed; diagrams требуют actual render/visual gate.
