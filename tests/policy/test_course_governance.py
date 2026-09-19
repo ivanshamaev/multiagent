@@ -7,7 +7,13 @@ from pathlib import Path
 import pytest
 
 from course.check import collect_issues, input_digest, local_references
-from course.publication import PASSES, check_publication, publication_digest, receipt_path
+from course.publication import (
+    PASSES,
+    TEXT_ONLY_PASSES,
+    check_publication,
+    publication_digest,
+    receipt_path,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -237,7 +243,39 @@ def test_diagram_review_cannot_pass_without_renderer(checkout: Path) -> None:
     receipt["input_digest"] = input_digest(checkout, lecture)
     receipt["passes"]["visual"] = True
     path.write_text(json.dumps(receipt))
-    assert any("renderer/visual" in e for e in collect_issues(checkout))
+    assert any("missing verified renderer" in e for e in collect_issues(checkout))
+
+
+def test_text_only_diagram_review_does_not_require_visual_pass(checkout: Path) -> None:
+    receipt, path = candidate(checkout)
+    lecture = manifest(checkout)["lectures"][0]
+    (checkout / lecture["path"]).write_text(
+        "# Test\n\n```mermaid\nflowchart LR\naccTitle: Test\naccDescr: Test\nA-->B\n```\n"
+    )
+    receipt["schema_version"] = 2
+    receipt["passes"].pop("visual")
+    receipt["passes"]["diagram_semantics"] = True
+    receipt["input_digest"] = input_digest(checkout, lecture)
+    path.write_text(json.dumps(receipt))
+    pub_path = checkout / receipt_path(lecture)
+    publication = json.loads(pub_path.read_text())
+    publication["schema_version"] = 2
+    publication["review_mode"] = "text-only"
+    publication["passes"] = dict.fromkeys(TEXT_ONLY_PASSES, True)
+    publication.pop("assistive_technology")
+    publication.pop("artifacts_sha256")
+    publication["publication_digest"] = publication_digest(checkout, lecture)
+    pub_path.write_text(json.dumps(publication))
+    assert collect_issues(checkout) == []
+    receipt["passes"]["visual"] = True
+    path.write_text(json.dumps(receipt))
+    assert any("must not claim visual" in issue for issue in collect_issues(checkout))
+    receipt["passes"].pop("visual")
+    path.write_text(json.dumps(receipt))
+    publication["passes"]["visual"] = True
+    pub_path.write_text(json.dumps(publication))
+    with pytest.raises(ValueError, match="must not claim browser or visual"):
+        check_publication(checkout, lecture)
 
 
 @pytest.mark.parametrize("change", ["missing", "pass", "css", "builder", "review", "identity"])

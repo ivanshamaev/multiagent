@@ -135,7 +135,8 @@ def check_review(root: Path, lecture: dict) -> None:
     if not isinstance(lecture.get("review"), str):
         raise ValueError("missing review receipt")
     receipt = load_json(root, lecture["review"])
-    if receipt.get("schema_version") != 1 or receipt.get("lecture_id") != lecture["id"]:
+    schema = receipt.get("schema_version")
+    if schema not in {1, 2} or receipt.get("lecture_id") != lecture["id"]:
         raise ValueError("receipt identity mismatch")
     if not receipt.get("reviewer") or not SKILLS.issubset(set(receipt.get("skills", []))):
         raise ValueError("missing reviewer/skills")
@@ -172,10 +173,16 @@ def check_review(root: Path, lecture: dict) -> None:
         diagrams = [t for t in parser().parse(text) if t.type == "fence" and t.info == "mermaid"]
         if diagrams:
             toolchain = load_json(root, "course/toolchain.json")
-            if toolchain.get("render_status") != "verified" or passes.get("visual") is not True:
+            if toolchain.get("render_status") != "verified":
+                raise ValueError("missing verified renderer")
+            if schema == 1 and passes.get("visual") is not True:
                 raise ValueError("missing actual renderer/visual gate")
+            if schema == 2 and passes.get("diagram_semantics") is not True:
+                raise ValueError("missing text-only diagram semantics review")
         elif not receipt.get("diagram_waiver"):
             raise ValueError("missing diagram or documented waiver")
+        if schema == 2 and (passes.get("visual") is True or "visual" in passes):
+            raise ValueError("text-only review must not claim visual pass")
         from course.publication import check_publication
 
         check_publication(root, lecture)

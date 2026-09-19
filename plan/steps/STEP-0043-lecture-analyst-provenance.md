@@ -1,6 +1,6 @@
 # STEP-0043 — Phase L: лекция 12, Analyst и provenance фактов
 
-Status: in progress
+Status: complete
 
 Owner: Codex
 
@@ -17,17 +17,17 @@ discovery, происхождении data facts и границе между н
 
 ## Порядок и критерии приёмки
 
-- [ ] Сверить S14/S07 с первичными текстами, `runtime/analyst.py`,
+- [x] Сверить S14/S07 с первичными текстами, `runtime/analyst.py`,
   `analyst_workflow.py`, contract, fixtures и датированным STEP-0012.
-- [ ] Написать причинную модель источников знания и evidence-backed fact,
+- [x] Написать причинную модель источников знания и evidence-backed fact,
   показать ограничение вывода из агрегата/выборки, контрпример, схему,
   3–5 вопросов и переход к PM.
-- [ ] Провести отдельную полную редакторскую вычитку, technical verification,
+- [x] Провести отдельную полную редакторскую вычитку, technical verification,
   исправления и recheck; сохранить content receipt.
-- [ ] Собрать candidate и проверить HTML/SVG в Chrome: desktop/mobile,
+- [x] Собрать candidate и проверить HTML/SVG в Chrome: desktop/mobile,
   light/dark, no-JS, keyboard, print, AX, CSP, subpath и links; сохранить
   publication receipt только после просмотра изображений.
-- [ ] Обновить manifest, todo, module/index и evidence; выполнить course
+- [x] Обновить manifest, todo, module/index и evidence; выполнить course
   gates, две идентичные сборки, `make check`, preview 8099.
 
 ## Риски
@@ -42,3 +42,6 @@ Exact-substring evidence подтверждает происхождение ф�
 
 2026-09-17: план создан после чтения todo 12 и текущего Analyst-кода, до
 авторства лекции.
+2026-09-18: content и browser/visual gates завершены, семь screenshots
+осмотрены; две сборки идентичны, `make check` — 531 PASS. Evidence:
+`plan/evidence/STEP-0043-lecture-analyst-provenance.md`.

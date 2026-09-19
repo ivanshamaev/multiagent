@@ -1,6 +1,6 @@
 # 22 — Failure modes: причины, propagation и retry amplification
 
-Status: outline; lecture not written
+Status: lecture written; text-only reviewed
 
 Track: core
 
@@ -53,7 +53,8 @@ Offline/code evidence ограничено своей областью. Proposed
 
 ## Авторство и проверка
 
-Будущий текст: `course/lectures/LECTURE-0022-failure-taxonomy.md`; outline не лекция.
+Текст: [course/lectures/LECTURE-0022-failure-taxonomy.md](../../lectures/LECTURE-0022-failure-taxonomy.md).
 [Editorial guidelines](../../editorial-guidelines.md), [lecture template](../../templates/lecture.md),
 [review schema](../../templates/review.json) требуют вычитку, technical verification и recheck.
-Missing/stale receipt запрещает reviewed; diagrams требуют actual render/visual gate.
+Missing/stale receipt запрещает reviewed; diagrams проходят text-only source review
+и машинную сборку без скриншотов или visual/AX/browser PASS.

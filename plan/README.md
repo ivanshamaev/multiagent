@@ -81,3 +81,47 @@
 - [STEP-0042](steps/STEP-0042-lecture-dbt-semantics.md) публикует лекцию 11
   о grain, lineage и границах dbt validation, отличая dbt-граф от Airflow DAG
   и агентского workflow. Опубликованы 00–11; далее 12, Analyst provenance.
+- [STEP-0043](steps/STEP-0043-lecture-analyst-provenance.md) публикует лекцию 12
+  об ограниченном discovery и evidence-backed data facts перед PM handoff.
+  Опубликованы 00–12; далее 13, PM specification.
+- [STEP-0044](steps/STEP-0044-lecture-pm-specification.md) публикует лекцию 13
+  о business metric definition, readiness и корректном NEEDS_USER при
+  существенной неопределённости. Опубликованы 00–13; далее 14, DE.
+- [STEP-0045](steps/STEP-0045-lecture-data-engineer.md) публикует лекцию 14
+  об implementation authority, изолированном candidate и semantic repair.
+  Публикационный gate v2 проверяет только текст и статическую собираемость,
+  без скриншотов/визуальной вычитки. Опубликованы 00–14; далее 15, QA.
+- [STEP-0046](steps/STEP-0046-lecture-qa-evidence.md) публикует лекцию 15
+  о независимом QA-probe, mutation detection и evidence-backed defect.
+  Text-only gate сохранён. Опубликованы 00–15; далее 16, Reviewer.
+- [STEP-0047](steps/STEP-0047-lecture-reviewer-authority.md) публикует
+  лекцию 16 о праве Reviewer принять или вернуть candidate, качестве кода
+  и рисках false approval/rejection. Опубликованы 00–16; далее 17, Recovery.
+- [STEP-0048](steps/STEP-0048-lecture-recovery-idempotency.md) публикует
+  лекцию 17 о checkpoint, role receipt и идемпотентности внешнего эффекта.
+  Опубликованы 00–17; далее 18, Airflow API.
+- [STEP-0049](steps/STEP-0049-lecture-airflow-operations.md) публикует
+  лекцию 18 о границе Airflow data DAG и агентского workflow, read-only
+  Observer и approved dev-DAG Trigger. Опубликованы 00–18; далее 19, Security.
+- [STEP-0050](steps/STEP-0050-lecture-security-authority.md) публикует
+  лекцию 19 об indirect prompt injection, scoped identity, code-owned
+  authorization и пределах локального bearer. Опубликованы 00–19;
+  далее 20, Observability.
+- [STEP-0051](steps/STEP-0051-lecture-observability.md) публикует лекцию 20
+  о trace causality, propagation, sampling, cardinality и retention.
+  Опубликованы 00–20; далее 21, Evaluation.
+- [STEP-0052](steps/STEP-0052-lecture-evaluation.md) публикует лекцию 21
+  о task/trial/outcome/grader, режимах evaluation, baseline и
+  статистической неопределённости. Опубликованы 00–21; далее 22,
+  Failure modes.
+- [STEP-0053](steps/STEP-0053-lecture-failure-taxonomy.md) публикует лекцию
+  22 о root-cause taxonomy, propagation, common-mode failures и retry
+  amplification. Опубликованы 00–22; далее 23, Cost/performance.
+- [STEP-0054](steps/STEP-0054-lecture-cost-performance.md) публикует лекцию
+  23 о total cost, budgets, critical path, parallel work и
+  quality-constrained optimization. Опубликованы 00–23; далее 24,
+  orchestration comparison.
+- [STEP-0055](steps/STEP-0055-lecture-orchestration-comparison.md) публикует
+  лекцию 24 о выборе между fixed workflow, agent-orchestrator, bounded hybrid
+  и более простой альтернативой. Опубликованы 00–24; далее 25,
+  architecture synthesis.

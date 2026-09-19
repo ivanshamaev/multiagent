@@ -276,7 +276,7 @@ def build_pages(
         "наша система служит примером, не заданием для студента.</p></details>"
         f"<details><summary>Можно ли уже читать лекции?</summary><p>{availability} "
         "Публикация текста требует вычитки, technical verification, "
-        "visual review и recheck.</p></details></section>"
+        "сверку исходного текста схем и recheck.</p></details></section>"
     )
     files = {
         "index.html": template(

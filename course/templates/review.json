@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "lecture_id": null,
   "reviewer": "",
   "checked_at": "",
@@ -13,7 +13,7 @@
     "editorial": false,
     "technical": false,
     "recheck": false,
-    "visual": false
+    "diagram_semantics": false
   },
   "claims": [],
   "findings": [],

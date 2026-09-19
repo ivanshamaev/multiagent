@@ -1,10 +1,12 @@
 # 13 — PM: формальная спецификация и пределы знания
 
-Status: outline; lecture not written
+Status: reviewed; content and visual publication gates passed
 
 Track: core
 
 [Todo-план](../../../plan/steps/lections/LECTURE-0013-pm-specification.md) · [Manifest](../../manifest.json) · [Технические требования](../../technical-requirements.md)
+
+[Читать лекцию 13](../../lectures/LECTURE-0013-pm-specification.md)
 
 ## Место и prerequisites
 
@@ -55,7 +57,7 @@ Offline/code evidence ограничено своей областью. Proposed
 
 ## Авторство и проверка
 
-Будущий текст: `course/lectures/LECTURE-0013-pm-specification.md`; outline не лекция.
+Текст: `course/lectures/LECTURE-0013-pm-specification.md`.
 [Editorial guidelines](../../editorial-guidelines.md), [lecture template](../../templates/lecture.md),
 [review schema](../../templates/review.json) требуют вычитку, technical verification и recheck.
 Missing/stale receipt запрещает reviewed; diagrams требуют actual render/visual gate.

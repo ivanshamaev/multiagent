@@ -1,8 +1,8 @@
 # Todo-планы лекций: маршрут, ownership и согласованность
 
-Updated: 2026-09-17
+Updated: 2026-09-18
 
-Status: planning reviewed; lectures 00–12 published; other 14 lecture texts not written
+Status: planning reviewed; lectures 00–20 published; other 5 lecture texts not written
 
 ## Размещение и формат
 
@@ -12,9 +12,12 @@ Status: planning reviewed; lectures 00–12 published; other 14 lecture texts no
 Соответствие прежним тематическим номерам зафиксировано в [STEP-0034](../STEP-0034-course-sequential-numbering.md).
 Реестр: [lecture-map.json](lecture-map.json); статьи: [SOURCES.md](SOURCES.md).
 Обязательны [технические требования](../../../course/technical-requirements.md): Markdown,
-Mermaid-схемы, доступность, static HTML и проверка отрендеренных диаграмм.
+Mermaid source с текстовым эквивалентом, доступность и static HTML.
 Согласованность плана проверена, но отсутствие повторов в ещё не написанных лекциях не заявляется.
 Каждый текст должен отдельно пройти duplication/content review ADR-0034.
+Уточнение пользователя от 2026-09-18: для следующих лекций проверять только текст;
+скриншоты и визуальная вычитка страниц/диаграмм не требуются. Начиная с
+лекции 14 действует text-only publication gate v2; фиктивный visual PASS запрещён.
 
 ## Порядок чтения и зависимости
 

@@ -174,17 +174,27 @@ Airflow trigger изолирован в отдельном profile/process/ident
 существенные unresolved findings запрещают reviewed. Editorial skills подготовлены в course/skills
 и локально; перед каждым применением читать инструкции и фиксировать фактическое usage в receipt.
 Не превращать примеры нашей системы в student labs.
+
+Уточнение пользователя от 2026-09-18 для следующих лекций: проверять **только текст** —
+структуру, язык, повторы, согласованность, источники, code/evidence claims и смысловое
+соответствие исходного текста диаграммы объяснению. Не запускать browser/visual review,
+не делать скриншоты и не вычитывать изображения/отрендеренные страницы. Ранее выполненные
+визуальные проверки остаются историческим evidence, но не образцом обязательного процесса.
+Legacy publication receipts v1 фиксируют только исторически выполненные проверки.
+Новые receipts v2 — text-only; нельзя проставлять фиктивный visual PASS.
 Тексты лекций хранить в `course/lectures/`, todo-планы — в `plan/steps/lections/`.
 Соблюдать `course/technical-requirements.md`: Mermaid source в Markdown, build-time SVG,
-общий HTML-компонент zoom/pan/fullscreen, текстовый fallback и обязательная визуальная проверка.
+общий HTML-компонент zoom/pan/fullscreen и текстовый fallback. Для лекций начиная с 14
+проверять семантику Mermaid только по тексту Markdown, без визуальной проверки.
 `make course-check` — offline governance; `make course-build` собирает allowlisted landing,
 roadmap, Markdown outlines, prototype и technical requirements (STEP-0026/0028).
-Не выдавать prototype PASS за публикационный gate
-всех лекций; reviewed Mermaid требует отдельной подтверждённой визуальной проверки.
+Не выдавать prototype PASS за содержательную проверку всех лекций; reviewed Mermaid
+требует подтверждённой текстовой сверки source/подписи/эквивалента.
 STEP-0030 добавляет publication receipts: обычный reader публикует только reviewed
 с актуальными content/publication fingerprints. Candidate build — отдельная labelled
-directory; `make course-review COURSE_LECTURE=0`. AX semantics не выдавать за actual
-Orca/NVDA/VoiceOver interaction. При изменении builder/styles/JS выполнять browser recheck.
+directory; `make course-review COURSE_LECTURE=0`. Для новых text-only receipts
+изменение builder/styles/JS требует повторного machine build/fingerprint gate,
+но не browser recheck; не заявлять AX/AT или visual PASS.
 Дизайн будущего сайта задан `course/design/site-design.md` и ADR-0038: Cyberpunk landing,
 manifest-driven SVG roadmap, course navigation слева и AST TOC справа. STEP-0028 реализует
 прототип UI для outlines, не publisher лекций. Сохранять readability/no-JS/CSP и review gates; не добавлять React/Tailwind

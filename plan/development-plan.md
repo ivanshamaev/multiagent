@@ -261,3 +261,93 @@ parse/compile/build/test, Cosmos и три несводимых друг к др
 Сверка с `platform/dbt/`, Airflow DAG и историческим STEP-0004 ограничивает
 claims; content и browser publication gates завершены. Reader содержит
 00–11. Следующая — 12, Analyst provenance.
+
+STEP-0043 публикует лекцию 12: различие каталога, lineage и профиля,
+происхождение факта, отдельные предположения и открытые вопросы. Три
+кодом заданных read phases и tool-free synthesis сверены с текущим кодом,
+а STEP-0012 использован только как датированное evidence. Content и
+browser publication gates завершены; reader содержит 00–12. Следующая —
+13, PM specification.
+
+STEP-0044 публикует лекцию 13: от business intent и Analyst facts к
+формальному metric definition, проверяемым критериям и readiness gate.
+Human-authored READY baseline отличён от исторического live BLOCKED;
+content и browser publication gates завершены. Reader содержит 00–13.
+Следующая — 14, DE и ограниченная автономия изменения данных.
+
+STEP-0045 публикует лекцию 14: authority DE над способом реализации
+при фиксированном business contract, изолированный candidate и repair
+по public evidence. По уточнению пользователя per-lecture gate v2
+выполняет только text/editorial/claim review и статическую проверку
+сборки; скриншотов/browser/visual review нет. Исторические v1 receipts
+сохранены. Reader содержит 00–14; следующая — 15, независимая QA.
+
+STEP-0046 публикует лекцию 15: read-only QA после public validator,
+границы независимого probe, mutation/false pass и принятие defect через
+измеренное evidence. Text-only editorial/claim review и статическая сборка
+завершены без screenshot/browser/visual проверки. Reader содержит 00–15;
+следующая — 16, Reviewer.
+
+STEP-0047 публикует лекцию 16: quality judgment и право Reviewer над
+локальным `DONE` после принятого QA PASS, запрет self-approval и пределы
+свежего контекста. Отдельно разобраны false approval и false rejection.
+Text-only review и статическая сборка выполнены без browser/visual/AX
+проверки. Reader содержит 00–16; следующая — 17, Recovery.
+
+STEP-0048 публикует лекцию 17: checkpoint commit boundary, локальный
+role receipt и отдельный контракт idempotency для внешнего эффекта.
+Исторические `SIGKILL` checks ограничены offline/process recovery;
+power-loss или exactly-once внешних сервисов не заявлены. Text-only review
+и статическая сборка выполнены без browser/visual/AX проверки. Reader
+содержит 00–17; следующая — 18, Airflow API.
+
+STEP-0049 публикует лекцию 18: public REST `/api/v2` отделён от Task
+Execution API, чтение Observer — от контролируемого dev-DAG trigger.
+Historical local smoke не выдан за production или autonomous six-role
+execution. Text-only review и static build не включают скриншоты или
+визуальную вычитку. Reader содержит 00–18; следующая — 19, Security.
+
+STEP-0050 публикует лекцию 19: недоверенный контент отделён от identity,
+role assignment, authorization и approval; локальный request-bound bearer
+не назван OAuth или процессной аттестацией. Planner-agent показан только
+как теоретический сценарий. Text-only review и static build выполнены
+без screenshots/browser/visual/AX проверки. Reader содержит 00–19;
+следующая — 20, Observability.
+
+STEP-0051 публикует лекцию 20: trace отделён от event log, metrics,
+artifact provenance и private reasoning; restart carrier — от checkpoint.
+Sampling/cardinality/retention описаны как границы наблюдения, а dashboard
+не выдан за evaluation. Text-only review и static build выполнены без
+screenshots/browser/visual/AX проверки. Reader содержит 00–20; следующая —
+21, Evaluation.
+
+STEP-0052 публикует лекцию 21: task, trial, outcome, trajectory и grader
+собраны в явную модель измерения; regression invariants отделены от
+датированных live samples и свежих сравнений. Baseline как policy threshold
+не смешан со статистическим comparator, а малый N, contamination, grader и
+infrastructure confounders записаны как ограничения. Text-only review и
+static build выполнены без screenshots/browser/visual/AX проверки. Reader
+содержит 00–21; следующая — 22, Failure modes.
+
+STEP-0053 публикует лекцию 22: наблюдаемый symptom отделён от ошибочного
+состояния, activation condition и root cause; показаны propagation через
+handoffs, common-mode correlation и вложенное умножение retries. Retained
+PRB-0035/0051/0052 использованы как разные causal chains. Dynamic manager
+comparison явно теоретический. Text-only review и static build выполнены
+без screenshots/browser/visual/AX проверки. Reader содержит 00–22;
+следующая — 23, Cost/performance.
+
+STEP-0054 публикует лекцию 23: provider token price отделён от total cost и
+cost per accepted outcome; critical path — от суммарного work; forecast —
+от code-enforced budget. Показаны allocation/reservation/reconciliation,
+tool-context overhead и quality-constrained optimization. GateLLM numbers
+остаются историческими, dynamic fan-out — аналитической моделью. Text-only
+review и static build выполнены без screenshots/browser/visual/AX проверки.
+Reader содержит 00–23; следующая — 24, сравнение orchestration approaches.
+
+STEP-0055 публикует лекцию 24: fixed workflow, agent-orchestrator, bounded
+hybrid и single-agent/no-agent alternatives сопоставлены по единой rubric.
+Dynamic read investigation отделено от code-owned permission/write/quality
+gates; десять data-engineering scenarios не выданы за универсальное правило.
+Text-only review и static build выполнены без screenshots/browser/visual/AX
+проверки. Reader содержит 00–24; следующая — 25, architecture synthesis.

@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "lecture_id": 14,
+  "reviewer": "Codex; same-author separate editorial/technical/recheck passes, not independent review",
+  "checked_at": "2026-09-18T15:22:29Z",
+  "input_digest": "fb55087a3ed344507294d62d15756c95041848a33a1177e1041aeb42273fbb97",
+  "content_sha256": "5d7c9b45489a5c8672f0068d6ff066b7865edeecea3d35b29c293d68beeefe1e",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "diagram_semantics": true},
+  "pass_scope": {
+    "editorial": "Full theory-only draft reread against todo 14, glossary, lecture 13 and owner boundaries 11/15/06/17. Definitions, authority distinctions, fan-out arithmetic, counterexample, conclusion and five questions checked.",
+    "technical": "Original dbt Labs S17 and Anthropic S09 checked online 2026-09-18; current DE executor, specification loader, workspace/profile/manifest, validator and historical STEP-0009/0013 read. 20 targeted DE/scenario/course-policy tests passed.",
+    "recheck": "Clarified syntactically valid SQL versus semantic correctness; distinguished ScenarioSpecification field validation from load-time TASK.md hash comparison; added escalation when specification itself conflicts with new evidence. Affected sections reread against code and plan.",
+    "diagram_semantics": "Mermaid source, accTitle/accDescr, branch labels, caption and textual equivalent compared line by line to prose and code. No SVG/HTML visual review, browser checks or screenshots were performed, per user instruction.",
+    "not_checked": ["Independent reviewer", "Rendered diagram visual quality", "Browser/mobile/print/AX", "Current live GateLLM/ClickHouse/Airflow", "Fully-live Analyst→PM→DE READY", "Production deployment"]
+  },
+  "claims": [
+    {"location": "Спецификация фиксирует смысл", "assertion": "dbt Labs frames analytics engineering as transforming, testing and documenting analytical data with engineering practices.", "source": "https://www.getdbt.com/blog/what-is-analytics-engineering", "anchor": "What is an analytics engineer?", "scope": "Original article checked 2026-09-18; organizational role labels are not transferred to local agents", "verdict": "verified"},
+    {"location": "Candidate", "assertion": "Scenario and DE profile allow writes only under platform/dbt/models/** and platform/dbt/tests/**; workspace adapter enforces their intersection and atomic writes.", "source": "runtime/tools/workspace.py", "anchor": "WorkspaceToolAdapter.__init__, execute and _write_atomic", "scope": "Current code checked with scenarios/net-revenue/manifest.json and policies/profiles/data_engineer_v1.json", "verdict": "verified"},
+    {"location": "От намерения к candidate", "assertion": "Autonomous Net Revenue spec is human-authored and loaded only with matching scenario version and TASK.md hash; historical PM live run ended BLOCKED/needs_user.", "source": "runtime/specification.py", "anchor": "load_scenario_specification; contracts/scenario_specification.py; plan/evidence/STEP-0013-pm-specification-gate.md", "scope": "Current code plus historical 2026-09-13 evidence; no live PM READY claim", "verdict": "verified"},
+    {"location": "От намерения к candidate", "assertion": "Phased DE has fixed investigation, SQL and test write phases; model draft cannot mark COMPLETED without observed changed files.", "source": "runtime/data_engineer_workflow.py", "anchor": "PhasedAutonomousDataEngineerExecutor.run_attempt; runtime/data_engineer.py accept_data_engineer_draft", "scope": "Current code checked 2026-09-18", "verdict": "verified"},
+    {"location": "Diagram and semantic repair", "assertion": "Validator runs code-owned workspace, public build, independent SQL and policy gates; rework uses bounded hash-checked public feedback and revalidates.", "source": "runtime/validator.py", "anchor": "validation_plan and validate_candidate; runtime/data_engineer_workflow.py _public_validation_feedback and repair loop", "scope": "Current code; no inference that passing gates prove all business truth", "verdict": "verified"},
+    {"location": "Net Revenue", "assertion": "Spec requires all succeeded payments minus all succeeded refunds attributed to original order UTC date, with no currency mixing.", "source": "scenarios/net-revenue/specification.json", "anchor": "specification.metric_definition, source_requirements, acceptance_criteria", "scope": "Human-authored baseline, not agent output; arithmetic example is explanatory synthesis", "verdict": "verified"},
+    {"location": "Semantic repair", "assertion": "Anthropic describes premature completion in long-running agents and advocates incremental progress with explicit artifacts.", "source": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents", "anchor": "The long-running agent problem; Incremental progress", "scope": "Original article checked 2026-09-18; no claim local harness matches Anthropic experiment", "verdict": "verified"},
+    {"location": "Semantic repair", "assertion": "STEP-0009 recorded a historical live DE sample with one successful repair, not a general reliability guarantee.", "source": "plan/evidence/STEP-0009-autonomous-data-engineer.md", "anchor": "Live model evidence and residual risks", "scope": "Historical 2026-09-12 evidence only", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Спецификация фиксирует смысл", "severity": "minor", "rationale": "Draft wording treated different SQL semantics as if they shared a single syntax.", "resolved": true, "resolution": "Rephrased as two syntactically valid variants with different business meaning; reread."},
+    {"location": "От намерения к candidate", "severity": "minor", "rationale": "Draft attributed actual TASK.md hash comparison to envelope validation.", "resolved": true, "resolution": "Separated typed envelope checks from loader's workspace/version/hash comparison; rechecked source."},
+    {"location": "Semantic repair", "severity": "minor", "rationale": "Escalation when new evidence contradicts the specification was implicit.", "resolved": true, "resolution": "Added explicit return to business owner rather than silent redefinition; reread."}
+  ],
+  "diagram_waiver": null
+}

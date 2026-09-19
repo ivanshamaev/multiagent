@@ -1,5 +1,52 @@
 # Журнал прогресса
 
+## 2026-09-19 — STEP-0051: лекция 20 опубликована
+
+- Написана теория trace causality, propagation через restart, различий
+  traces/events/metrics/provenance и границ sampling/cardinality/retention.
+- Separate editorial/technical/recheck, source-level Mermaid semantics и
+  статическая сборка выполнены без screenshots/browser/visual review.
+  Три minor findings исправлены; dashboard не выдан за evaluation.
+- Две production-сборки (120 файлов, 25 диаграмм) совпали побайтно;
+  `make check` — 532 passed. Reader содержит 00–20, далее 21, Evaluation.
+  Evidence: [STEP-0051](evidence/STEP-0051-lecture-observability.md).
+
+## 2026-09-19 — STEP-0050: лекция 19 опубликована
+
+- Написана теория indirect prompt injection и границ identity,
+  authorization, role assignment, approval; локальный HS256 bearer
+  отделён от OAuth/процессной аттестации.
+- Separate editorial/technical/recheck, source-level Mermaid semantics и
+  статическая сборка выполнены без screenshots/browser/visual review.
+  Три minor findings исправлены; model-directed manager не объявлен
+  реализованным.
+- Две production-сборки (118 файлов, 24 диаграммы) совпали побайтно;
+  `make check` — 532 passed. Reader содержит 00–19, далее 20,
+  Observability. Evidence: [STEP-0050](evidence/STEP-0050-lecture-security-authority.md).
+
+## 2026-09-18 — STEP-0049: лекция 18 опубликована
+
+- Написана теория Airflow data-task orchestration и агентского control plane,
+  public REST и Task Execution API, раздельных Observer/Trigger identities и
+  approval-bound dev-DAG запуска.
+- Separate editorial/technical/recheck, source-level Mermaid semantics и
+  статическая сборка выполнены без screenshots/browser/visual review.
+  Первичный candidate render получил непостоянный SIGSEGV на старой схеме 05;
+  повтор прошёл без изменения исходников.
+- Две production-сборки (116 файлов, 23 диаграммы) совпали побайтно;
+  `make check` — 532 passed. Reader содержит 00–18, далее 19, Security.
+  Evidence: [STEP-0049](evidence/STEP-0049-lecture-airflow-operations.md).
+
+## 2026-09-18 — STEP-0043: лекция 12 опубликована
+
+- Написана теория semantic discovery, provenance фактов и пределов
+  агрегированных наблюдений перед PM specification gate; пример сверён
+  с текущим Analyst-кодом и датированным STEP-0012.
+- Separate editorial/technical/recheck и фактический browser gate завершены;
+  семь скриншотов осмотрены. Same-author review, actual AT не заявлен.
+- Две идентичные сборки (104 файла, 17 SVG); reader содержит 00–12, далее
+  лекция 13. Evidence: `plan/evidence/STEP-0043-lecture-analyst-provenance.md`.
+
 ## 2026-09-17 — STEP-0042: лекция 11 опубликована
 
 - Написана теория grain, dbt lineage, уровней parse/compile/build/test и
@@ -629,3 +676,101 @@ SQL resource envelope. Текст прошёл отдельные editorial/tech
 Во время проверки временно не хватало места на разделе; после очистки
 восстановимого npm-кэша browser gate повторно прошёл. Reader содержит
 00–10; далее 11, dbt semantics.
+
+## 2026-09-18 — STEP-0044: лекция 13
+
+Опубликована theory-only лекция о формальной спецификации показателя,
+readiness и допустимом NEEDS_USER. Отдельные editorial/technical/recheck,
+28 профильных тестов и actual Chrome visual gate завершены. Исторический
+live BLOCKED не выдан за READY; семь скриншотов осмотрены, две сборки
+совпали побайтно. Reader содержит 00–13, 12 тем остаются outlines.
+Следующая — 14, DE. Промежуточные публикации 11–12 учтены в
+[STEP-0042](steps/STEP-0042-lecture-dbt-semantics.md) и
+[STEP-0043](steps/STEP-0043-lecture-analyst-provenance.md).
+
+## 2026-09-18 — STEP-0045: лекция 14
+
+Опубликована theory-only лекция о границах реализации DE, disposable dbt
+candidate и semantic repair на примере Net Revenue. Separate editorial,
+technical и recheck passes завершены; Mermaid сверена только по исходному
+тексту, подписи и текстовому эквиваленту. Новый gate v2 не требует
+скриншотов/визуальной вычитки и запрещает fake visual PASS; исторические
+v1 receipts сохранены. Две статические сборки совпали побайтно,
+`make check` — 532 passed. Reader содержит 00–14; далее 15, QA.
+
+## 2026-09-18 — STEP-0046: лекция 15
+
+Опубликована theory-only лекция о независимом QA-probe, мутациях,
+свидетельствах дефекта и пределах PASS после validator. Исторические
+5/5 и общая ошибка candidate/oracle не выданы за гарантию качества.
+Separate editorial/technical/recheck и Mermaid source review выполнены
+только по тексту, без скриншотов или browser/visual проверки. Две
+production-сборки совпали побайтно; `make check` — 532 passed. Reader
+содержит 00–15; далее 16, Reviewer. Подробности:
+[evidence](evidence/STEP-0046-lecture-qa-evidence.md).
+
+## 2026-09-18 — STEP-0047: лекция 16
+
+Опубликована theory-only лекция о read-only Reviewer, качестве изменения,
+праве одобрить локальный workflow и рисках false approval/rejection.
+Отдельные editorial/technical/recheck и Mermaid source review выполнены
+только по тексту, без скриншотов или browser/visual проверки. Две
+production-сборки совпали побайтно; `make check` — 532 passed. Reader
+содержит 00–16; далее 17, Recovery. Подробности:
+[evidence](evidence/STEP-0047-lecture-reviewer-authority.md).
+
+## 2026-09-18 — STEP-0048: лекция 17
+
+Опубликована theory-only лекция о checkpoint, role receipt, operation
+identity и пределах exactly-once. Процессные `SIGKILL` доказательства
+не выданы за гарантию внешних эффектов или power-loss durability.
+Separate editorial/technical/recheck и Mermaid source review выполнены
+только по тексту, без скриншотов или browser/visual проверки. Исправлена
+ссылка на owner operation identity в outline 18. Две production-сборки
+совпали побайтно; `make check` — 532 passed. Reader содержит 00–17;
+далее 18, Airflow API. Подробности:
+[evidence](evidence/STEP-0048-lecture-recovery-idempotency.md).
+
+## 2026-09-19 — STEP-0052: лекция 21
+
+Опубликована theory-only лекция об evaluation как измерительной системе:
+task/trial/outcome/grader, единицы успеха, baseline и неопределённость.
+Offline `17 × 3`, исторический live sample и fresh A/B comparison явно
+разделены; `51/51` не выдан за 51 независимую задачу, а `7/10` — за
+постоянное свойство модели. Separate editorial/technical/recheck и Mermaid
+source review выполнены только по тексту. Две production-сборки совпали;
+`make check` — 532 passed. Reader содержит 00–21; далее 22, Failure modes.
+Подробности: [evidence](evidence/STEP-0052-lecture-evaluation.md).
+
+## 2026-09-19 — STEP-0053: лекция 22
+
+Опубликована theory-only лекция о symptom/root-cause distinction,
+propagation и retry amplification. Infrastructure/tool/workflow/reasoning/
+policy taxonomy показана как пересекающаяся инженерная модель; PRB-0035,
+0051 и 0052 разобраны через common-mode blind spot, shared fixture и race
+window. Backoff с jitter не выдан за исправление permanent defect. Separate
+editorial/technical/recheck и Mermaid source review выполнены только по
+тексту. Reader содержит 00–22; далее 23, Cost/performance. Подробности:
+[evidence](evidence/STEP-0053-lecture-failure-taxonomy.md).
+
+## 2026-09-19 — STEP-0054: лекция 23
+
+Опубликована theory-only лекция о total cost, cost per accepted outcome,
+critical path и иерархии budgets. Provider token price отделён от tools,
+infrastructure, coordination, human work и failed attempts; parallel work —
+от latency. Cost-first capability gate ограничен своим реальным scope, а
+EXP-0001/STEP-0009 сохранены как датированные measurements. Separate
+editorial/technical/recheck и Mermaid source review выполнены только по
+тексту. Reader содержит 00–23; далее 24, orchestration comparison.
+Подробности: [evidence](evidence/STEP-0054-lecture-cost-performance.md).
+
+## 2026-09-19 — STEP-0055: лекция 24
+
+Опубликована theory-only лекция о выборе между code-owned workflow,
+agent-orchestrator, bounded hybrid и более простой реализацией. Topology,
+control ownership, authority и transport разведены; десять DE-сценариев
+сопоставлены по единой rubric. External observations ограничены исходными
+settings, а manager/hybrid — статусом `not-implemented`. Separate
+editorial/technical/recheck и Mermaid source review выполнены только по
+тексту. Reader содержит 00–24; далее 25, architecture synthesis.
+Подробности: [evidence](evidence/STEP-0055-lecture-orchestration-comparison.md).

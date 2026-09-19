@@ -145,3 +145,144 @@ Content review и browser/visual gate завершены; семь скринш�
 Reader содержит 00–11, 15 тем остаются outlines. Следующая — 12,
 Analyst и provenance фактов. Фактическое взаимодействие с screen reader
 не проверено.
+
+## STEP-0043: лекция 12 — Analyst и provenance фактов
+
+Theory-only текст объясняет semantic discovery, привязку data fact к
+наблюдению, границы агрегата и разделение facts/assumptions/questions.
+Текущие три read phases и tool-free synthesis сверены с кодом, исторический
+STEP-0012 не выдан за свежий live результат. Content и browser/visual
+gates завершены, семь скриншотов осмотрены. Reader содержит 00–12,
+14 тем остаются outlines. Следующая — 13, PM specification.
+
+## STEP-0044: лекция 13 — PM и формальная спецификация
+
+Theory-only текст отделяет business intent, наблюдаемые факты, нормативное
+определение метрики и acceptance criteria. PM `READY` с полным контрактом
+не смешан с историческим live `BLOCKED/needs_user`; human-authored сценарий
+не выдан за ответ агента. Content и actual browser/visual gates завершены,
+семь скриншотов осмотрены. Reader содержит 00–13, 12 тем остаются outlines.
+Следующая — 14, DE и границы разрешённых изменений. Реальное AT не проверено.
+
+## STEP-0045: лекция 14 — Data Engineer
+
+Theory-only текст отделяет authority над реализацией от business contract,
+показывает границу disposable dbt candidate, fan-out контрпример и repair
+по public evidence. С этой лекции per-lecture gate v2 — text-only:
+редакторская и техническая вычитка, сверка Mermaid source с прозой,
+машинная сборка и hashes. Скриншоты, browser/visual review и AX не
+выполнялись; визуальное качество не заявляется. Исторические receipts v1
+сохраняют фактически выполненные проверки. Reader содержит 00–14,
+11 тем остаются outlines. Следующая — 15, QA.
+
+## STEP-0046: лекция 15 — QA
+
+Theory-only текст объясняет разницу validator PASS и независимого QA-probe,
+mutation/false pass, read-only identity и evidence-backed defect. Historical
+sample 5/5 ограничен датой и corpus; общий blind spot oracle показан через
+PRB-0035. Separate editorial/technical/recheck и text-only diagram semantics
+зафиксированы в schema-v2 receipts. Candidate и две production-сборки прошли;
+последние совпали побайтно (`7c20ed4606347b8fa3a70091e630704dcf954291e166e68943485547f3b8a98c`).
+Скриншотов, browser/visual/AX review не было. Reader содержит 00–15,
+10 тем остаются outlines. Следующая — 16, Reviewer.
+
+## STEP-0047: лекция 16 — Reviewer
+
+Theory-only текст отделяет quality/maintainability judgment от semantic QA,
+объясняет code-owned review authority и запрет self-approval. Four-mutant
+historical sample и canonical false rejection ограничены датой/configuration;
+`APPROVE → DONE` не выдан за production merge/deploy. Separate editorial,
+technical/recheck и Mermaid source review зафиксированы в schema-v2 receipts.
+Candidate и две production-сборки прошли; последние совпали побайтно
+(`6665f83a55ce82375916481a7c01c6969796ac72848b1aa309ceb980120cba92`).
+Скриншотов, browser/visual/AX review не было. Reader содержит 00–16,
+9 тем остаются outlines. Следующая — 17, Recovery.
+
+## STEP-0048: лекция 17 — Recovery и idempotency
+
+Theory-only текст разделяет MAF checkpoint, локальный role receipt и
+idempotency внешнего эффекта, включая окна сбоя до/после receipt и
+checkpoint. Исторические `SIGKILL` tests ограничены process/offline scope;
+power-loss durability и exactly-once внешних сервисов не заявлены.
+Schema-v2 editorial/technical/recheck и Mermaid source review сохранены.
+Candidate и две production-сборки прошли; последние совпали побайтно
+(`322e1dad43309c592a7ddf6c576ca4cd16f56c40b05d0cdf45ee8340a2d3dbc8`).
+Скриншотов, browser/visual/AX review не было. Reader содержит 00–17,
+8 тем остаются outlines. Следующая — 18, Airflow API.
+
+## STEP-0049: лекция 18 — Airflow API
+
+Theory-only текст разделяет Airflow DAG и agent workflow, public REST
+`/api/v2` и Task Execution API, Observer и approved dev-DAG Trigger.
+Historical STEP-0014/0015 ограничены локальным Airflow 3.3.1. Schema-v2
+editorial/technical/recheck и Mermaid source review сохранены. Первый
+candidate render получил непостоянный SIGSEGV на диаграмме темы 05;
+повтор прошёл. Две production-сборки совпали побайтно
+(`b24be0231fbc78b8609374229b858ec4f4507664e651912391f042e61fa21c01`).
+Скриншотов, browser/visual/AX review не было. Reader содержит 00–18,
+7 тем остаются outlines. Следующая — 19, Security.
+
+## STEP-0050: лекция 19 — Security и полномочия
+
+Theory-only текст разделяет untrusted content, authentication, role
+assignment, authorization и approval authority. Локальный request-bound
+bearer не назван OAuth, human/process attestation или one-time nonce;
+manager-agent остаётся теоретическим сценарием. Schema-v2
+editorial/technical/recheck и Mermaid source review сохранены. Candidate
+и две production-сборки прошли; последние совпали побайтно
+(`a2fa6496fe2bab2d15876d88f1af1bc95eaad7e2005fb364bfe7ef10217adff9`).
+Скриншотов, browser/visual/AX review не было. Reader содержит 00–19,
+6 тем остаются outlines. Следующая — 20, Observability.
+
+## STEP-0051: лекция 20 — Observability
+
+Theory-only текст разделяет trace, event log, metrics, artifact provenance
+и private reasoning; объясняет restart carrier, post-sampling span metrics,
+cardinality и retention. Dated STEP-0021/0023 ограничены offline и
+historical single-host scope. Schema-v2 editorial/technical/recheck и
+Mermaid source review сохранены. Candidate и две production-сборки прошли;
+последние совпали побайтно
+(`5ffc1c1479c5492b5e1de854c377bcc6b7c333977f0dd4b6527619e7c148b038`).
+Скриншотов, browser/visual/AX review не было. Reader содержит 00–20,
+5 тем остаются outlines. Следующая — 21, Evaluation.
+
+## STEP-0052: лекция 21 — Evaluation
+
+Theory-only текст определяет task/trial/outcome/grader, различает offline
+regression invariants, датированные live samples и fresh comparisons.
+`51/51` не выдан за независимые semantic tasks, а historical `7/10` — за
+текущую надёжность модели. Schema-v2 editorial/technical/recheck и Mermaid
+source review сохранены. Скриншотов, browser/visual/AX review не было.
+Reader содержит 00–21, 4 темы остаются outlines. Следующая — 22,
+Failure modes.
+
+## STEP-0053: лекция 22 — Failure modes
+
+Theory-only текст разделяет symptom, ошибочное состояние, activation
+condition и root cause; классифицирует infrastructure/tool/workflow/
+reasoning/policy причины и показывает common-mode correlation. PRB-0035,
+0051 и 0052 разобраны как разные causal chains, а retry с backoff/jitter не
+выдан за semantic или policy repair. Schema-v2 editorial/technical/recheck
+и Mermaid source review сохранены. Скриншотов, browser/visual/AX review не
+было. Reader содержит 00–22, 3 темы остаются outlines. Следующая — 23,
+Cost/performance.
+
+## STEP-0054: лекция 23 — Cost/performance
+
+Theory-only текст отделяет provider token price от total cost и cost per
+accepted outcome; объясняет critical path, parallel work, hierarchy budgets
+и reservation/reconciliation. Cost-first capability gate не выдан за
+полный optimizer, а EXP-0001/STEP-0009 — за текущие цены или SLO.
+Schema-v2 editorial/technical/recheck и Mermaid source review сохранены.
+Скриншотов, browser/visual/AX review не было. Reader содержит 00–23,
+2 темы остаются outlines. Следующая — 24, Workflow vs agent-orchestrator.
+
+## STEP-0055: лекция 24 — Workflow vs agent-orchestrator
+
+Theory-only текст сравнивает четыре архитектурных кандидата по известности
+декомпозиции, coupling, side-effect risk, audit/replay, cost/latency и
+evaluation. Bounded hybrid ограничивает model-directed область read-only
+исследованием; writes и gates остаются code-owned. Separate editorial,
+technical/recheck и Mermaid source review сохранены в schema-v2 receipts.
+Candidate static build прошёл; скриншотов и browser/visual/AX review не было.
+Reader содержит 00–24; далее 25, architecture synthesis.

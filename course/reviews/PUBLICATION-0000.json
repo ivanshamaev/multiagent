@@ -3,7 +3,7 @@
   "lecture_id": 0,
   "reviewer": "Codex; same-author separate browser/visual passes, not independent review",
   "checked_at": "2026-09-16T16:49:28.217197Z",
-  "publication_digest": "2bcb11ab709b953944e5042bc4c210c54e4b0d8687324e93e0e21cc89283ef16",
+  "publication_digest": "de8a6853bd9934ade5b9cf55b3e743e6af9e0442128c55142ded3f86fca6b6ed",
   "passes": {
     "desktop": true,
     "mobile": true,

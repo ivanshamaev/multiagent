@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "lecture_id": 22,
+  "reviewer": "Codex; same-author separate editorial/technical/recheck passes, not independent review",
+  "checked_at": "2026-09-19T07:33:23Z",
+  "input_digest": "e766ba9b4805dfe3a4ada4cad51b154d11f38dcd1002cf6106a853e3b1537d93",
+  "content_sha256": "0826635cb9595835058ee34f068aa1d9e1a4c4a42fce32f3341b435c224b7ca9",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "diagram_semantics": true},
+  "pass_scope": {
+    "editorial": "Complete theory-only text reread against todo 22, technical requirements, glossary and neighbouring owners 06/07/17/20/21/23. Symptom/cause distinctions, taxonomy, propagation, three retained problems, retry amplification, orchestration comparison and five questions checked for continuity and non-duplication.",
+    "technical": "AWS Exponential Backoff and Jitter and Anthropic infrastructure-noise articles checked online 2026-09-19; current role pipeline/checkpoint code, regression tests and dated PRB-0035/0051/0052 plus STEP-0010/0024 evidence checked locally. Dynamic manager comparison remains explicitly theoretical.",
+    "recheck": "Clarified that taxonomy classes can overlap, DENY can be correct containment rather than failure, and systematic fixed-graph coverage requires bounded state/budgets. All corrected sections and the complete lecture were reread.",
+    "diagram_semantics": "Mermaid source, accTitle/accDescr, cause/activation/error chain, gate branches, evidence classification, bounded retry/repair/block reactions, caption and text equivalent checked against the prose. No screenshots, browser checks, SVG/HTML visual or AX review, per user instruction.",
+    "not_checked": ["Independent reviewer", "Rendered visual quality", "Browser/mobile/print/AX", "Fresh fault injection", "Fresh live model/provider behavior", "Power-loss durability", "Implemented dynamic manager", "Fully-live six-role READY"]
+  },
+  "claims": [
+    {"location": "Когда retry превращается в amplifier", "assertion": "In AWS's OCC simulation, exponential backoff without jitter retained clustered calls; jitter spread calls and reduced work, with more than half the call count removed in the 100-client example.", "source": "https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/", "anchor": "Adding Backoff; Adding Jitter", "scope": "AWS simulation article checked 2026-09-19; numeric result is not transferred to this repository", "verdict": "verified"},
+    {"location": "Infrastructure failure", "assertion": "Anthropic observed up to a six-percentage-point Terminal-Bench 2.0 spread across resource configurations with model, harness and task set held fixed.", "source": "https://www.anthropic.com/engineering/infrastructure-noise", "anchor": "How we got here; How this affects measurement", "scope": "Original article checked 2026-09-19; benchmark-specific result, not a local coefficient", "verdict": "verified"},
+    {"location": "Propagation через artifacts", "assertion": "After accepted rework, only Data Engineer may replace implementation, prior gate artifacts are preserved in gate_history, and current validation/QA/review fields must be reset.", "source": "runtime/role_pipeline.py", "anchor": "RoleExecutor._accept_result rework branch; RolePipelineSnapshot._validate_rework_shape", "scope": "Current code and workflow regression tests; does not prove semantic quality of rerun gates", "verdict": "verified"},
+    {"location": "Common-mode failure", "assertion": "PRB-0035 recorded a shared nullable-argMax blind spot in candidate and initial oracle despite an empty diff; normalization moved inside argMax and was rechecked.", "source": "plan/problems/PRB-0035-null-attribution-argmax.md", "anchor": "Reproduction; Cause and fix; Regression check", "scope": "Historical defect evidence dated 2026-09-12 via STEP-0010; no claim that all semantic common modes are removed", "verdict": "verified"},
+    {"location": "Common-mode failure", "assertion": "PRB-0051 arose when concurrent pytest processes mutated the same scenario workspace; a common flock now serializes make test and evaluation-benchmark.", "source": "plan/problems/PRB-0051-concurrent-offline-scenario-fixtures.md", "anchor": "Reproduction and cause; Fix and regression", "scope": "Historical process-race evidence plus current Makefile targets; direct commands outside locked targets remain a stated risk", "verdict": "verified"},
+    {"location": "Race window", "assertion": "PRB-0052 exposed a visible checkpoint before chmod; current storage encodes in private staging, applies 0600, fsyncs the file and publishes create-only with a hard link.", "source": "runtime/checkpoints.py", "anchor": "SecureCheckpointStorage.save", "scope": "Current code and tests/unit/test_checkpoints.py; no directory-fsync, power-loss or external exactly-once claim", "verdict": "verified"},
+    {"location": "Race window", "assertion": "A deterministic unit test observes storage before final publication and requires no checkpoint to be listed or visible until the owner-only file is published.", "source": "tests/unit/test_checkpoints.py", "anchor": "test_reader_never_sees_checkpoint_before_owner_only_publication", "scope": "Current process-level regression test, not filesystem crash testing", "verdict": "verified"},
+    {"location": "Ошибочная ветка и ошибочный replan", "assertion": "The repository implements a code-owned role graph; dynamic manager/replanning remains an architectural alternative rather than local runtime evidence.", "source": "course/lectures/LECTURE-0007-agent-orchestrator.md", "anchor": "Мысленный пример для инженерии данных; Итог", "scope": "Course architecture boundary backed by current runtime/role_pipeline.py; no manager benchmark claimed", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Рабочая taxonomy", "severity": "minor", "rationale": "A layer table could be read as a mutually exclusive classifier although distributed failures commonly combine layers.", "resolved": true, "resolution": "Added an explicit overlap example spanning infrastructure, tool deadline and workflow retry policy; reread."},
+    {"location": "Рабочая taxonomy", "severity": "minor", "rationale": "Listing DENY as a symptom risked presenting correct policy containment as a system defect.", "resolved": true, "resolution": "Distinguished correct denial from erroneous policy/identity and forbidden-action failures; reread."},
+    {"location": "Ошибочная ветка", "severity": "minor", "rationale": "Initial exhaustive-test wording omitted the bounded-state prerequisite.", "resolved": true, "resolution": "Narrowed the claim to systematic coverage when state space and budgets are actually bounded; reread."}
+  ],
+  "diagram_waiver": null
+}

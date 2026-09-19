@@ -3,7 +3,7 @@
   "lecture_id": 7,
   "reviewer": "Codex; same-author separate browser/visual passes, not independent review",
   "checked_at": "2026-09-16T22:03:00Z",
-  "publication_digest": "13e466d664b64fad53ad4e424e6c13bd07cb6d3cb35f8a594c6ff4d4eb8850ae",
+  "publication_digest": "a54d41312281a55965ee185ab791797e8704bd625bae6408126d4327769081ee",
   "passes": {"desktop": true, "mobile": true, "light": true, "dark": true, "no_js": true, "keyboard": true, "print": true, "accessibility_tree": true, "subpath": true, "csp": true, "links": true, "visual": true},
   "assistive_technology": {"tested": false, "scope": "Chrome AX main landmark and named/described SVG checked; actual Orca/NVDA/VoiceOver interaction not tested."},
   "renderer": {

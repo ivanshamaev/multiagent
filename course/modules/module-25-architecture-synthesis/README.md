@@ -56,4 +56,5 @@ Offline/code evidence ограничено своей областью. Proposed
 Будущий текст: `course/lectures/LECTURE-0025-architecture-synthesis.md`; outline не лекция.
 [Editorial guidelines](../../editorial-guidelines.md), [lecture template](../../templates/lecture.md),
 [review schema](../../templates/review.json) требуют вычитку, technical verification и recheck.
-Missing/stale receipt запрещает reviewed; diagrams требуют actual render/visual gate.
+Missing/stale receipt запрещает reviewed; diagrams проходят text-only source review
+и машинную сборку без скриншотов или visual/AX/browser PASS.

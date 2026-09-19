@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "lecture_id": 24,
+  "reviewer": "Codex; same-author separate editorial/technical/recheck passes, not independent review",
+  "checked_at": "2026-09-19T08:13:00Z",
+  "input_digest": "7aaebef6548fb0de216d9928cbdce3cf577c11c0f741561f5f86ae143fb94bc2",
+  "content_sha256": "d5af418fdb7e7b00ed33a0326427cf910718784f21aff574a39c8aee63a60dfb",
+  "skills": [
+    "technical-markdown-lectures",
+    "technical-editorial-review",
+    "technical-claim-verification"
+  ],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {
+    "editorial": true,
+    "technical": true,
+    "recheck": true,
+    "diagram_semantics": true
+  },
+  "pass_scope": {
+    "editorial": "Complete theory-only text reread against todo 24, technical requirements and neighbouring owners 06/07/19/21/23/25. Four-axis distinction, four architecture candidates, selection rubric, bounded hybrid, ten scenarios, operational comparison, local boundary, counterexamples and five questions checked for continuity and non-duplication.",
+    "technical": "Anthropic S01/S02 and Cognition S03/S04 checked online 2026-09-19. ADR-0035, current transition reducer and role pipeline, and dated STEP-0020 evidence checked locally. Vendor observations remain scoped to their systems; no product benchmark or dynamic-manager implementation is inferred.",
+    "recheck": "Clarified taxonomy differences around orchestrator-workers, stated that a fixed graph does not create audit evidence without persisted events, and defined single writer as serialized change ownership rather than necessarily one process. Complete corrected lecture reread.",
+    "diagram_semantics": "Mermaid source, accTitle/accDescr, readiness branch, model-directed read envelope, synthesis loop, provenance/budget gate, controlled writer and checks/QA/approval outcomes checked against prose and textual equivalent. No screenshots, browser checks, SVG/HTML visual or AX review, per user instruction.",
+    "not_checked": [
+      "Independent reviewer",
+      "Rendered visual quality",
+      "Browser/mobile/print/AX",
+      "Implemented dynamic manager or hybrid scheduler",
+      "Fresh paid model calls",
+      "Comparative runtime benchmark",
+      "Fully-live six-role READY or autonomous merge"
+    ]
+  },
+  "claims": [
+    {
+      "location": "Четыре кандидата; причинная граница",
+      "assertion": "Anthropic distinguishes predefined code-path workflows from model-directed agents and describes orchestrator-workers as useful when subtasks cannot be predicted in advance.",
+      "source": "https://www.anthropic.com/engineering/building-effective-agents",
+      "anchor": "What are agents?; Workflow: Orchestrator-workers; Combining and customizing these patterns",
+      "scope": "Original article checked 2026-09-19; its terminology and recommendations are not treated as a universal taxonomy or local benchmark.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Причинная граница",
+      "assertion": "Anthropic reports its multi-agent research design as a fit for breadth-first independent exploration and explicitly limits fit for domains requiring shared context or many inter-agent dependencies.",
+      "source": "https://www.anthropic.com/engineering/multi-agent-research-system",
+      "anchor": "Benefits of a multi-agent system; Architecture overview for Research",
+      "scope": "Original article checked 2026-09-19; research-system observations are not transferred to data-engineering quality, cost or latency.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Причинная граница",
+      "assertion": "Cognition argues that parallel actors can make conflicting implicit decisions when relevant context and actions are separated.",
+      "source": "https://cognition.com/blog/dont-build-multi-agents",
+      "anchor": "Principles of Context Engineering; Applying the Principles",
+      "scope": "Author engineering position checked 2026-09-19; used as a causal warning, not a universal impossibility result.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Причинная граница; bounded hybrid",
+      "assertion": "Cognition's later account identifies a narrower deployed pattern in which multiple agents contribute intelligence while writes remain single-threaded.",
+      "source": "https://cognition.com/blog/multi-agents-working",
+      "anchor": "Introduction; A Refresher on Context Engineering; practical experiments",
+      "scope": "Product-team observations checked 2026-09-19; numerical and model-specific product claims are not reused.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Что подтверждено нашей системой",
+      "assertion": "ADR-0035 defines the manager as a theoretical alternative and keeps permission, side-effect and acceptance boundaries outside either orchestration approach.",
+      "source": "plan/decisions/ADR-0035-dual-orchestration-lecture-boundaries.md",
+      "anchor": "Decision; Consequences",
+      "scope": "Accepted curriculum/architecture boundary; not runtime evidence.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Что подтверждено нашей системой",
+      "assertion": "The current reducer owns allowed stage transitions and artifact gates, while the role pipeline routes typed snapshots through predefined executors.",
+      "source": "orchestrator/transitions.py",
+      "anchor": "ALLOWED_TRANSITIONS; _validate_artifact_gate",
+      "scope": "Current code inspected 2026-09-19 together with runtime/role_pipeline.py; no model-directed planner or dynamic worker queue is inferred.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Что подтверждено нашей системой",
+      "assertion": "STEP-0020 records offline evidence for graph-v2 branching, bounded rework and receipt-backed restart, without GateLLM or Data Platform mutation.",
+      "source": "plan/evidence/STEP-0020-branching-rework-idempotency.md",
+      "anchor": "Proven behavior; Commands; Residual risk",
+      "scope": "Dated historical offline evidence; not proof of the current graph's fully-live six-role behavior or a dynamic manager.",
+      "verdict": "verified"
+    }
+  ],
+  "findings": [
+    {
+      "location": "Четыре кандидата",
+      "severity": "minor",
+      "rationale": "The label orchestrator-workers workflow could appear to contradict the lecture's agent-orchestrator category.",
+      "resolved": true,
+      "resolution": "Made the taxonomy explicitly ownership-based and noted that source labels vary; reread."
+    },
+    {
+      "location": "Rubric выбора",
+      "severity": "minor",
+      "rationale": "The audit row could imply that a fixed graph automatically produces an audit trail.",
+      "resolved": true,
+      "resolution": "Stated that the graph only simplifies the audit model and both approaches require persisted events; reread."
+    },
+    {
+      "location": "Причинная граница",
+      "severity": "minor",
+      "rationale": "Single-threaded writes could be misread as requiring one process globally.",
+      "resolved": true,
+      "resolution": "Defined it as serialized ownership of a coherent change, not necessarily one process; reread."
+    }
+  ],
+  "diagram_waiver": null
+}

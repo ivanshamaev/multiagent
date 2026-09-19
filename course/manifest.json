@@ -863,7 +863,7 @@
       "plan": "plan/steps/lections/LECTURE-0013-pm-specification.md",
       "path": "course/lectures/LECTURE-0013-pm-specification.md",
       "outline": "course/modules/module-13-pm-specification/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить business metric definition, предпосылки и ограничения.",
         "Объяснить requirements readiness, предпосылки и ограничения.",
@@ -882,7 +882,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0013.json"
     },
     {
       "id": 14,
@@ -900,7 +900,7 @@
       "todos": [
         "Разделить утверждённую спецификацию и пространство допустимых implementation choices.",
         "Объяснить isolated candidate и authority только над editable dbt subtree.",
-        "Показать Net Revenue payment/refund attribution как применение grain/semantics из 08/10.",
+        "Показать Net Revenue payment/refund attribution как применение grain/semantics из 11/13.",
         "Рассмотреть semantic repair по validator evidence; не переобъяснять QA, reducer budget и checkpoint."
       ],
       "sources": [
@@ -926,7 +926,7 @@
       "plan": "plan/steps/lections/LECTURE-0014-data-engineer.md",
       "path": "course/lectures/LECTURE-0014-data-engineer.md",
       "outline": "course/modules/module-14-data-engineer/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить implementation authority, предпосылки и ограничения.",
         "Объяснить candidate change boundary, предпосылки и ограничения.",
@@ -945,7 +945,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0014.json"
     },
     {
       "id": 15,
@@ -987,7 +987,7 @@
       "plan": "plan/steps/lections/LECTURE-0015-qa-evidence.md",
       "path": "course/lectures/LECTURE-0015-qa-evidence.md",
       "outline": "course/modules/module-15-qa-evidence/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить QA independent probes, предпосылки и ограничения.",
         "Объяснить mutation detection, предпосылки и ограничения.",
@@ -1005,7 +1005,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0015.json"
     },
     {
       "id": 16,
@@ -1047,7 +1047,7 @@
       "plan": "plan/steps/lections/LECTURE-0016-review-authority.md",
       "path": "course/lectures/LECTURE-0016-review-authority.md",
       "outline": "course/modules/module-16-review-authority/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить review authority, предпосылки и ограничения.",
         "Объяснить false approval, предпосылки и ограничения.",
@@ -1065,7 +1065,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0016.json"
     },
     {
       "id": 17,
@@ -1109,7 +1109,7 @@
       "plan": "plan/steps/lections/LECTURE-0017-recovery-idempotency.md",
       "path": "course/lectures/LECTURE-0017-recovery-idempotency.md",
       "outline": "course/modules/module-17-recovery-idempotency/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить checkpoint commit boundary, предпосылки и ограничения.",
         "Объяснить operation idempotency, предпосылки и ограничения.",
@@ -1128,7 +1128,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0017.json"
     },
     {
       "id": 18,
@@ -1147,7 +1147,7 @@
         "Развести data-task scheduling и orchestration reasoning агентов.",
         "Объяснить stable REST /api/v2 vs Task Execution API без смешения двух интерфейсов.",
         "Показать observer GET scope и separate approved dev-DAG trigger identity.",
-        "Применить понятие operation identity из 18; не переобъяснять idempotency protocol и общий threat model."
+        "Применить понятие operation identity из 17; не переобъяснять idempotency protocol и общий threat model."
       ],
       "sources": [
         {
@@ -1171,7 +1171,7 @@
       "plan": "plan/steps/lections/LECTURE-0018-airflow-operations.md",
       "path": "course/lectures/LECTURE-0018-airflow-operations.md",
       "outline": "course/modules/module-18-airflow-operations/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить data orchestration boundary, предпосылки и ограничения.",
         "Объяснить operation approval binding, предпосылки и ограничения.",
@@ -1190,7 +1190,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0018.json"
     },
     {
       "id": 19,
@@ -1238,7 +1238,7 @@
       "plan": "plan/steps/lections/LECTURE-0019-security-authority.md",
       "path": "course/lectures/LECTURE-0019-security-authority.md",
       "outline": "course/modules/module-19-security-authority/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить indirect prompt injection, предпосылки и ограничения.",
         "Объяснить authentication/authorization distinction, предпосылки и ограничения.",
@@ -1256,7 +1256,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0019.json"
     },
     {
       "id": 20,
@@ -1300,7 +1300,7 @@
       "plan": "plan/steps/lections/LECTURE-0020-observability.md",
       "path": "course/lectures/LECTURE-0020-observability.md",
       "outline": "course/modules/module-20-observability/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить trace context propagation, предпосылки и ограничения.",
         "Объяснить telemetry cardinality, предпосылки и ограничения.",
@@ -1318,7 +1318,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0020.json"
     },
     {
       "id": 21,
@@ -1365,7 +1365,7 @@
       "plan": "plan/steps/lections/LECTURE-0021-evaluation.md",
       "path": "course/lectures/LECTURE-0021-evaluation.md",
       "outline": "course/modules/module-21-evaluation/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить task/trial distinction, предпосылки и ограничения.",
         "Объяснить quality vs invariant evaluation, предпосылки и ограничения.",
@@ -1382,7 +1382,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0021.json"
     },
     {
       "id": 22,
@@ -1425,7 +1425,7 @@
       "plan": "plan/steps/lections/LECTURE-0022-failure-taxonomy.md",
       "path": "course/lectures/LECTURE-0022-failure-taxonomy.md",
       "outline": "course/modules/module-22-failure-taxonomy/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить failure root-cause taxonomy, предпосылки и ограничения.",
         "Объяснить retry amplification, предпосылки и ограничения.",
@@ -1439,7 +1439,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0022.json"
     },
     {
       "id": 23,
@@ -1483,7 +1483,7 @@
       "plan": "plan/steps/lections/LECTURE-0023-cost-performance.md",
       "path": "course/lectures/LECTURE-0023-cost-performance.md",
       "outline": "course/modules/module-23-cost-performance/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить budget allocation, предпосылки и ограничения.",
         "Объяснить critical-path cost trade-off, предпосылки и ограничения.",
@@ -1501,7 +1501,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0023.json"
     },
     {
       "id": 24,
@@ -1560,7 +1560,7 @@
       "plan": "plan/steps/lections/LECTURE-0024-orchestration-comparison.md",
       "path": "course/lectures/LECTURE-0024-orchestration-comparison.md",
       "outline": "course/modules/module-24-orchestration-comparison/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить scenario architecture selection, предпосылки и ограничения.",
         "Объяснить hybrid orchestration envelope, предпосылки и ограничения.",
@@ -1574,7 +1574,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0024.json"
     },
     {
       "id": 25,

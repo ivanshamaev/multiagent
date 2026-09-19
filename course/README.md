@@ -2,8 +2,8 @@
 
 Глубокая теоретическая база для Data Engineers с Python/SQL и знанием pipelines.
 Наша Agentic Data Platform — иллюстрация подтверждённых решений, не student lab.
-Подготовлены 26 core outlines и optional Kubernetes extension. Написаны и опубликованы лекции 00–12;
-остальные 14 текстов ещё не написаны. Для каждого текста действует отдельный publication gate;
+Подготовлены 26 core outlines и optional Kubernetes extension. Написаны и опубликованы лекции 00–24;
+оставшийся core-текст 25 ещё не написан. Для каждого текста действует отдельный publication gate;
 полный текст выбирается reader только по reviewed и актуальным receipts.
 Manager/Kubernetes не объявляются реализованными.
 В core номер 00–25 равен позиции в маршруте; optional Kubernetes — 26.

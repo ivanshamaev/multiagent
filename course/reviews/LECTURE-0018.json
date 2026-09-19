@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "lecture_id": 18,
+  "reviewer": "Codex; same-author separate editorial/technical/recheck passes, not independent review",
+  "checked_at": "2026-09-18T21:03:38Z",
+  "input_digest": "5ceec86d12177a74cd3d2bb0022ca2970ab9fca6553aa551c0b6015b30100e9d",
+  "content_sha256": "2f63111debfb1fcedfd9c2da7126fef603f25e37767312be560cdf20c99245eb",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "diagram_semantics": true},
+  "pass_scope": {
+    "editorial": "Full theory-only text reread against todo 18 and neighbouring owners 09/17/19: two orchestration levels, client/runtime API distinction, identity table, counterexample, diagram caption and five questions checked.",
+    "technical": "Official Airflow 3 release and Task SDK docs, AWS Builders' Library, current observer/trigger/approval code and policies, and dated STEP-0014/0015 evidence checked; pinned local Airflow 3.3.1 distinguished from current docs.",
+    "recheck": "Corrected Observer GET-only wording to acknowledge token POST; qualified POST error reconciliation and non-atomic approval consumption; added direct AWS attribution; aligned lecture title with manifest and reread affected text.",
+    "diagram_semantics": "Mermaid source, accTitle/accDescr, branch labels, caption and text equivalent checked against adapter control flow. Diagram is conceptual trusted-caller flow, not evidence of autonomous six-role trigger. No screenshots, browser checks, SVG/HTML visual or AX review, per user instruction.",
+    "not_checked": ["Independent reviewer", "Rendered visual quality", "Browser/mobile/print/AX", "Fresh live Airflow run", "Production approval service", "Fully-live six-role trigger"]
+  },
+  "claims": [
+    {"location": "Не путать два API Airflow 3", "assertion": "Airflow 3 exposes API server/public REST while task execution has a distinct interface.", "source": "https://airflow.apache.org/blog/airflow-three-point-oh-is-here/", "anchor": "API-first architecture and Task Execution Interface", "scope": "Official release article checked 2026-09-18; endpoint details grounded in pinned local adapter", "verdict": "verified"},
+    {"location": "Не путать два API Airflow 3", "assertion": "Task Execution API supports task-runtime interaction including state, heartbeats and XCom; it is not this agent's DAG-run client API.", "source": "https://airflow.apache.org/docs/task-sdk/stable/", "anchor": "Task Execution API and Task SDK overview", "scope": "Official docs checked 2026-09-18; conceptual API boundary", "verdict": "verified"},
+    {"location": "Observer: видеть достаточно, но не всё", "assertion": "Observer exposes six closed read operations, fixed GET /api/v2 resource paths, allowlisted DAG IDs and bounded projected output; authentication separately POSTs /auth/token.", "source": "runtime/tools/airflow_api.py", "anchor": "AirflowAPIAdapter.execute/_authenticate/_get_json; policies/profiles/airflow_observer_v1.json", "scope": "Current local code checked 2026-09-18; no arbitrary path or write capability", "verdict": "verified"},
+    {"location": "Trigger: отдельное полномочие", "assertion": "Separate trigger profile allows one dev DAG; adapter claims matching approval, derives deterministic run ID, GETs before fixed POST, reconciles errors/409 and consumes approval after confirmed result.", "source": "runtime/tools/airflow_trigger.py", "anchor": "AirflowTriggerAdapter.execute/run_id/_lookup/_create; policies/profiles/airflow_trigger_v1.json", "scope": "Current local code checked 2026-09-18; no distributed transaction or universal exactly-once guarantee", "verdict": "verified"},
+    {"location": "Trigger: отдельное полномочие", "assertion": "Approval records bind task/DAG/key/approver with TTL and are claimed under a local file lock, then marked consumed.", "source": "runtime/tools/airflow_approval.py", "anchor": "AirflowApprovalStore.create/claim; AirflowApprovalClaim.consume", "scope": "Local dev approval store; not a remote authenticated service", "verdict": "verified"},
+    {"location": "Контрпример и доказанная область", "assertion": "Client request identity is needed to distinguish a retry after a lost response from a new request.", "source": "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/", "anchor": "Reducing client complexity; retries and semantic equivalence", "scope": "Primary article checked 2026-09-18; no AWS guarantee transferred to this adapter", "verdict": "verified"},
+    {"location": "Контрпример и доказанная область", "assertion": "Dated local observer smoke was read-only; dated dev trigger smoke returned created then existing with two approvals and 11 successful tasks.", "source": "plan/evidence/STEP-0015-controlled-dev-dag-trigger.md", "anchor": "Proven behavior; plan/evidence/STEP-0014-read-only-airflow-mcp.md", "scope": "Historical local Airflow 3.3.1 evidence, not a fresh test or production/fully-live six-role claim", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Observer: видеть достаточно, но не всё", "severity": "minor", "rationale": "GET-only claim could imply no authentication POST.", "resolved": true, "resolution": "Separated resource GET from token POST and reread."},
+    {"location": "Trigger: отдельное полномочие", "severity": "minor", "rationale": "A confirmed run and approval consumption are not one distributed transaction.", "resolved": true, "resolution": "Explicit crash window and reconciliation caveat added; diagram limited to logical successful flow."},
+    {"location": "Контрпример и доказанная область", "severity": "minor", "rationale": "AWS concept needed direct attribution and separation from local behavior.", "resolved": true, "resolution": "Added primary-source link and explicit scope qualifier."}
+  ],
+  "diagram_waiver": null
+}

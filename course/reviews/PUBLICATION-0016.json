@@ -1,0 +1,26 @@
+{
+  "schema_version": 2,
+  "lecture_id": 16,
+  "reviewer": "Codex; text-only static publication check, no browser or visual review",
+  "checked_at": "2026-09-18T20:34:27Z",
+  "review_mode": "text-only",
+  "publication_digest": "7b17b40c71561bacf220049517e17b31632030f49a6cf98f750092215431fcf3",
+  "passes": {"static_build": true, "markdown_links": true, "diagram_semantics": true},
+  "renderer": {
+    "node": "v22.22.0",
+    "cli": "11.17.0",
+    "mermaid": "11.16.1",
+    "browser_version": "Google Chrome for Testing 153.0.8010.36",
+    "lock_sha256": "2e528e208a65c3ffd5c89446637e68812dc5c56f1e30762f24c2a2e3449fd928",
+    "diagram_config_sha256": "bc12b7e5869cf9fea920a4ed5b52619096949dc7c1c3de2cef760e0d105cdd8d",
+    "builder_sha256": "095fa29ffe2926bea7999900eee5f269a02376c9ef09c8e4e723a2c62d85f994",
+    "system_render_font_sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d",
+    "font_sha256": {
+      "latin": "0d352d8a993d3f79d860e44d74ee3e132649253f2af24caad088c3aed6ec08c8",
+      "cyrillic": "05af9e705d3b63aedba67197d19fb448b97353e1386930716c7e835b08f126ba"
+    }
+  },
+  "rendered_sha256": "cc1113d242f34ee167b236acdd9df55727bf31b0c040633f03f86eedd3b1e5cc",
+  "scope": "Markdown/links and source-level diagram semantics checked; pinned static build completed and output hash bound. No screenshot, browser navigation, SVG/HTML visual review, AX inspection or AT interaction.",
+  "evidence": "plan/evidence/STEP-0047-lecture-reviewer-authority.md"
+}

@@ -3,7 +3,7 @@
   "lecture_id": 9,
   "reviewer": "Codex; same-author separate passes, not independent review",
   "checked_at": "2026-09-17T04:10:00Z",
-  "input_digest": "3938c985b00e3a945b69ff1279e2cb2f5943f7bb206175831b1add0a8ecc083f",
+  "input_digest": "0af12f2297f22c3b874e603a24815111a672504bbda51985194e6ccf6bff92e5",
   "content_sha256": "7b2df49aa3f0f6a7b06bdf0bc655c58ebf3206418153d947127e2a9fb0195a11",
   "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
   "skill_versions_sha256": {

@@ -1,0 +1,40 @@
+{
+  "schema_version": 2,
+  "lecture_id": 20,
+  "reviewer": "Codex; same-author separate editorial/technical/recheck passes, not independent review",
+  "checked_at": "2026-09-19T06:53:13Z",
+  "input_digest": "43e5d0f0a45011df50065a5c8fef0aedc7c323f67129537aa65e991a3582ed76",
+  "content_sha256": "9a9c9d33eb9307ef53f51cdabcb2b49fe42628436fa2c0c4916f3523742b9559",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "diagram_semantics": true},
+  "pass_scope": {
+    "editorial": "Complete theory-only text reread against todo 20, technical requirements, glossary and neighbouring owners 17/19/21/22. Signal taxonomy, causal qualifications, restart carrier, sampling counterexample, cardinality/retention and five questions checked for continuity and duplication.",
+    "technical": "Original Dapper paper landing/source and Anthropic Managed Agents article plus official OpenTelemetry trace/sampling documentation checked online 2026-09-19; current telemetry facade, Collector/Tempo/Prometheus/Grafana configs, tests and dated STEP-0021/0023 checked locally.",
+    "recheck": "Qualified parent/child as instrumentation-declared operational causality; explicitly limited error-retention completeness by decision window/incomplete traces; clarified that span metrics consume the post-sampling stream and that hashes are not encryption. Diagram reduced to twelve nodes and affected text reread.",
+    "diagram_semantics": "Mermaid source, accTitle/accDescr, carrier/restart parent path, post-tail-sampling branches, caption and text equivalent checked against runtime and Collector pipeline. No screenshots, browser checks, SVG/HTML visual or AX review, per user instruction.",
+    "not_checked": ["Independent reviewer", "Rendered visual quality", "Browser/mobile/print/AX", "Fresh live observability containers", "Sampling statistical representativeness", "HA/TLS/alerts/object storage", "Fully-live six-role READY"]
+  },
+  "claims": [
+    {"location": "Четыре вида свидетельств", "assertion": "OpenTelemetry spans carry trace/span/parent identity, timing, status and attributes; propagated span context correlates spans into a trace.", "source": "https://opentelemetry.io/docs/concepts/signals/traces/", "anchor": "Context Propagation; Spans; Span Context", "scope": "Official documentation checked 2026-09-19; parentage treated as declared operational relation, not proof of complete causality", "verdict": "verified"},
+    {"location": "Четыре вида свидетельств", "assertion": "Dapper emphasizes low-overhead common instrumentation and sampling for large-scale distributed tracing.", "source": "https://research.google/pubs/dapper-a-large-scale-distributed-systems-tracing-infrastructure/", "anchor": "Abstract and original paper download", "scope": "Original Google Research publication from 2010 checked 2026-09-19; scale/usage measurements not transferred", "verdict": "verified"},
+    {"location": "Иерархия trace", "assertion": "Local facade allowlists five span names and closed attributes, exports hashes/usage/status rather than prompt/tool/artifact content, and records only error type.", "source": "runtime/telemetry.py", "anchor": "TRACE_SPAN_NAMES; SPAN_ATTRIBUTES; SafeSpan; SanitizedJsonSpanExporter._encode", "scope": "Current explicit facade/exporter; does not claim every possible runtime path is instrumented", "verdict": "verified"},
+    {"location": "Propagation через restart", "assertion": "Typed carrier stores nonzero 128-bit trace ID and workflow span ID; role spans reconstruct a remote parent context from it.", "source": "runtime/telemetry.py", "anchor": "TraceCarrier; _carrier_context; AgenticTelemetry.workflow/role", "scope": "Current code and dated STEP-0021 offline evidence; carrier is not execution checkpoint", "verdict": "verified"},
+    {"location": "Propagation через restart", "assertion": "Managed Agents separates durable session, harness and sandbox, and describes ambiguity when an event stream was the only debugging window.", "source": "https://www.anthropic.com/engineering/managed-agents", "anchor": "Don't adopt a pet; Decouple the brain from the hands; The session is not Claude's context window", "scope": "Original 2026-04-08 article checked 2026-09-19; analogy only, no hosted-product equivalence", "verdict": "verified"},
+    {"location": "Sampling", "assertion": "Head sampling decides early without whole-trace evidence; tail sampling can inspect all or most spans but requires state/resources and may miss critical information if designed poorly.", "source": "https://opentelemetry.io/docs/concepts/sampling/", "anchor": "Why sampling; Head Sampling; Tail Sampling", "scope": "Official OpenTelemetry docs checked 2026-09-19; no universal recommendation transferred", "verdict": "verified"},
+    {"location": "От span к backend", "assertion": "Collector applies memory limiter, tail sampling and batch before both Tempo and span-metrics exporters; derived Prometheus metrics therefore use retained traces.", "source": "observability/otel-collector.yaml", "anchor": "service.pipelines.traces; connectors.span_metrics", "scope": "Current repository config checked 2026-09-19", "verdict": "verified"},
+    {"location": "Sampling", "assertion": "Local policies target ERROR traces and probabilistically select healthy traces at 25%, under explicit decision/capacity bounds.", "source": "observability/otel-collector.yaml", "anchor": "processors.tail_sampling", "scope": "Current config and dated STEP-0023; policy intent is not a mathematical completeness guarantee", "verdict": "verified"},
+    {"location": "Cardinality", "assertion": "Span metrics use five low-cardinality dimensions, exclude unique workflow/task/operation/request/artifact IDs and cap aggregation cardinality at 1000.", "source": "tests/policy/test_observability_config.py", "anchor": "test_collector_sampling_metrics_and_cardinality_policy_are_explicit; observability/otel-collector.yaml", "scope": "Current static policy/config check", "verdict": "verified"},
+    {"location": "Retention", "assertion": "Tempo local blocks are configured for 72h; Prometheus is bounded by 7d and 1GB; dated smoke proved single-host backend flow with stated limitations.", "source": "plan/evidence/STEP-0023-operational-observability-backend.md", "anchor": "Delivered boundary; Verification; Problems and remaining risks", "scope": "Historical live evidence dated 2026-09-14 plus current config; no fresh service start or production guarantee", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Четыре вида свидетельств", "severity": "minor", "rationale": "Trace parentage could be read as proof of complete real-world causality.", "resolved": true, "resolution": "Scoped it to instrumentation-declared operational dependency and noted uninstrumented operations; reread."},
+    {"location": "Sampling", "severity": "minor", "rationale": "Keep-errors wording could imply all errors are inevitably retained.", "resolved": true, "resolution": "Added decision-window and incomplete-trace caveat and framed configuration as policy intent; reread."},
+    {"location": "От span к backend", "severity": "minor", "rationale": "Initial diagram exceeded the lecture's preferred node count and split child-span types unnecessarily.", "resolved": true, "resolution": "Combined model/tool/artifact into one conceptual node, retained semantic text and rechecked twelve-node flow."}
+  ],
+  "diagram_waiver": null
+}

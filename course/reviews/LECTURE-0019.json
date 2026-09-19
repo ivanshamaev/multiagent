@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "lecture_id": 19,
+  "reviewer": "Codex; same-author separate editorial/technical/recheck passes, not independent review",
+  "checked_at": "2026-09-18T21:16:58Z",
+  "input_digest": "03908d10aee379799c8c2ee5883ff85f38ff37ea5cf017b249b112517d89a4e2",
+  "content_sha256": "9d1cefa54376b3ce029a705627d9a830d464a57e6d074bc6c627828932dfb569",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "diagram_semantics": true},
+  "pass_scope": {
+    "editorial": "Complete Russian theory-only draft reread against todo 19, technical requirements, glossary and neighbouring owners 07/08/09/16/18/20/24/26. Threat assumptions, four-way distinction, counterexample, diagram text and five questions checked.",
+    "technical": "Original Google S25 and Anthropic S10 articles plus official MCP 2026-07-28 authorization specification checked online 2026-09-18; current auth/facade/gateway/policy/approval code, unit/adversarial/integration tests and dated STEP-0022 checked locally.",
+    "recheck": "Qualified bearer authentication as credential/claims validation rather than human or process attestation; added explicit local CLI approver-identity limitation; softened claims about model-layer risk reduction. Corrected paragraphs reread against primary sources and code.",
+    "diagram_semantics": "Mermaid source, accTitle/accDescr, six participants, auth/policy denial branches, caption and textual equivalent checked against AuthenticatedMCPGateway and MCPToolGateway. No screenshots, browser checks, SVG/HTML visual or AX review, per user instruction.",
+    "not_checked": ["Independent reviewer", "Rendered visual quality", "Browser/mobile/print/AX", "Actual prompt-injection model success rate", "Fresh live Gateway/Airflow", "Remote HTTP MCP/OAuth implementation", "Fully-live six-role READY"]
+  },
+  "claims": [
+    {"location": "Модель угроз", "assertion": "Indirect prompt injection can place instructions in external data, including documents and messages; layered mitigations are product strategy, not complete protection.", "source": "https://blog.google/security/mitigating-prompt-injection-attacks/", "anchor": "Opening definition; A layered security approach; User confirmation framework", "scope": "Original Google GenAI Security Team article checked 2026-09-18; no Gemini metrics transferred to this repository", "verdict": "verified"},
+    {"location": "Два code-owned gate", "assertion": "Local HS256 bearer binds issuer/audience, runner/profile, role/actor/task, canonical request hash and expiry; verification precedes delegated gateway execution.", "source": "runtime/mcp_auth.py", "anchor": "MCPTokenAuthority.mint/verify; AuthenticatedMCPGateway.execute", "scope": "Current local wrapped path checked 2026-09-18; not process attestation, nonce or HTTP OAuth", "verdict": "verified"},
+    {"location": "Два code-owned gate", "assertion": "Facades mint request-scoped bearer after constructing ToolRequest and do not pass bearer as remote tool argument.", "source": "runtime/tools/maf_facade.py", "anchor": "DataEngineerMCPTools._execute", "scope": "Current wrapped MAF tool path; direct gateway construction remains possible in tests", "verdict": "verified"},
+    {"location": "Два code-owned gate", "assertion": "Policy gateway denies disallowed tools before adapter execution, records typed denial; policy checks exact allowlist, role, object scope and budgets.", "source": "runtime/tools/mcp_gateway.py", "anchor": "MCPToolGateway._execute; policies/tool_policy.py#authorize_tool_call", "scope": "Current local code, not proof of semantic correctness of allowed output", "verdict": "verified"},
+    {"location": "Четыре разных вопроса", "assertion": "Local Airflow approval CLI accepts approved_by from trusted invoker without independently authenticating a human.", "source": "runtime/airflow_trigger_approval.py", "anchor": "main --approved-by; runtime/tools/airflow_approval.py#create", "scope": "Current development CLI; not production approval identity proof", "verdict": "verified"},
+    {"location": "Два code-owned gate", "assertion": "Unit tests reject changed/expired/tampered/cross-key credentials before gateway; integration test confirms no bearer passed to remote call/result/evidence.", "source": "tests/unit/test_mcp_auth.py", "anchor": "test_bearer_rejects_cross_scope_and_tampering_before_gateway; tests/integration/test_authenticated_mcp_gateway.py", "scope": "Offline tests and dated STEP-0022; no live prompt-injection success-rate claim", "verdict": "verified"},
+    {"location": "Fixed workflow и manager", "assertion": "Adversarial policy test leaves later protected .env read denied despite policy-ignoring text in writable model content.", "source": "tests/adversarial/test_tool_policy_guards.py", "anchor": "test_prompt_injection_content_cannot_expand_later_capabilities", "scope": "Pure offline policy test, not a model robustness evaluation", "verdict": "verified"},
+    {"location": "Многоуровневая защита", "assertion": "Anthropic describes filesystem plus network isolation as complementary containment for agent tool execution.", "source": "https://www.anthropic.com/engineering/claude-code-sandboxing", "anchor": "Sandboxing: a safer and more autonomous approach", "scope": "Original 2025 article checked 2026-09-18; product claims not treated as universal guarantees", "verdict": "verified"},
+    {"location": "Многоуровневая защита", "assertion": "MCP 2026-07-28 HTTP authorization uses OAuth-based resource-server flow, protected resource discovery and intended audience validation; stdio uses a different credential model.", "source": "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization", "anchor": "Purpose and Scope; Protocol Requirements; Token Handling", "scope": "Official specification checked 2026-09-18; local HS256 bearer is explicitly not claimed conformant HTTP OAuth", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Четыре разных вопроса", "severity": "minor", "rationale": "Authentication wording could imply proof of human/process identity from possession of bearer.", "resolved": true, "resolution": "Defined credential/claims validation and explicitly excluded human/process attestation; reread."},
+    {"location": "Четыре разных вопроса", "severity": "minor", "rationale": "Approved_by field could be mistaken for independently authenticated approver identity.", "resolved": true, "resolution": "Added CLI-supplied identity caveat and development-only scope; reread."},
+    {"location": "Многоуровневая защита", "severity": "minor", "rationale": "Model-layer risk-reduction statement sounded guaranteed without measurement.", "resolved": true, "resolution": "Qualified as possible risk reduction without strict guarantee; reread."}
+  ],
+  "diagram_waiver": null
+}

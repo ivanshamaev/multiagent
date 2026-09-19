@@ -1,10 +1,10 @@
 # TODO — Лекция 19. Security: untrusted content, identity и enforcement
 
-Status: planned
+Status: lecture written; text-only reviewed
 
-Updated: 2026-09-15
+Updated: 2026-09-19
 
-Текст: `course/lectures/LECTURE-0019-security-authority.md` (ещё не написан).
+Текст: `course/lectures/LECTURE-0019-security-authority.md`.
 
 Track: core; исходная тема init: 19.
 
@@ -17,13 +17,13 @@ Prerequisites: [08](LECTURE-0008-isolation.md), [09](LECTURE-0009-mcp-interface.
 
 ## Что писать — todo
 
-- [ ] Дать threat model для user/tool/file content и цепочки delegation.
-- [ ] Развести authentication, code-owned authorization, role assignment и approval authority.
-- [ ] Показать request-bound local HMAC bearer, no passthrough и deny-by-default MCP gateway.
-- [ ] Сравнить атаки на fixed workflow и planner-agent; model-driven manager не может сам повышать права.
-- [ ] Объяснить defense-in-depth без обещания полной защиты injection или equivalence local HMAC/OAuth.
-- [ ] Добавить полезную схему/таблицу, строгие предпосылки и хотя бы один контрпример без laboratory exercise.
-- [ ] Завершить кратким резюме, 3–5 концептуальными self-check questions и переходом по syllabus.
+- [x] Дать threat model для user/tool/file content и цепочки delegation.
+- [x] Развести authentication, code-owned authorization, role assignment и approval authority.
+- [x] Показать request-bound local HMAC bearer, no passthrough и deny-by-default MCP gateway.
+- [x] Сравнить атаки на fixed workflow и planner-agent; model-driven manager не может сам повышать права.
+- [x] Объяснить defense-in-depth без обещания полной защиты injection или equivalence local HMAC/OAuth.
+- [x] Добавить полезную схему/таблицу, строгие предпосылки и хотя бы один контрпример без laboratory exercise.
+- [x] Завершить кратким резюме, 3–5 концептуальными self-check questions и переходом по syllabus.
 
 ## Границы и согласованность
 
@@ -36,27 +36,27 @@ Prerequisites: [08](LECTURE-0008-isolation.md), [09](LECTURE-0009-mcp-interface.
 
 runtime/mcp_auth.py; tests/adversarial/; STEP-0022.
 
-- [ ] Проверить code/evidence anchors и подписать historical/offline/not-implemented boundaries.
-- [ ] Не расширять фактические claims до fully-live READY, autonomous merge или planner runtime, которого нет.
+- [x] Проверить code/evidence anchors и подписать historical/offline/not-implemented boundaries.
+- [x] Не расширять фактические claims до fully-live READY, autonomous merge или planner runtime, которого нет.
 
 ## Интернет-статьи и переиспользуемые идеи
 
 - [Mitigating prompt injection attacks with a layered defense strategy](https://blog.google/security/mitigating-prompt-injection-attacks/) (Google GenAI Security Team, S25). Идея для этого ракурса: Indirect injection и layered defense.
 - [Beyond permission prompts: making Claude Code more secure and autonomous](https://www.anthropic.com/engineering/claude-code-sandboxing) (Anthropic, S10). Идея для этого ракурса: Containment ограничивает последствия untrusted execution.
 
-- [ ] Перед авторством перечитать выбранные разделы; точные claims/API details проверить по первичным источникам.
-- [ ] Переиспользовать концепции своими словами с attribution; не копировать текст, полный перевод или чужую схему.
-- [ ] Различить утверждение статьи, наш пример и авторское обобщение; source caveats — в [SOURCES](SOURCES.md).
+- [x] Перед авторством перечитать выбранные разделы; точные claims/API details проверить по первичным источникам.
+- [x] Переиспользовать концепции своими словами с attribution; не копировать текст, полный перевод или чужую схему.
+- [x] Различить утверждение статьи, наш пример и авторское обобщение; source caveats — в [SOURCES](SOURCES.md).
 
 ## Авторство, редактура и фактчекинг — обязательные todo
 
-- [ ] Соблюсти [технические требования](../../../course/technical-requirements.md): Markdown и Mermaid с подписью, accTitle/accDescr и текстовым эквивалентом.
-- [ ] При готовом сборщике проверить SVG/HTML визуально: стрелки, кириллицу, mobile/desktop, no-JS и доступность; не отмечать render PASS до фактической проверки.
-- [ ] В review учесть diagram config/toolchain/assets; не повторять UI-код zoom/pan/fullscreen в тексте лекции.
+- [x] Соблюсти [технические требования](../../../course/technical-requirements.md): Markdown и Mermaid с подписью, accTitle/accDescr и текстовым эквивалентом.
+- [x] Проверить текстовую семантику Mermaid source, подписи и текстового эквивалента; не делать скриншоты и визуальную вычитку SVG/HTML.
+- [x] Сохранить text-only review и static-build fingerprints; не проставлять visual/AX/browser PASS и не повторять UI-код zoom/pan/fullscreen в лекции.
 
-- [ ] Применить `technical-markdown-lectures` с deep-theory depth; созданные editorial skills прочитать перед review и записать версии/usage.
-- [ ] После написания выполнить полную вычитку: язык, терминология, структура, повторы внутри лекции и по соседним темам.
-- [ ] Отдельно перепроверить существенные claims, числа/даты/версии, соответствие схем тексту и code/evidence.
-- [ ] Исправить findings и повторно проверить затронутый текст; существенная переработка требует полной вычитки.
-- [ ] Сохранить per-lecture review record с content hash и source anchors; missing/stale review запрещает reviewed.
-- [ ] Перед публикацией сверить topic ownership/cross-links и отсутствие unresolved существенных замечаний.
+- [x] Применить `technical-markdown-lectures` с deep-theory depth; созданные editorial skills прочитать перед review и записать версии/usage.
+- [x] После написания выполнить полную вычитку: язык, терминология, структура, повторы внутри лекции и по соседним темам.
+- [x] Отдельно перепроверить существенные claims, числа/даты/версии, соответствие схем тексту и code/evidence.
+- [x] Исправить findings и повторно проверить затронутый текст; существенная переработка требует полной вычитки.
+- [x] Сохранить per-lecture review record с content hash и source anchors; missing/stale review запрещает reviewed.
+- [x] Перед публикацией сверить topic ownership/cross-links и отсутствие unresolved существенных замечаний.

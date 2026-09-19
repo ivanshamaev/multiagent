@@ -1,10 +1,10 @@
 # 18 — Airflow API: наблюдение и контролируемые операции
 
-Status: outline; lecture not written
+Status: lecture written; text-only reviewed
 
 Track: core
 
-[Todo-план](../../../plan/steps/lections/LECTURE-0018-airflow-operations.md) · [Manifest](../../manifest.json) · [Технические требования](../../technical-requirements.md)
+[Лекция](../../lectures/LECTURE-0018-airflow-operations.md) · [Todo-план](../../../plan/steps/lections/LECTURE-0018-airflow-operations.md) · [Manifest](../../manifest.json) · [Технические требования](../../technical-requirements.md)
 
 ## Место и prerequisites
 
@@ -26,7 +26,7 @@ Primary concepts: `data orchestration boundary`, `operation approval binding`, `
 - Развести data-task scheduling и orchestration reasoning агентов.
 - Объяснить stable REST /api/v2 vs Task Execution API без смешения двух интерфейсов.
 - Показать observer GET scope и separate approved dev-DAG trigger identity.
-- Применить понятие operation identity из 18; не переобъяснять idempotency protocol и общий threat model.
+- Применить понятие operation identity из 17; не переобъяснять idempotency protocol и общий threat model.
 
 Интуиция → предпосылки → причинность → контрпример → синтез, 3–5 вопросов и переход.
 Нет student coding tasks или обязательных запусков.
@@ -55,7 +55,8 @@ Offline/code evidence ограничено своей областью. Proposed
 
 ## Авторство и проверка
 
-Будущий текст: `course/lectures/LECTURE-0018-airflow-operations.md`; outline не лекция.
+Текст: `course/lectures/LECTURE-0018-airflow-operations.md`.
 [Editorial guidelines](../../editorial-guidelines.md), [lecture template](../../templates/lecture.md),
 [review schema](../../templates/review.json) требуют вычитку, technical verification и recheck.
-Missing/stale receipt запрещает reviewed; diagrams требуют actual render/visual gate.
+Missing/stale receipt запрещает reviewed; diagrams проходят text-only source review
+и машинную сборку без скриншотов или visual/AX/browser PASS.

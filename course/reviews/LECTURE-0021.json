@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "lecture_id": 21,
+  "reviewer": "Codex; same-author separate editorial/technical/recheck passes, not independent review",
+  "checked_at": "2026-09-19T07:12:21Z",
+  "input_digest": "e9450ad67def5e993241730370a60b1a5b38512cc435c08639b439987def8817",
+  "content_sha256": "2e7f91382b72f684981bcd68656cbbf65a926860f1f8cede0fddbb0a1871ed01",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "diagram_semantics": true},
+  "pass_scope": {
+    "editorial": "Complete theory-only text reread against todo 21, technical requirements, glossary and neighbouring owners 15/16/20/22/23/24. Definitions, measurement-unit section, three evidence regimes, baseline distinctions, counterexample and five questions checked for continuity and non-duplication.",
+    "technical": "Anthropic evaluation and infrastructure-noise articles checked online 2026-09-19; current Phase K suite/baseline/runtime/tests and dated STEP-0024/STEP-0009 evidence checked locally. Statistical claims are qualified by independence, configuration, denominator and small-sample limitations.",
+    "recheck": "Replaced an overbroad release-gate example with an explicit repetition policy; removed an unsupported implication that graders are necessarily independent; clarified balanced paired comparison and reread the complete affected lecture.",
+    "diagram_semantics": "Mermaid source, accTitle/accDescr, configuration/task inputs, execution/evidence/grader flow, confounder branch, baseline comparison, caption and text equivalent checked against the prose. No screenshots, browser checks, SVG/HTML visual or AX review, per user instruction.",
+    "not_checked": ["Independent reviewer", "Rendered visual quality", "Browser/mobile/print/AX", "Fresh paid model evaluation", "Current provider behavior", "Population-level model reliability", "Fully-live six-role READY"]
+  },
+  "claims": [
+    {"location": "Язык измерения", "assertion": "Agent evaluation distinguishes task, trial, grader, transcript/trajectory, outcome, harness and suite; outcome can differ from an agent's textual claim.", "source": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents", "anchor": "The structure of an evaluation", "scope": "Original article checked 2026-09-19; terminology adapted to the local platform", "verdict": "verified"},
+    {"location": "Единица успеха", "assertion": "pass@k represents at least one success among k attempts, whereas pass^k represents all k attempts succeeding; interpretation depends on product requirements.", "source": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents", "anchor": "How to think about non-determinism in evaluations for agents", "scope": "Article checked 2026-09-19; displayed formulas explicitly assume identical independent Bernoulli trials", "verdict": "verified"},
+    {"location": "Три режима evidence", "assertion": "Capability and regression evaluations serve different questions; regression suites target previously supported behavior while saturated capability suites lose improvement signal.", "source": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents", "anchor": "Capability vs. regression evals; Monitor for capability eval saturation", "scope": "Original article checked 2026-09-19; no numeric target transferred to the local system", "verdict": "verified"},
+    {"location": "Grader", "assertion": "Agent evaluation can combine code-, model- and human-based graders; model graders need calibration and path-exact grading can reject valid solutions.", "source": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents", "anchor": "Types of graders for agents; Design graders thoughtfully", "scope": "Original article checked 2026-09-19; local QA/Reviewer authority remains defined by lectures 15/16", "verdict": "verified"},
+    {"location": "Инфраструктура", "assertion": "In Anthropic's Terminal-Bench 2.0 experiment, resource configuration produced a six-percentage-point spread and therefore acted as an experimental variable.", "source": "https://www.anthropic.com/engineering/infrastructure-noise", "anchor": "How we got here; How this affects measurement", "scope": "Original article checked 2026-09-19; result is not generalized numerically to this repository", "verdict": "verified"},
+    {"location": "Что измерено", "assertion": "The Phase K suite has 17 cases split 5 reliability, 5 quality and 7 safety, with three subprocess repetitions and a strict all-category 1.0 acceptance threshold plus zero policy violations/tokens/cost.", "source": "evals/phase_k/suite.json", "anchor": "repetitions; cases; configuration_inputs", "scope": "Current suite plus evals/phase_k/baseline.json and runtime/evaluation_benchmark.py; offline regression scope only", "verdict": "verified"},
+    {"location": "Что измерено", "assertion": "Two final post-fix Phase K samples each passed 51/51 runs, totaling 102/102, without constituting 102 independent semantic tasks or a live model-quality run.", "source": "plan/evidence/STEP-0024-phase-k-evaluation-benchmark.md", "anchor": "Final post-fix sample; Problems and remaining risks", "scope": "Dated repository evidence; timing is not an SLO and paid models were not rerun", "verdict": "verified"},
+    {"location": "Что измерено", "assertion": "The retained Data Engineer sample observed 7/10 end-to-end successes for one GPT-5.6 Luna configuration; the historical index contains 24 heterogeneous attempts across roles.", "source": "evals/phase_k/historical_live_baseline.json", "anchor": "samples", "scope": "Historical, heterogeneous role-specific evidence; STEP-0009 reliability sample supplies the DE provenance", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Единица успеха", "severity": "minor", "rationale": "The initial release-gate example could be read as at-least-once success even though the local strict baseline requires every run to pass.", "resolved": true, "resolution": "Reframed it as a predeclared repetition policy and reread the section."},
+    {"location": "Измерительный pipeline", "severity": "minor", "rationale": "The first accDescr called graders independent although separation does not prove statistical or organizational independence.", "resolved": true, "resolution": "Changed the label to declared graders and rechecked diagram/prose equivalence."},
+    {"location": "Baseline", "severity": "minor", "rationale": "A comparison-order recommendation needed to avoid implying that ordering alone removes dependency.", "resolved": true, "resolution": "Specified paired balanced ordering and retained the explicit residual-dependency caveat."}
+  ],
+  "diagram_waiver": null
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "lecture_id": 15,
+  "reviewer": "Codex; same-author separate editorial/technical/recheck passes, not independent review",
+  "checked_at": "2026-09-18T16:41:56Z",
+  "input_digest": "8222d720414a2c8acc925efd2c5a4786bef3aba5db892471104cce19040d2e93",
+  "content_sha256": "048d0da1a5eb6bcdea708d0dde0180d2ccf2394de1c15c031f558d6d6f15f5b1",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "diagram_semantics": true},
+  "pass_scope": {
+    "editorial": "Full lecture reread against todo 15, glossary and adjacent lectures 14/06 plus owner boundaries 16/21. Terminology, progression, duplicated theory, counterexample, conclusion and five questions checked.",
+    "technical": "Original dbt Labs S18 and Anthropic S20 checked online 2026-09-18; current validator, QA executor/probe/profile/contracts, five-mutant manifest and dated STEP-0010/EXP-0003/PRB-0035 evidence checked. Historical claims explicitly bounded.",
+    "recheck": "Corrected PRB-0035 path and reread affected paragraph. Verified shared-oracle blind spot and current empty-diff protocol separately; no material unresolved issue.",
+    "diagram_semantics": "Mermaid source, accTitle/accDescr, branch labels, caption and textual equivalent compared to prose and code. No SVG/HTML visual review, browser checks or screenshots were performed, per user instruction.",
+    "not_checked": ["Independent reviewer", "Rendered diagram visual quality", "Browser/mobile/print/AX", "Fresh live GateLLM/ClickHouse/Airflow", "Fully-live six-role READY", "Production deployment"]
+  },
+  "claims": [
+    {"location": "PASS публичного validator", "assertion": "dbt Labs describes data tests as codified assumptions and notes failure may reveal wrong SQL or changed source assumptions.", "source": "https://www.getdbt.com/blog/data-testing", "anchor": "Why data testing is essential for analytics engineering; data assumptions and test failures", "scope": "Original article checked 2026-09-18; no changing adoption statistics reused", "verdict": "verified"},
+    {"location": "PASS публичного validator", "assertion": "Anthropic distinguishes agent transcript from outcome and discusses multiple code/model/human grader types.", "source": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents", "anchor": "What to evaluate; graders", "scope": "Original article checked 2026-09-18; local QA is not equated with full evaluation", "verdict": "verified"},
+    {"location": "PASS публичного validator", "assertion": "Validator executes workspace integrity, public build, independent SQL and repository policy gates before VALIDATED.", "source": "runtime/validator.py", "anchor": "validation_plan; validate_candidate", "scope": "Current code checked 2026-09-18", "verdict": "verified"},
+    {"location": "Как QA получает evidence", "assertion": "QA performs one fixed model-file read and one code-owned no-argument SQL probe; runtime checks measured evidence count and query arguments hash.", "source": "runtime/qa_workflow.py", "anchor": "AutonomousQAExecutor.run_assessment; _public_probe_tool", "scope": "Current code; structural proof does not imply correct model interpretation", "verdict": "verified"},
+    {"location": "Как QA получает evidence", "assertion": "Public semantic probe rebuilds attribution, compares expected and actual rows symmetrically with EXCEPT DISTINCT, and limits returned diagnostic rows to 100.", "source": "runtime/qa.py", "anchor": "QA_SEMANTIC_PROBE_SQL", "scope": "Current code; oracle shares fct_orders upstream", "verdict": "verified"},
+    {"location": "Принятый defect", "assertion": "QA requires VALIDATED state, different author identity, same-task evidence; FAIL requires severity, description and acceptance criterion and creates REWORK branch.", "source": "runtime/qa.py", "anchor": "accept_qa_draft; contracts/artifacts.py QAReport", "scope": "Current code checked 2026-09-18", "verdict": "verified"},
+    {"location": "Мутация", "assertion": "Five fixed mutants and 0/5 false passes were observed in the historical dated run after public validator PASS.", "source": "plan/experiments/EXP-0003-qa-mutations.md", "anchor": "Result matrix and limitations; tests/fixtures/qa_mutants/manifest.json", "scope": "Historical 2026-09-12 corpus only; not a population quality estimate", "verdict": "verified"},
+    {"location": "Принятый defect", "assertion": "Historical refund-date mutation passed public validator and produced a QA mismatch; later DE repair was revalidated and reassessed.", "source": "plan/evidence/STEP-0010-qa-quality-loop.md", "anchor": "QA mutation and rework evidence", "scope": "Historical sample only", "verdict": "verified"},
+    {"location": "Принятый defect", "assertion": "The earlier canonical candidate and oracle shared ClickHouse argMax nullable-channel bug, yielding empty semantic diff before repair.", "source": "plan/problems/PRB-0035-null-attribution-argmax.md", "anchor": "Reproduction; cause and fix", "scope": "Earlier protocol; not a current QA promise", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Контрпример к чрезмерной уверенности", "severity": "minor", "rationale": "Draft PRB-0035 link used an incorrect filename.", "resolved": true, "resolution": "Corrected link to PRB-0035-null-attribution-argmax.md and rechecked its factual summary."}
+  ],
+  "diagram_waiver": null
+}

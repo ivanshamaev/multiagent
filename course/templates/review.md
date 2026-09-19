@@ -19,7 +19,11 @@ Claim location → primary source/code/evidence anchor → verified verdict и s
 
 Finding → correction → recheck; major rewriting → full reread.
 
-## Visual gate и итог
+## Текстовая семантика схем и итог
 
-Actual SVG/HTML/visual checks, не исходный fence. Без major/blocking unresolved findings.
-Актуальный JSON receipt, same-author passes не называются independent.
+Сверить Mermaid source, `accTitle`/`accDescr`, подпись и текстовый эквивалент
+с техническими claims. Не делать скриншоты и browser/visual review.
+Для новых лекций использовать schema v2 и `diagram_semantics: true` только после
+такой текстовой проверки. Машинная сборка — отдельный static gate, не визуальная
+вычитка. Без major/blocking unresolved findings; same-author passes не independent.
+Исторические schema v1 receipts сохраняют фактически выполненные проверки.

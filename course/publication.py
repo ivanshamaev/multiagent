@@ -36,6 +36,7 @@ PASSES = (
     "links",
     "visual",
 )
+TEXT_ONLY_PASSES = ("static_build", "markdown_links", "diagram_semantics")
 
 
 def receipt_path(lecture: dict) -> str:
@@ -53,7 +54,8 @@ def publication_digest(root: Path, lecture: dict) -> str:
 
 def check_publication(root: Path, lecture: dict) -> dict:
     receipt = load_json(root, receipt_path(lecture))
-    if receipt.get("schema_version") != 1 or receipt.get("lecture_id") != lecture["id"]:
+    schema = receipt.get("schema_version")
+    if schema not in {1, 2} or receipt.get("lecture_id") != lecture["id"]:
         raise ValueError("publication identity mismatch")
     if not receipt.get("reviewer"):
         raise ValueError("missing publication reviewer")
@@ -62,19 +64,29 @@ def check_publication(root: Path, lecture: dict) -> dict:
         raise ValueError("publication timestamp must be UTC")
     if receipt.get("publication_digest") != publication_digest(root, lecture):
         raise ValueError("stale publication receipt")
-    if any(receipt.get("passes", {}).get(name) is not True for name in PASSES):
-        raise ValueError("incomplete publication passes")
-    if receipt.get("assistive_technology", {}).get("tested") not in (True, False):
-        raise ValueError("missing actual assistive technology scope")
-    if not receipt["assistive_technology"].get("scope"):
-        raise ValueError("missing assistive technology limitation")
+    if schema == 1:
+        if any(receipt.get("passes", {}).get(name) is not True for name in PASSES):
+            raise ValueError("incomplete publication passes")
+        if receipt.get("assistive_technology", {}).get("tested") not in (True, False):
+            raise ValueError("missing actual assistive technology scope")
+        if not receipt["assistive_technology"].get("scope"):
+            raise ValueError("missing assistive technology limitation")
+    else:
+        if receipt.get("review_mode") != "text-only":
+            raise ValueError("text-only publication mode is required")
+        if any(receipt.get("passes", {}).get(name) is not True for name in TEXT_ONLY_PASSES):
+            raise ValueError("incomplete text-only publication passes")
+        if any(name in receipt for name in ("assistive_technology", "artifacts_sha256")):
+            raise ValueError("text-only receipt must not claim visual evidence")
+        if any(name in receipt.get("passes", {}) for name in PASSES):
+            raise ValueError("text-only receipt must not claim browser or visual passes")
     if not isinstance(receipt.get("renderer"), dict) or not receipt["renderer"]:
         raise ValueError("missing actual renderer fingerprint")
-    artifacts = receipt.get("artifacts_sha256")
+    artifacts = receipt.get("artifacts_sha256") if schema == 1 else {}
     if not isinstance(artifacts, dict):
         raise ValueError("missing publication artifact hashes")
     hashes = [receipt.get("rendered_sha256"), *artifacts.values()]
-    if len(hashes) < 2 or any(
+    if (schema == 1 and len(hashes) < 2) or any(
         not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value) for value in hashes
     ):
         raise ValueError("missing publication artifact hashes")

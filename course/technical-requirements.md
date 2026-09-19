@@ -58,10 +58,12 @@ Sequence diagrams поддерживают participants, сообщения, в�
 - Имена согласованы с прозой. Стрелки обозначают запрос/proposal/artifact/evidence/verdict;
   data flow не смешивается с authority. Пунктир, цвета и trust boundaries имеют легенду.
 - Латинские локальные IDs, короткие русские labels. Ориентир: до 6 участников sequence
-  или 12 основных узлов flowchart; превышение требует визуальной проверки, обычно делить схему.
+  или 12 основных узлов flowchart; более сложную схему обычно делить и проверять
+  текстовую полноту каждой части.
 - `accTitle` и `accDescr` обязательны, как и текстовый эквивалент существенных шагов рядом:
   [доступность Mermaid](https://mermaid.js.org/config/accessibility.html).
-- Цвет не единственный носитель смысла. Кириллица, light/dark palette и контраст проверяются.
+- Цвет не единственный носитель смысла. Эти свойства остаются требованиями
+  к HTML-компоненту, но для отдельных лекций не заявляется визуальный PASS.
 - Запрещены `click`, HTML labels, init directives и внешние картинки. Конфигурация/стиль — общие.
 - LLM предлагает действие, runtime проверяет и выполняет. Обозначать denial/failure/budget,
   если они существенны. Не изображать private chain-of-thought.
@@ -166,31 +168,38 @@ runtime behavior. Не копировать чужой SVG, полный тек�
 
 После каждой лекции обязательны полная редакторская вычитка, technical verification и recheck.
 Review receipt связывается с hash Markdown/assets, diagram config и toolchain fingerprint;
-изменение влияющих inputs делает соответствующую проверку stale.
+изменение влияющих inputs делает соответствующую проверку stale. Начиная с
+лекции 14 (уточнение пользователя от 2026-09-18), per-lecture review только
+текстовый: редактура, факты, links и семантика Mermaid source. Скриншоты и
+browser/visual вычитка не выполняются. Legacy receipts v1 для лекций 00–13
+сохраняют фактически выполненную ранее визуальную проверку.
 
 - [ ] Markdown lint, metadata, prerequisites, links/anchors и contained paths проходят.
 - [ ] Все Mermaid blocks парсятся/рендерятся pinned CLI; ошибка останавливает build.
 - [ ] Нет secrets/private artifacts в output; SVG проходит allowlist validation.
-- [ ] Каждый рисунок визуально проверен: labels/стрелки/ветки соответствуют тексту,
-  кириллица читаема, нет clipping/overlap.
-- [ ] Проверены mobile/desktop, light/dark, no-JS, keyboard, print и screen-reader доступность.
-  Несколько рисунков на странице не конфликтуют IDs/handlers.
-- [ ] Final URL/subpath/CSP работают без обязательных внешних запросов.
+- [ ] Mermaid source, стрелки/ветки, подпись и текстовый эквивалент семантически
+  согласованы с прозой и code/evidence; визуальное качество не заявляется.
+- [ ] Статическая сборка парсит Markdown/схемы, проверяет ссылки и не выпускает
+  неразрешённые внешние ресурсы; это машинная проверка, не браузерный review.
 - [ ] Нет unresolved существенных findings; review актуален для публикуемой версии.
 
 `make course-check` реализован как offline gate; `make course-build` рендерит ограниченный
 STEP-0026 prototype, включая приведённый tool loop. Публикационный gate всех лекций остаётся отдельным.
-Build/lint не заменяет вычитку, фактчекинг и визуальную проверку.
+Build/lint не заменяет вычитку и фактчекинг; визуальная проверка больше не
+входит в per-lecture workflow.
 
 STEP-0030 / ADR-0039: основной reader выбирает полный текст только при `reviewed`
 и актуальных content/publication receipts. Кандидат собирается отдельной командой
 `uv run python -m course.build --candidate 0 --output build/course-review-0000`.
 Publication digest включает builder/templates/CSS/JS/lockfiles и content review.
-Изменение этих inputs требует повторной browser/visual проверки.
+Для receipts v2 изменение этих inputs требует повторного content/static-build
+gate, но не browser/visual проверки. Для исторических receipts v1 сохранён
+прежний fingerprint и прежняя область доказательства.
 
-Автоматическая проверка screen-reader разметки включает AX tree, accessible
-names/descriptions, landmarks и текстовые альтернативы при выключенном JS.
-Она не подменяет реальную AT-навигацию:
+Ранее автоматическая проверка screen-reader разметки включала AX tree,
+accessible names/descriptions, landmarks и текстовые альтернативы при
+выключенном JS. Она не подменяла реальную AT-навигацию и не входит в
+новый text-only gate:
 [Chrome accessibility reference](https://developer.chrome.com/docs/devtools/accessibility/reference).
 Фактическое взаимодействие с Orca/NVDA/VoiceOver записывается отдельно, без fake PASS;
 непроверенная interoperability остаётся явно указанным deployment risk.

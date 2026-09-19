@@ -1,10 +1,10 @@
 # TODO — Лекция 14. DE: ограниченная автономия изменения данных
 
-Status: planned
+Status: reviewed; text-only publication gate
 
-Updated: 2026-09-15
+Updated: 2026-09-18
 
-Текст: `course/lectures/LECTURE-0014-data-engineer.md` (ещё не написан).
+Текст: `course/lectures/LECTURE-0014-data-engineer.md` (написан и проверен).
 
 Track: core; исходная тема init: 12.
 
@@ -17,12 +17,12 @@ Prerequisites: [13](LECTURE-0013-pm-specification.md), [11](LECTURE-0011-dbt-sem
 
 ## Что писать — todo
 
-- [ ] Разделить утверждённую спецификацию и пространство допустимых implementation choices.
-- [ ] Объяснить isolated candidate и authority только над editable dbt subtree.
-- [ ] Показать Net Revenue payment/refund attribution как применение grain/semantics из 11/13.
-- [ ] Рассмотреть semantic repair по validator evidence; не переобъяснять QA, reducer budget и checkpoint.
-- [ ] Добавить полезную схему/таблицу, строгие предпосылки и хотя бы один контрпример без laboratory exercise.
-- [ ] Завершить кратким резюме, 3–5 концептуальными self-check questions и переходом по syllabus.
+- [x] Разделить утверждённую спецификацию и пространство допустимых implementation choices.
+- [x] Объяснить isolated candidate и authority только над editable dbt subtree.
+- [x] Показать Net Revenue payment/refund attribution как применение grain/semantics из 11/13.
+- [x] Рассмотреть semantic repair по validator evidence; не переобъяснять QA, reducer budget и checkpoint.
+- [x] Добавить полезную схему/таблицу, строгие предпосылки и хотя бы один контрпример без laboratory exercise.
+- [x] Завершить кратким резюме, 3–5 концептуальными self-check questions и переходом по syllabus.
 
 ## Границы и согласованность
 
@@ -35,27 +35,27 @@ Prerequisites: [13](LECTURE-0013-pm-specification.md), [11](LECTURE-0011-dbt-sem
 
 runtime/data_engineer.py; runtime/data_engineer_workflow.py; STEP-0009.
 
-- [ ] Проверить code/evidence anchors и подписать historical/offline/not-implemented boundaries.
-- [ ] Не расширять фактические claims до fully-live READY, autonomous merge или planner runtime, которого нет.
+- [x] Проверить code/evidence anchors и подписать historical/offline/not-implemented boundaries.
+- [x] Не расширять фактические claims до fully-live READY, autonomous merge или planner runtime, которого нет.
 
 ## Интернет-статьи и переиспользуемые идеи
 
 - [What is analytics engineering?](https://www.getdbt.com/blog/what-is-analytics-engineering) (dbt Labs, S17). Идея для этого ракурса: Transformation work как инженерная дисциплина.
 - [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) (Anthropic, S09). Идея для этого ракурса: Инкрементальный прогресс без необоснованного completion.
 
-- [ ] Перед авторством перечитать выбранные разделы; точные claims/API details проверить по первичным источникам.
-- [ ] Переиспользовать концепции своими словами с attribution; не копировать текст, полный перевод или чужую схему.
-- [ ] Различить утверждение статьи, наш пример и авторское обобщение; source caveats — в [SOURCES](SOURCES.md).
+- [x] Перед авторством перечитать выбранные разделы; точные claims/API details проверить по первичным источникам.
+- [x] Переиспользовать концепции своими словами с attribution; не копировать текст, полный перевод или чужую схему.
+- [x] Различить утверждение статьи, наш пример и авторское обобщение; source caveats — в [SOURCES](SOURCES.md).
 
 ## Авторство, редактура и фактчекинг — обязательные todo
 
-- [ ] Соблюсти [технические требования](../../../course/technical-requirements.md): Markdown и Mermaid с подписью, accTitle/accDescr и текстовым эквивалентом.
-- [ ] При готовом сборщике проверить SVG/HTML визуально: стрелки, кириллицу, mobile/desktop, no-JS и доступность; не отмечать render PASS до фактической проверки.
-- [ ] В review учесть diagram config/toolchain/assets; не повторять UI-код zoom/pan/fullscreen в тексте лекции.
+- [x] Соблюсти [технические требования](../../../course/technical-requirements.md): Markdown и Mermaid с подписью, accTitle/accDescr и текстовым эквивалентом.
+- [x] Проверить только текстовую семантику Mermaid source, подписи и текстового эквивалента; не делать скриншоты и визуальную вычитку SVG/HTML.
+- [x] Не повторять UI-код zoom/pan/fullscreen в тексте лекции; до публикации согласовать legacy visual publication gate с уточнением пользователя от 2026-09-18, не проставляя фиктивный PASS.
 
-- [ ] Применить `technical-markdown-lectures` с deep-theory depth; созданные editorial skills прочитать перед review и записать версии/usage.
-- [ ] После написания выполнить полную вычитку: язык, терминология, структура, повторы внутри лекции и по соседним темам.
-- [ ] Отдельно перепроверить существенные claims, числа/даты/версии, соответствие схем тексту и code/evidence.
-- [ ] Исправить findings и повторно проверить затронутый текст; существенная переработка требует полной вычитки.
-- [ ] Сохранить per-lecture review record с content hash и source anchors; missing/stale review запрещает reviewed.
-- [ ] Перед публикацией сверить topic ownership/cross-links и отсутствие unresolved существенных замечаний.
+- [x] Применить `technical-markdown-lectures` с deep-theory depth; созданные editorial skills прочитать перед review и записать версии/usage.
+- [x] После написания выполнить полную вычитку: язык, терминология, структура, повторы внутри лекции и по соседним темам.
+- [x] Отдельно перепроверить существенные claims, числа/даты/версии, соответствие схем тексту и code/evidence.
+- [x] Исправить findings и повторно проверить затронутый текст; существенная переработка требует полной вычитки.
+- [x] Сохранить per-lecture review record с content hash и source anchors; missing/stale review запрещает reviewed.
+- [x] Перед публикацией сверить topic ownership/cross-links и отсутствие unresolved существенных замечаний.

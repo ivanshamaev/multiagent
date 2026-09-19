@@ -1,6 +1,6 @@
 # 14 — DE: ограниченная автономия изменения данных
 
-Status: outline; lecture not written
+Status: reviewed; text-only publication gate passed
 
 Track: core
 
@@ -25,7 +25,7 @@ Primary concepts: `implementation authority`, `candidate change boundary`, `sema
 
 - Разделить утверждённую спецификацию и пространство допустимых implementation choices.
 - Объяснить isolated candidate и authority только над editable dbt subtree.
-- Показать Net Revenue payment/refund attribution как применение grain/semantics из 08/10.
+- Показать Net Revenue payment/refund attribution как применение grain/semantics из 11/13.
 - Рассмотреть semantic repair по validator evidence; не переобъяснять QA, reducer budget и checkpoint.
 
 Интуиция → предпосылки → причинность → контрпример → синтез, 3–5 вопросов и переход.
@@ -50,12 +50,13 @@ Offline/code evidence ограничено своей областью. Proposed
 - [What is analytics engineering?](https://www.getdbt.com/blog/what-is-analytics-engineering) — Transformation work как инженерная дисциплина.
 - [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) — Инкрементальный прогресс без необоснованного completion.
 
-Перечитать перед авторством; пересказать своими словами с attribution.
+Идеи пересказаны своими словами с attribution после чтения первоисточников.
 [Source caveats](../../../plan/steps/lections/SOURCES.md) обязательны.
 
 ## Авторство и проверка
 
-Будущий текст: `course/lectures/LECTURE-0014-data-engineer.md`; outline не лекция.
+Текст: [лекция 14](../../lectures/LECTURE-0014-data-engineer.md); text-only review завершён.
 [Editorial guidelines](../../editorial-guidelines.md), [lecture template](../../templates/lecture.md),
 [review schema](../../templates/review.json) требуют вычитку, technical verification и recheck.
-Missing/stale receipt запрещает reviewed; diagrams требуют actual render/visual gate.
+Missing/stale receipt запрещает reviewed; для этой лекции действует text-only
+review без скриншотов и browser/visual gate.

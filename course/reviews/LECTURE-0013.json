@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "lecture_id": 13,
+  "reviewer": "Codex; same-author separate passes, not independent review",
+  "checked_at": "2026-09-18T15:00:21Z",
+  "input_digest": "8ee8e5278dfa51a4525e83a81617e51bfa4ecbeab0317ef54138510b353cfb7a",
+  "content_sha256": "454156d402259d5e5d23254a0415110427aeef620fcf8f08888a325f6560a869",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "visual": true},
+  "pass_scope": {
+    "editorial": "Entire theory-only lecture reread after authoring against todo 13, glossary, lecture 12 and owner boundaries 06/11/14. Metric-definition causal chain, authority/readiness distinction, table, counterexample, diagram and transition checked.",
+    "technical": "Primary dbt Labs S15 and Zhamak Dehghani S14 read online 2026-09-18; current PM executor, artifact/reducer contract, human-authored scenario spec and dated STEP-0013 checked. 28 targeted PM/contract/workflow tests passed.",
+    "recheck": "Corrected four-row taxonomy heading, separated executor state/events from model-visible handoff, clarified that code cannot assess business materiality, narrowed baseline return terminology and fixed example-period wording. Affected sections reread against code and scenario JSON.",
+    "visual": "Chrome candidate reviewed at /course/topic-0013.html: desktop, 360px mobile, light/dark, no-JS, keyboard, print, AX, CSP, subpath and links passed. Seven screenshots inspected: diagram branches, arrows and Cyrillic legible; mobile scroll and print unobstructed.",
+    "not_checked": ["Independent reviewer", "Actual assistive technology interaction", "Current live GateLLM/ClickHouse/Airflow", "Autonomous PM READY on the unresolved case", "Fully-live six-role readiness"]
+  },
+  "claims": [
+    {"location": "От намерения к контракту", "assertion": "dbt Labs argues that centrally defined metric calculations and contextual metadata support consistency across consumption tools.", "source": "https://www.getdbt.com/blog/build-centralize-and-deliver-consistent-metrics-with-the-dbt-semantic-layer", "anchor": "Bring consistency to your metrics; Empower downstream stakeholders", "scope": "Original article checked 2026-09-18; local project does not claim dbt Semantic Layer/MetricFlow implementation", "verdict": "verified"},
+    {"location": "От намерения к контракту", "assertion": "Data Mesh article frames analytical data consumers as users of data products with understandable interfaces.", "source": "https://martinfowler.com/articles/data-mesh-principles.html", "anchor": "Data as a product", "scope": "Original 2020 article checked 2026-09-18; concept transferred, not platform implementation claim", "verdict": "verified"},
+    {"location": "Readiness", "assertion": "PM executor verifies ANALYSIS_READY, accepted chain tip and matching workflow/task before one tool-free model call.", "source": "runtime/agent_runtime.py", "anchor": "validate_pm_request and SpecificationExecutor.specify", "scope": "Current repository code 2026-09-18; 28 targeted tests passed", "verdict": "verified"},
+    {"location": "Readiness", "assertion": "PM draft cannot be READY with unresolved Analyst questions and cannot alter their order/content; code owns identity, budget and transition.", "source": "runtime/agent_runtime.py", "anchor": "accept_specification_draft", "scope": "Current repository code 2026-09-18", "verdict": "verified"},
+    {"location": "Readiness", "assertion": "READY requires metric, grain, dimensions, sources, criteria and no questions; BLOCKED requires needs_user and questions.", "source": "contracts/artifacts.py", "anchor": "TaskSpecification.validate_decision", "scope": "Current repository code 2026-09-18; structural gate, not semantic truth proof", "verdict": "verified"},
+    {"location": "Diagram", "assertion": "Reducer binds spec_ready to ready artifact and PM blocked to needs_user; BLOCKED has no outgoing transition in v1.", "source": "orchestrator/transitions.py", "anchor": "ALLOWED_TRANSITIONS and _artifact_gate", "scope": "Current repository code 2026-09-18", "verdict": "verified"},
+    {"location": "Net Revenue", "assertion": "Human-authored baseline defines event arithmetic, original order UTC date, four-dimensional grain, no FX mixing and acceptance criteria.", "source": "scenarios/net-revenue/specification.json", "anchor": "specification.metric_definition, grain, source_requirements, acceptance_criteria", "scope": "Repository scenario baseline, not autonomous PM output", "verdict": "verified"},
+    {"location": "Net Revenue", "assertion": "Specification loader checks managed workspace, scenario version and TASK.md hash.", "source": "runtime/specification.py", "anchor": "load_scenario_specification", "scope": "Current repository code 2026-09-18", "verdict": "verified"},
+    {"location": "Net Revenue", "assertion": "STEP-0013 recorded one Analyst to PM live run ending BLOCKED/needs_user with nine unresolved questions.", "source": "plan/evidence/STEP-0013-pm-specification-gate.md", "anchor": "Verification and residual risks", "scope": "Historical 2026-09-13 evidence only; no live READY claim", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "От намерения к контракту", "severity": "minor", "rationale": "Draft announced three kinds of statements but table contained four.", "resolved": true, "resolution": "Changed heading to four and reread table."},
+    {"location": "Readiness", "severity": "minor", "rationale": "Draft collapsed executor input into handoff and could imply model sees state/events.", "resolved": true, "resolution": "Separated executor's handoff/state/events from model-visible task/analysis summary; rechecked _user_prompt and request contract."},
+    {"location": "Readiness/diagram", "severity": "minor", "rationale": "Initial wording could imply code decides whether a question is materially important to business.", "resolved": true, "resolution": "Specified code checks structural requirements and preserves identified questions; diagram description narrowed; reread PM/reducer code."},
+    {"location": "Net Revenue counterexample", "severity": "minor", "rationale": "Initial 'two days' wording could imply consecutive dates; 'repeated refunds' could imply duplicates rather than multiple valid refunds.", "resolved": true, "resolution": "Used period including both dates and multiple/partial/late refunds; compared scenario JSON."}
+  ],
+  "diagram_waiver": null
+}

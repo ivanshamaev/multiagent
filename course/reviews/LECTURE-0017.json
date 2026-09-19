@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "lecture_id": 17,
+  "reviewer": "Codex; same-author separate editorial/technical/recheck passes, not independent review",
+  "checked_at": "2026-09-18T20:50:14Z",
+  "input_digest": "86bebf7f94b3d99375cfa3128da727d94e96263abd13b1631dfceb49d8890736",
+  "content_sha256": "8556a7497001d597b8a25a5e28b7ac4669a222b8e2913329209412d39f38673f",
+  "skills": ["technical-markdown-lectures", "technical-editorial-review", "technical-claim-verification"],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {"editorial": true, "technical": true, "recheck": true, "diagram_semantics": true},
+  "pass_scope": {
+    "editorial": "Full theory-only text reread against todo 17, glossary and neighbouring owners 04/06/18/22. Definitions, temporal causality, distinct failure windows, counterexample, diagram caption and five questions checked.",
+    "technical": "Original AWS Builders' Library S12 and Anthropic S27 checked online 2026-09-18; current checkpoint/receipt adapters, role executor, process-kill integration tests and dated STEP-0018/0019/0020 plus PRB-0052 verified.",
+    "recheck": "Qualified at-least-once as retry policy conditional on eventual recipient availability; limited the diagram to an external write; distinguished read-only repeats; qualified reconciliation by observability. Corrected affected paragraphs and reread them against source code.",
+    "diagram_semantics": "Mermaid source, accTitle/accDescr, timing/branch labels, caption and text equivalent compared to code and failure-window table. No screenshots, browser checks, SVG/HTML visual or AX review, per user instruction.",
+    "not_checked": ["Independent reviewer", "Rendered visual quality", "Browser/mobile/print/AX", "Power-loss durability", "Fresh live GateLLM/ClickHouse/Airflow", "Fully-live six-role READY"]
+  },
+  "claims": [
+    {"location": "Три разных результата", "assertion": "AWS describes lost responses, client request identity and semantic equivalence for idempotent retries.", "source": "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/", "anchor": "Retrying and side effects; Reducing client complexity; Retries and semantic equivalence", "scope": "Original article checked 2026-09-18; no AWS service guarantee transferred to this repository", "verdict": "verified"},
+    {"location": "Три разных результата", "assertion": "Anthropic's Managed Agents separates durable session log, harness and sandbox lifecycles.", "source": "https://www.anthropic.com/engineering/managed-agents", "anchor": "Decouple the brain from the hands; Recovering from harness failure; The session is not Claude's context window", "scope": "Original 2026-04-08 article checked 2026-09-18; architectural analogy only", "verdict": "verified"},
+    {"location": "Окна сбоя", "assertion": "Role executor computes input-bound operation ID, checks receipt, validates stage result, saves receipt before returning output, and verifies receipt on replay.", "source": "runtime/role_pipeline.py", "anchor": "_RoleExecutor.advance", "scope": "Current code checked 2026-09-18; external tool effect is a separate boundary", "verdict": "verified"},
+    {"location": "Наш механизм", "assertion": "Role receipts are create-only, mode-0600, fsynced, linked into final name, directory-fsynced and validated for identity/output hash on read.", "source": "runtime/role_receipts.py", "anchor": "role_operation_id; SecureRoleReceiptStore._read/save", "scope": "Current local adapter; does not prove remote side effects", "verdict": "verified"},
+    {"location": "Наш механизм", "assertion": "Checkpoint adapter contains paths/UUIDs, rejects symlinks and loose mode, and stages/fsyncs file before create-only publication.", "source": "runtime/checkpoints.py", "anchor": "SecureCheckpointStorage.__init__/_validate_file/save", "scope": "Current code; no parent-directory fsync/power-loss claim", "verdict": "verified"},
+    {"location": "Наш механизм", "assertion": "PRB-0052 identified permission race where final checkpoint appeared before chmod; staged publication fixed observed process race.", "source": "plan/problems/PRB-0052-checkpoint-publication-permission-race.md", "anchor": "Reproduction and cause; planned fix and regression", "scope": "Dated 2026-09-15 defect evidence", "verdict": "verified"},
+    {"location": "Наш механизм", "assertion": "STEP-0018/0019 recorded process-kill resume without replaying committed stages in fixed offline graphs.", "source": "plan/evidence/STEP-0019-checkpointable-role-pipeline.md", "anchor": "Proven behavior; plan/evidence/STEP-0018-checkpoint-resume-crash-recovery.md", "scope": "Dated 2026-09-13 offline evidence only", "verdict": "verified"},
+    {"location": "Наш механизм", "assertion": "A process killed after DE receipt but before its checkpoint resumed from previous PM checkpoint; every role counter stayed at one.", "source": "plan/evidence/STEP-0020-branching-rework-idempotency.md", "anchor": "Proven behavior; tests/integration/test_role_pipeline_recovery.py", "scope": "Dated 2026-09-14 offline process-kill test; no live external effect", "verdict": "verified"}
+  ],
+  "findings": [
+    {"location": "Что означает один раз", "severity": "minor", "rationale": "At-least-once wording could imply guaranteed completion despite permanently unavailable receiver.", "resolved": true, "resolution": "Reframed as retry policy aimed at at-least-once, with availability caveat; reread."},
+    {"location": "Окна сбоя", "severity": "minor", "rationale": "First diagram mixed read-only call with uncertain external side effect.", "resolved": true, "resolution": "Diagram and table scoped to external write; separate read-only consequence added; reread."},
+    {"location": "Контрпример", "severity": "minor", "rationale": "Reconciliation is not necessarily conclusive when receiver state is ambiguous.", "resolved": true, "resolution": "Qualified by sufficiently observable state and suitable contract; reread."}
+  ],
+  "diagram_waiver": null
+}

@@ -1,10 +1,10 @@
 # 19 — Security: untrusted content, identity и enforcement
 
-Status: outline; lecture not written
+Status: lecture written; text-only reviewed
 
 Track: core
 
-[Todo-план](../../../plan/steps/lections/LECTURE-0019-security-authority.md) · [Manifest](../../manifest.json) · [Технические требования](../../technical-requirements.md)
+[Лекция](../../lectures/LECTURE-0019-security-authority.md) · [Todo-план](../../../plan/steps/lections/LECTURE-0019-security-authority.md) · [Manifest](../../manifest.json) · [Технические требования](../../technical-requirements.md)
 
 ## Место и prerequisites
 
@@ -55,7 +55,8 @@ Offline/code evidence ограничено своей областью. Proposed
 
 ## Авторство и проверка
 
-Будущий текст: `course/lectures/LECTURE-0019-security-authority.md`; outline не лекция.
+Текст: `course/lectures/LECTURE-0019-security-authority.md`.
 [Editorial guidelines](../../editorial-guidelines.md), [lecture template](../../templates/lecture.md),
 [review schema](../../templates/review.json) требуют вычитку, technical verification и recheck.
-Missing/stale receipt запрещает reviewed; diagrams требуют actual render/visual gate.
+Missing/stale receipt запрещает reviewed; diagrams проходят text-only source review
+и машинную сборку без скриншотов или visual/AX/browser PASS.

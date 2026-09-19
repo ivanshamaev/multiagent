@@ -33,4 +33,5 @@ Implementation status, code и dated evidence scope.
 ## Источники
 
 Primary sources/anchors/attribution и дата проверки.
-После текста — вычитка, technical verification, corrections/recheck и actual diagram visual gate.
+После текста — вычитка, technical verification, corrections/recheck и текстовая
+сверка Mermaid source/подписи/эквивалента. Без скриншотов и visual review.

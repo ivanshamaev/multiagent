@@ -1,10 +1,10 @@
 # TODO — Лекция 24. Workflow vs agent-orchestrator: сценарии, trade-offs и гибрид
 
-Status: planned
+Status: lecture written; text-only reviewed
 
 Updated: 2026-09-15
 
-Текст: `course/lectures/LECTURE-0024-orchestration-comparison.md` (ещё не написан).
+Текст: `course/lectures/LECTURE-0024-orchestration-comparison.md`.
 
 Track: core; исходная тема init: новое архитектурное сравнение.
 
@@ -17,13 +17,13 @@ Prerequisites: [06](LECTURE-0006-strict-workflow.md), [07](LECTURE-0007-agent-or
 
 ## Что писать — todo
 
-- [ ] Сравнить ownership plan/routing/stopping, predictability, audit/replay, адаптивность, cost/latency и риски.
-- [ ] Показать для каждого подхода преимущества/недостатки и cases, где он оправдан или избыточен.
-- [ ] Разобрать минимум восемь data-engineering scenarios по единой rubric, включая alternative single agent/no agent.
-- [ ] Описать hybrid: dynamic read investigation внутри static permission/quality/write gates; не считать любой orchestrator безграничным.
-- [ ] Сопоставить Anthropic и Cognition без ложного универсального победителя; дать критерии выбора, а не vendor recommendation.
-- [ ] Добавить полезную схему/таблицу, строгие предпосылки и хотя бы один контрпример без laboratory exercise.
-- [ ] Завершить кратким резюме, 3–5 концептуальными self-check questions и переходом по syllabus.
+- [x] Сравнить ownership plan/routing/stopping, predictability, audit/replay, адаптивность, cost/latency и риски.
+- [x] Показать для каждого подхода преимущества/недостатки и cases, где он оправдан или избыточен.
+- [x] Разобрать минимум восемь data-engineering scenarios по единой rubric, включая alternative single agent/no agent.
+- [x] Описать hybrid: dynamic read investigation внутри static permission/quality/write gates; не считать любой orchestrator безграничным.
+- [x] Сопоставить Anthropic и Cognition без ложного универсального победителя; дать критерии выбора, а не vendor recommendation.
+- [x] Добавить полезную схему/таблицу, строгие предпосылки и хотя бы один контрпример без laboratory exercise.
+- [x] Завершить кратким резюме, 3–5 концептуальными self-check questions и переходом по syllabus.
 
 ## Границы и согласованность
 
@@ -34,15 +34,15 @@ Prerequisites: [06](LECTURE-0006-strict-workflow.md), [07](LECTURE-0007-agent-or
 
 ## Центральное сравнение — todo для раскрытия
 
-- [ ] Workflow: code-owned допустимые пути, versioned policy, стабильные acceptance/approval gates;
+- [x] Workflow: code-owned допустимые пути, versioned policy, стабильные acceptance/approval gates;
   преимущества auditability и контроля side effects, недостатки при неизвестных subtasks/новых ситуациях.
-- [ ] Agent-orchestrator: динамическая декомпозиция/worker selection/replanning; преимущества в
+- [x] Agent-orchestrator: динамическая декомпозиция/worker selection/replanning; преимущества в
   discovery/open-ended research, недостатки planner error propagation, budget variance и coordination cost.
-- [ ] Уточнить: fixed graph допускает parallelism/branching/loops; deterministic control не делает
+- [x] Уточнить: fixed graph допускает parallelism/branching/loops; deterministic control не делает
   вывод LLM детерминированным. Dynamic routing допускает audit logs и hard bounds, но не гарантирует их.
-- [ ] Hybrid: code-owned outer policy и write/quality gates, model-directed read investigation внутри;
+- [x] Hybrid: code-owned outer policy и write/quality gates, model-directed read investigation внутри;
   объяснить стоимость двух уровней и условия, когда простой fixed workflow/один agent лучше.
-- [ ] Сравнить agent-as-tool/subworkflow/handoff без отождествления transport и control ownership.
+- [x] Сравнить agent-as-tool/subworkflow/handoff без отождествления transport и control ownership.
 
 ## Матрица применимости — раскрыть каждый scenario
 
@@ -63,15 +63,15 @@ Prerequisites: [06](LECTURE-0006-strict-workflow.md), [07](LECTURE-0007-agent-or
 | Поиск regressions/разбор нескольких failures | Fixed checks + optional manager diagnosis | Как избежать LLM override фактического non-zero verdict? |
 | Небольшая одношаговая bounded задача | Single agent или обычная функция | Окупается ли management/communication overhead? |
 
-- [ ] Не выдавать mapping за универсальную рекомендацию: раскрыть counterexample каждой группы.
-- [ ] Разделить преимущества архитектуры и преимущества конкретной модели/бюджета/dataset.
+- [x] Не выдавать mapping за универсальную рекомендацию: раскрыть counterexample каждой группы.
+- [x] Разделить преимущества архитектуры и преимущества конкретной модели/бюджета/dataset.
 
 ## Иллюстрация нашей системой
 
 Our workflow as implemented baseline; dynamic/hybrid variants explicitly hypothetical; ADR-0035.
 
-- [ ] Проверить code/evidence anchors и подписать historical/offline/not-implemented boundaries.
-- [ ] Не расширять фактические claims до fully-live READY, autonomous merge или planner runtime, которого нет.
+- [x] Проверить code/evidence anchors и подписать historical/offline/not-implemented boundaries.
+- [x] Не расширять фактические claims до fully-live READY, autonomous merge или planner runtime, которого нет.
 
 ## Интернет-статьи и переиспользуемые идеи
 
@@ -80,19 +80,19 @@ Our workflow as implemented baseline; dynamic/hybrid variants explicitly hypothe
 - [Don’t Build Multi-Agents](https://cognition.com/blog/dont-build-multi-agents) (Cognition, S03). Идея для этого ракурса: Ограничения разделения зависимых действий.
 - [Multi-Agents: What’s Actually Working](https://cognition.com/blog/multi-agents-working) (Cognition, S04). Идея для этого ракурса: Managed intellectual parallelism при single writer.
 
-- [ ] Перед авторством перечитать выбранные разделы; точные claims/API details проверить по первичным источникам.
-- [ ] Переиспользовать концепции своими словами с attribution; не копировать текст, полный перевод или чужую схему.
-- [ ] Различить утверждение статьи, наш пример и авторское обобщение; source caveats — в [SOURCES](SOURCES.md).
+- [x] Перед авторством перечитать выбранные разделы; точные claims/API details проверить по первичным источникам.
+- [x] Переиспользовать концепции своими словами с attribution; не копировать текст, полный перевод или чужую схему.
+- [x] Различить утверждение статьи, наш пример и авторское обобщение; source caveats — в [SOURCES](SOURCES.md).
 
 ## Авторство, редактура и фактчекинг — обязательные todo
 
-- [ ] Соблюсти [технические требования](../../../course/technical-requirements.md): Markdown и Mermaid с подписью, accTitle/accDescr и текстовым эквивалентом.
-- [ ] При готовом сборщике проверить SVG/HTML визуально: стрелки, кириллицу, mobile/desktop, no-JS и доступность; не отмечать render PASS до фактической проверки.
-- [ ] В review учесть diagram config/toolchain/assets; не повторять UI-код zoom/pan/fullscreen в тексте лекции.
+- [x] Соблюсти [технические требования](../../../course/technical-requirements.md): Markdown и Mermaid с подписью, accTitle/accDescr и текстовым эквивалентом.
+- [x] Проверить текстовую семантику Mermaid source, подписи и текстового эквивалента; не делать скриншоты и визуальную вычитку SVG/HTML.
+- [x] Сохранить text-only review и static-build fingerprints; не проставлять visual/AX/browser PASS и не повторять UI-код zoom/pan/fullscreen в лекции.
 
-- [ ] Применить `technical-markdown-lectures` с deep-theory depth; созданные editorial skills прочитать перед review и записать версии/usage.
-- [ ] После написания выполнить полную вычитку: язык, терминология, структура, повторы внутри лекции и по соседним темам.
-- [ ] Отдельно перепроверить существенные claims, числа/даты/версии, соответствие схем тексту и code/evidence.
-- [ ] Исправить findings и повторно проверить затронутый текст; существенная переработка требует полной вычитки.
-- [ ] Сохранить per-lecture review record с content hash и source anchors; missing/stale review запрещает reviewed.
-- [ ] Перед публикацией сверить topic ownership/cross-links и отсутствие unresolved существенных замечаний.
+- [x] Применить `technical-markdown-lectures` с deep-theory depth; созданные editorial skills прочитать перед review и записать версии/usage.
+- [x] После написания выполнить полную вычитку: язык, терминология, структура, повторы внутри лекции и по соседним темам.
+- [x] Отдельно перепроверить существенные claims, числа/даты/версии, соответствие схем тексту и code/evidence.
+- [x] Исправить findings и повторно проверить затронутый текст; существенная переработка требует полной вычитки.
+- [x] Сохранить per-lecture review record с content hash и source anchors; missing/stale review запрещает reviewed.
+- [x] Перед публикацией сверить topic ownership/cross-links и отсутствие unresolved существенных замечаний.

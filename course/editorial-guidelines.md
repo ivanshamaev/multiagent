@@ -26,8 +26,12 @@ Versioned packages — course/skills, локальные copies — ~/.codex/ski
 2. Отдельная полная редакторская вычитка после написания.
 3. Technical verification: definitions/causality/API/numbers/code/evidence/diagrams.
 4. Corrections + recheck; major rewriting требует полной повторной вычитки.
-5. При diagrams — actual render/visual gate; отсутствующий renderer не получает PASS.
-6. Актуальный receipt без unresolved major/blocking findings, затем reviewed.
+5. Для новых лекций — только текстовая сверка Mermaid source, подписи,
+   текстового эквивалента и прозы; не создавать скриншоты и не выполнять
+   browser/visual review. Машинная сборка может проверять синтаксис и
+   целостность статического output, но не заявляет визуальное качество.
+6. Актуальный text-only receipt без unresolved major/blocking findings,
+   затем reviewed. Старые visual receipts — историческое evidence.
 
 Один автор может выполнять разные проходы, но это не независимый review. Checker проверяет
 формат и input freshness, не истинность prose или полноту человеческой проверки.
