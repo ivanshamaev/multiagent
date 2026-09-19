@@ -48,6 +48,28 @@ jobs:
       - name: Install locked renderer
         run: make course-renderer-install
 
+      - name: Fix Chrome SUID sandbox helper
+        run: |
+          set -euo pipefail
+          helper=$(find "$HOME/.cache/puppeteer" course/node_modules/.cache/puppeteer \
+            \( -name chrome_sandbox -o -name chrome-sandbox \) -type f 2>/dev/null | head -1 || true)
+          if [ -n "$helper" ]; then
+            sudo chown root:root "$helper"
+            sudo chmod 4755 "$helper"
+          fi
+
+      - name: Diagnose renderer (single test diagram)
+        run: |
+          set +e
+          mkdir -p build/diag
+          printf 'flowchart TD\n  A[Start] --> B[End]\n' > build/diag/diag.mmd
+          printf 'body{font-family:"Noto Sans";}\n' > build/diag/fonts.css
+          PATH="$PWD/course/node_modules/node/bin:$PATH" \
+            node course/node_modules/@mermaid-js/mermaid-cli/src/cli.js \
+            -i build/diag/diag.mmd -o build/diag/out.svg \
+            -c course/diagram-config.json -C build/diag/fonts.css -b transparent
+          echo "diagnostic exit: $?"
+
       - name: Metadata and Markdown checks
         run: make course-check
 
