@@ -351,3 +351,20 @@ Dynamic read investigation отделено от code-owned permission/write/qua
 gates; десять data-engineering scenarios не выданы за универсальное правило.
 Text-only review и static build выполнены без screenshots/browser/visual/AX
 проверки. Reader содержит 00–24; следующая — 25, architecture synthesis.
+
+STEP-0057 публикует лекцию 25: четыре слоя Agentic Data Platform связаны
+через semantics, identity, version, policy и evidence. Сквозной Net Revenue
+путь и change-impact matrix показывают composition gaps; code-enforced,
+offline-proven, historical-live и not-proven claims разделены. Text-only
+review и static build выполнены без screenshots/browser/visual/AX проверки.
+Все core-лекции 00–25 опубликованы; далее только optional тема 26.
+
+STEP-0058 публикует optional лекцию 26: tenant определён через trust model,
+а namespace-per-tenant, virtual control plane и dedicated cluster сравнены
+по control/data-plane isolation, blast radius, cost и operations.
+ServiceAccount/RBAC, admission/seccomp, NetworkPolicy, storage,
+ResourceQuota/cgroups и shared kernel не смешаны в одну гарантию. Локальный
+Bubblewrap/Compose baseline ограничен offline evidence; Kubernetes runtime
+остаётся `not-implemented`. Text-only review и repeatable static build
+выполнены без screenshots/browser/visual/AX проверки. Лекции 00–26
+опубликованы.

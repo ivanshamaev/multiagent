@@ -1,6 +1,6 @@
 # 26 — Deployment extension: Kubernetes и tenancy
 
-Status: outline; lecture not written
+Status: lecture written; text-only reviewed
 
 Track: extension
 
@@ -35,7 +35,11 @@ Primary concepts: `tenancy deployment model`, `namespace vs tenant isolation`, `
 
 Implementation boundary: `not-implemented`. Исходный ракурс: Extension only; ADR-0001/0031
 
-Нет execution anchors для этого теоретического варианта.
+- [runtime/runner_isolation.py](../../../runtime/runner_isolation.py)
+- [plan/evidence/STEP-0022-runner-and-mcp-isolation.md](../../../plan/evidence/STEP-0022-runner-and-mcp-isolation.md)
+
+Эти anchors подтверждают только локальный host baseline. Kubernetes-вариант
+остаётся `not-implemented`.
 
 Offline/code evidence ограничено своей областью. Proposed manager/hybrid не execution result.
 
@@ -53,7 +57,8 @@ Offline/code evidence ограничено своей областью. Proposed
 
 ## Авторство и проверка
 
-Будущий текст: `course/lectures/LECTURE-0026-deployment-theory.md`; outline не лекция.
+Текст: [course/lectures/LECTURE-0026-deployment-theory.md](../../lectures/LECTURE-0026-deployment-theory.md).
 [Editorial guidelines](../../editorial-guidelines.md), [lecture template](../../templates/lecture.md),
 [review schema](../../templates/review.json) требуют вычитку, technical verification и recheck.
-Missing/stale receipt запрещает reviewed; diagrams требуют actual render/visual gate.
+Missing/stale receipt запрещает reviewed; diagrams проходят text-only source review
+и машинную сборку без скриншотов или visual/AX/browser PASS.

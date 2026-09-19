@@ -36,7 +36,8 @@ Prerequisites: Python/SQL и data/software pipelines. Kubernetes не требу
 
 ## Optional extension
 
-[26 — Deployment theory](extensions/module-26-deployment-theory/README.md) — отдельно после prerequisites.
+[26 — Kubernetes, tenancy и границы развёртывания](extensions/module-26-deployment-theory/README.md) —
+отдельно после лекций 08 и 19; Kubernetes runtime в примере не реализован.
 
 ## Границы
 

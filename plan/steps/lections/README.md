@@ -1,8 +1,8 @@
 # Todo-планы лекций: маршрут, ownership и согласованность
 
-Updated: 2026-09-18
+Updated: 2026-09-19
 
-Status: planning reviewed; lectures 00–20 published; other 5 lecture texts not written
+Status: planning reviewed; lectures 00–25 and optional extension 26 published
 
 ## Размещение и формат
 

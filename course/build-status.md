@@ -286,3 +286,26 @@ evaluation. Bounded hybrid ограничивает model-directed област�
 technical/recheck и Mermaid source review сохранены в schema-v2 receipts.
 Candidate static build прошёл; скриншотов и browser/visual/AX review не было.
 Reader содержит 00–24; далее 25, architecture synthesis.
+
+## STEP-0057: лекция 25 — Architecture synthesis
+
+Theory-only текст собирает intent/evidence, control/contracts,
+execution/capabilities и assurance/operations в одну evidence-bounded
+архитектуру. Net Revenue walkthrough отделяет локальный `DONE` от
+merge/deploy; code-enforced, offline-proven, historical-live и not-proven
+claims разведены. Separate editorial, technical/recheck и Mermaid source
+review сохранены. Candidate static build прошёл; скриншотов и
+browser/visual/AX review не было. Reader содержит все core-лекции 00–25;
+outline остаётся только у optional темы 26.
+
+## STEP-0058: опциональная лекция 26 — Kubernetes и tenancy
+
+Theory-only extension определяет tenant через trust model и сравнивает
+namespace-per-tenant, virtual control plane и dedicated cluster. Identity/RBAC,
+admission/seccomp, network, storage, quotas/cgroups и kernel boundary разведены
+как разные enforcement layers. Локальный Bubblewrap/Compose baseline отмечен
+`offline-proven`, Kubernetes — `not-implemented`. Separate editorial,
+technical/recheck и Mermaid source review сохранены. Candidate и две
+production-сборки прошли; последние совпали побайтно
+(`87bf3367dcec915145a0f05c29d068b17f2f46d277b1f7ee8ae06a5e65019b36`).
+Скриншотов, browser/visual/AX review не было. Reader содержит лекции 00–26.

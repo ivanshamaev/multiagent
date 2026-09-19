@@ -1595,7 +1595,7 @@
         "Собрать существующие concepts в четыре слоя и один Net Revenue architecture walkthrough.",
         "Проследить known facts → requirements → implementation → independent quality → terminal outcome.",
         "Отдельно показать доказанное offline/live, NEEDS_USER и оставшиеся integration gaps.",
-        "Сформулировать последствия смены одного layer, не повторяя определения/сравнение из 26."
+        "Сформулировать последствия смены одного layer, не повторяя определения/сравнение из 24."
       ],
       "sources": [
         {
@@ -1621,7 +1621,7 @@
       "plan": "plan/steps/lections/LECTURE-0025-architecture-synthesis.md",
       "path": "course/lectures/LECTURE-0025-architecture-synthesis.md",
       "outline": "course/modules/module-25-architecture-synthesis/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить integrated architecture rationale, предпосылки и ограничения.",
         "Объяснить evidence-bounded system claims, предпосылки и ограничения.",
@@ -1637,7 +1637,7 @@
       "known_gaps": [
         "Code/offline evidence не доказывает fully-live six-role READY/autonomous merge."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0025.json"
     },
     {
       "id": 26,
@@ -1679,21 +1679,25 @@
       "plan": "plan/steps/lections/LECTURE-0026-deployment-theory.md",
       "path": "course/lectures/LECTURE-0026-deployment-theory.md",
       "outline": "course/extensions/module-26-deployment-theory/README.md",
-      "status": "outline",
+      "status": "reviewed",
       "outcomes": [
         "Объяснить tenancy deployment model, предпосылки и ограничения.",
         "Объяснить namespace vs tenant isolation, предпосылки и ограничения.",
         "Объяснить deployment resource governance, предпосылки и ограничения."
       ],
       "example_anchors": {
-        "code": [],
-        "evidence": []
+        "code": [
+          "runtime/runner_isolation.py"
+        ],
+        "evidence": [
+          "plan/evidence/STEP-0022-runner-and-mcp-isolation.md"
+        ]
       },
       "implementation_status": "not-implemented",
       "known_gaps": [
         "Kubernetes runtime не реализован."
       ],
-      "review": null
+      "review": "course/reviews/LECTURE-0026.json"
     }
   ]
 }

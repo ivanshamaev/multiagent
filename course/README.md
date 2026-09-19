@@ -2,8 +2,8 @@
 
 Глубокая теоретическая база для Data Engineers с Python/SQL и знанием pipelines.
 Наша Agentic Data Platform — иллюстрация подтверждённых решений, не student lab.
-Подготовлены 26 core outlines и optional Kubernetes extension. Написаны и опубликованы лекции 00–24;
-оставшийся core-текст 25 ещё не написан. Для каждого текста действует отдельный publication gate;
+Подготовлены и опубликованы 26 core lectures и optional Kubernetes extension 26.
+Для каждого текста действует отдельный publication gate;
 полный текст выбирается reader только по reviewed и актуальным receipts.
 Manager/Kubernetes не объявляются реализованными.
 В core номер 00–25 равен позиции в маршруте; optional Kubernetes — 26.
@@ -16,11 +16,11 @@ Manager/Kubernetes не объявляются реализованными.
 - [Статус HTML/SVG-сборки](build-status.md)
 - [Принятый дизайн сайта](design/site-design.md): Cyberpunk landing, SVG roadmap,
   меню модулей/лекций слева и TOC справа. STEP-0028 реализует UI прототипа:
-  вместо ещё не написанных лекций отображаются существующие Markdown-планы тем.
+  reader публикует проверенные Markdown-лекции и сохраняет outline fallback.
 
 Contributor command: `make course-check` — offline metadata/Markdown/receipt checks, не
 фактчекинг и не проверка model quality. `make course-build` собирает проверочный прототип,
-публикует только проверенные тексты, остальные темы остаются outlines.
+публикует только проверенные тексты; все текущие темы имеют актуальные receipts.
 Кандидат: `make course-review COURSE_LECTURE=0` в отдельном labelled output.
 Установка renderer: `make course-renderer-install`; просмотр:
 `make course-preview` → http://127.0.0.1:8099/course/. Python окружение: `make bootstrap`.

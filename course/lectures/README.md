@@ -43,8 +43,14 @@ critical path, parallel work и quality-constrained optimization.
 [Лекция 24](LECTURE-0024-orchestration-comparison.md) сравнивает code-owned
 workflow, agent-orchestrator, bounded hybrid и более простые альтернативы по
 свойствам задачи и риску действий.
-Все двадцать пять опубликованы после отдельных content/publication gates;
-оставшиеся 2 темы — core-план 25 и optional extension 26.
+[Лекция 25](LECTURE-0025-architecture-synthesis.md) собирает платформу в
+четыре слоя, прослеживает Net Revenue end-to-end и ограничивает системные
+claims фактическими evidence.
+[Опциональная лекция 26](LECTURE-0026-deployment-theory.md) сравнивает
+namespace-per-tenant, virtual control plane и dedicated cluster, связывая
+tenancy с identity, network, resources и kernel boundary.
+Все двадцать шесть core-лекций и optional extension опубликованы после
+отдельных content/publication gates.
 Для остальных тем подготовлены [индивидуальные todo-планы](../../plan/steps/lections/README.md)
 и [реестр источников](../../plan/steps/lections/SOURCES.md).
 
@@ -52,7 +58,8 @@ workflow, agent-orchestrator, bounded hybrid и более простые аль
 
 Курс рассматривает жёсткий workflow, управление командой агентом-оркестратором и гибридные
 архитектуры. Наша Agentic Data Platform служит иллюстрацией подтверждённых решений; динамический
-manager и Kubernetes не объявляются реализованными возможностями.
+manager и Kubernetes не объявляются реализованными возможностями; лекция 26
+рассматривает Kubernetes только как deployment theory.
 
 Лабораторных работ и практических заданий нет. После написания каждой лекции обязательны
 редакторская вычитка, проверка технических утверждений и источников, повторная проверка после

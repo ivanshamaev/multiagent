@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "lecture_id": 25,
+  "reviewer": "Codex; same-author separate editorial/technical/recheck passes, not independent review",
+  "checked_at": "2026-09-19T13:06:41Z",
+  "input_digest": "29ae7ff1c41c3a6ca3498ac7053f061736149e92002edfabb93f03f498185d66",
+  "content_sha256": "a6c37e50c2f62a523a358fececcdb90f027a6ff8dca12ce2b7b9bad9c8a5a8e9",
+  "skills": [
+    "technical-markdown-lectures",
+    "technical-editorial-review",
+    "technical-claim-verification"
+  ],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {
+    "editorial": true,
+    "technical": true,
+    "recheck": true,
+    "diagram_semantics": true
+  },
+  "pass_scope": {
+    "editorial": "Complete theory-only text reread against todo 25, technical requirements, glossary and neighbouring owners 02/06/13/14/17/19/21/22/24/26. Architectural closure, four-layer model, Net Revenue walkthrough, claim chain, evidence ladder, composition gaps, change-impact analysis, counterexample and five questions checked for continuity and non-duplication.",
+    "technical": "Anthropic S09 and Cognition S04 checked online 2026-09-19. Current artifact contracts, reducer, role graph v3, deny-by-default policy and telemetry inspected locally; dated STEP-0010/0013/0020/0024 evidence checked with offline, historical-live and not-proven boundaries preserved.",
+    "recheck": "Removed an ambiguous Mermaid loop around terminal outcomes, distinguished historical graph-v2 evidence from current graph-v3 code, corrected the stale lecture-26 comparison reference to owner lecture 24, removed a transient numeric repository-gate claim, and replaced a Mermaid message semicolon rejected by the pinned parser. Complete corrected lecture reread.",
+    "diagram_semantics": "Mermaid source, accTitle/accDescr, task intake, Analyst evidence, PM NEEDS_USER/READY branch, DE candidate, ordered independent gates, one bounded rework illustration and terminal outcomes checked against prose and textual equivalent. No screenshots, browser checks, SVG/HTML visual or AX review, per user instruction.",
+    "not_checked": [
+      "Independent reviewer",
+      "Rendered visual quality",
+      "Browser/mobile/print/AX",
+      "Fresh paid model calls",
+      "Fully-live six-role READY path",
+      "Implemented dynamic manager or autonomous merge/deploy",
+      "Production certification"
+    ]
+  },
+  "claims": [
+    {
+      "location": "Четыре слоя; прогресс и право записи",
+      "assertion": "Anthropic's long-running-agent experiment uses explicit feature/progress artifacts, incremental work and state verification to bridge fresh context sessions and reduce premature completion.",
+      "source": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+      "anchor": "The long-running agent problem; Feature list; Incremental progress; Getting up to speed",
+      "scope": "Original article checked 2026-09-19; web-app harness observations are reused only as a design principle, not as Data Platform evidence.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Прогресс, завершение и право записи",
+      "assertion": "Cognition describes a narrower multi-agent pattern in which additional agents contribute intelligence while writes remain single-threaded and context transfer remains a central problem.",
+      "source": "https://cognition.com/blog/multi-agents-working",
+      "anchor": "A Refresher on Context Engineering; What We Know Today",
+      "scope": "Product-team observations checked 2026-09-19; numerical and model-specific product claims are not reused or generalized.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Четыре слоя; цепочка claims",
+      "assertion": "Current typed artifacts enforce task/evidence binding, READY versus NEEDS_USER invariants, implementation evidence, independent QA and reviewer author separation.",
+      "source": "contracts/artifacts.py",
+      "anchor": "ArtifactBase; TaskSpecification; RequirementsAnalysisReport; ImplementationResult; QAReport; ReviewReport",
+      "scope": "Current code inspected 2026-09-19; schema validity is not semantic truth or live execution evidence.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Сквозной путь; evidence ladder",
+      "assertion": "The current role pipeline is a predefined graph-v3 path through Analyst, PM, DE, Validator, QA and Reviewer with reducer-decoded branches and bounded iterations.",
+      "source": "runtime/role_pipeline.py",
+      "anchor": "ROLE_PIPELINE_NAME; build_role_pipeline",
+      "scope": "Current code and offline tests; no model-directed planner, autonomous merge or fully-live READY run is inferred.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Execution/capabilities",
+      "assertion": "Current tool authorization denies role, tool, path, database, query, DAG and budget mismatches before allowed execution.",
+      "source": "policies/tool_policy.py",
+      "anchor": "authorize_tool_call",
+      "scope": "Pure code-owned authorization decision; it does not by itself prove runner, network or remote-service enforcement.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Evidence ladder",
+      "assertion": "STEP-0013 records one historical live Analyst-to-PM run that terminated BLOCKED/needs_user with unresolved material questions.",
+      "source": "plan/evidence/STEP-0013-pm-specification-gate.md",
+      "anchor": "Verification; Residual risks and next step",
+      "scope": "Dated 2026-09-13 single run; not a READY path or current reliability estimate.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Evidence ladder; composition gap",
+      "assertion": "STEP-0010 records a historical live QA rework loop that found a nullable argMax semantic issue and whose first overbroad repair was rejected by the validator.",
+      "source": "plan/evidence/STEP-0010-qa-quality-loop.md",
+      "anchor": "Functional evidence; Residual risks",
+      "scope": "Dated 2026-09-12 slice without the later Reviewer gate; not full current graph evidence.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Evidence ladder",
+      "assertion": "STEP-0020 proves graph-v2 branching, bounded rework and receipt-backed process recovery offline, while explicitly retaining an external-effect crash window.",
+      "source": "plan/evidence/STEP-0020-branching-rework-idempotency.md",
+      "anchor": "Proven behavior; Residual risk",
+      "scope": "Dated historical offline graph-v2 evidence; current graph-v3 live behavior is not inferred.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Evidence ladder",
+      "assertion": "STEP-0024 records a fixed 17-case by three-run offline benchmark with strict invariant thresholds and explicitly separates historical live provenance from current model quality.",
+      "source": "plan/evidence/STEP-0024-phase-k-evaluation-benchmark.md",
+      "anchor": "Delivered boundary; Final post-fix sample; Problems and remaining risks",
+      "scope": "Repository-owned offline regression evidence; not a network sandbox, production SLO or fresh model comparison.",
+      "verdict": "verified"
+    }
+  ],
+  "findings": [
+    {
+      "location": "Сквозной путь Net Revenue",
+      "severity": "minor",
+      "rationale": "A Mermaid loop enclosing PASS and terminal branches could imply that execution continues after a terminal outcome.",
+      "resolved": true,
+      "resolution": "Replaced the loop with explicit verdict branches and one representative full-gate rework repetition; reread."
+    },
+    {
+      "location": "Evidence-bounded system claims",
+      "severity": "minor",
+      "rationale": "STEP-0020 graph-v2 evidence could appear to describe the current graph-v3 runtime without qualification.",
+      "resolved": true,
+      "resolution": "Added the version boundary and limited the claim to offline code-owned routing; reread."
+    },
+    {
+      "location": "Outline consistency and evidence ladder",
+      "severity": "minor",
+      "rationale": "The outline retained a pre-renumbering lecture-26 comparison reference, and a transient numeric gate statement risked becoming stale before final verification.",
+      "resolved": true,
+      "resolution": "Corrected the owner to lecture 24 across outline/manifest/map and replaced the count with a scope statement; reread."
+    },
+    {
+      "location": "Сквозной путь Net Revenue",
+      "severity": "minor",
+      "rationale": "The pinned Mermaid sequence parser treated a semicolon in message text as a statement separator and rejected the source.",
+      "resolved": true,
+      "resolution": "Rephrased the message without a semicolon and repeated the static parser gate."
+    }
+  ],
+  "diagram_waiver": null
+}

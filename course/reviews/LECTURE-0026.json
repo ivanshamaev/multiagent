@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "lecture_id": 26,
+  "reviewer": "Codex; same-author separate editorial/technical/recheck passes, not independent review",
+  "checked_at": "2026-09-19T13:27:15Z",
+  "input_digest": "c0bd8a00eff84cbabde842e7787fe1c6fb6cb55c2e8a8a39ecb5208e45426937",
+  "content_sha256": "d548210491de6dbf04aa9d11778fa0212e1ec2e512b5a8e574c34803048207d9",
+  "skills": [
+    "technical-markdown-lectures",
+    "technical-editorial-review",
+    "technical-claim-verification"
+  ],
+  "skill_versions_sha256": {
+    "technical-markdown-lectures": "fd303e71af032b8a7e7d30152c72201d9a2d329526d62d0d870e3a052c11d433",
+    "technical-editorial-review": "d16fa811a5b73efe6b323c2883729d6308682b3e43f96a2247c3a5d8cf9d05b2",
+    "technical-claim-verification": "45e9be65480c7478e97f138aaf1925a5caf87b5ebaa202a14aacf66b8c3577f3"
+  },
+  "passes": {
+    "editorial": true,
+    "technical": true,
+    "recheck": true,
+    "diagram_semantics": true
+  },
+  "pass_scope": {
+    "editorial": "Complete theory-only text reread against todo 26, technical requirements and primary owners 08/19/23. Tenant definition, threat assumptions, three deployment models, enforcement layers, decision matrix, counterexample, local mapping, synthesis and five questions checked for continuity and non-duplication.",
+    "technical": "Kubernetes WG S22 and current official multi-tenancy, ServiceAccount, NetworkPolicy, ResourceQuota, resource-management, seccomp and Linux-kernel-constraint documentation checked online 2026-09-19. Anthropic S10 scope checked. ADR-0001/0031, current launcher and STEP-0022 evidence inspected locally; Kubernetes remains not-implemented.",
+    "recheck": "Corrected an invalid implication that moving Bubblewrap work to a regular Pod necessarily weakens the kernel boundary, qualified resource-limit negative-test outcomes, replaced an ambiguous private-network phrase, and removed the stale visual-gate requirement from the extension outline. Complete corrected lecture reread.",
+    "diagram_semantics": "Mermaid source, accTitle/accDescr, shared API gate, per-tenant namespace controls, shared node/runtime risk and external MCP/data authorization checked against prose, caption and textual equivalent. No screenshots, browser checks, SVG/HTML visual or AX review, per user instruction.",
+    "not_checked": [
+      "Independent reviewer",
+      "Rendered visual quality",
+      "Browser/mobile/print/AX",
+      "A live Kubernetes cluster",
+      "RBAC, CNI, quota or seccomp enforcement in this repository",
+      "Production hardening or kernel-escape resistance"
+    ]
+  },
+  "claims": [
+    {
+      "location": "Три основные модели tenancy",
+      "assertion": "Kubernetes multi-tenancy can use namespace-per-tenant or virtual control planes within a shared cluster, while dedicated clusters provide a separate control-plane lifecycle at higher overhead.",
+      "source": "https://kubernetes.io/docs/concepts/security/multi-tenancy/",
+      "anchor": "Isolation; Implementations; Namespace per tenant; Virtual control plane per tenant",
+      "scope": "Current official documentation checked 2026-09-19; topology does not select or certify the platform threat model.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Три основные модели tenancy",
+      "assertion": "The Kubernetes Multi-Tenancy Working Group taxonomy distinguishes Namespaces as a Service, Clusters as a Service and Control Planes as a Service.",
+      "source": "https://kubernetes.io/blog/2021/04/15/three-tenancy-models-for-kubernetes/",
+      "anchor": "Namespaces as a Service; Clusters as a Service; Control planes as a Service",
+      "scope": "2021 architectural taxonomy checked against current multi-tenancy documentation on 2026-09-19; dated project details and survey figures are not reused.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Identity и API authorization",
+      "assertion": "A Kubernetes ServiceAccount is a namespaced non-human cluster identity, while least-privilege API permissions are granted separately through RBAC roles and bindings.",
+      "source": "https://kubernetes.io/docs/concepts/security/service-accounts/",
+      "anchor": "What are service accounts?; Use cases for Kubernetes service accounts",
+      "scope": "Current official documentation checked 2026-09-19; ServiceAccount identity is not treated as end-user identity, MCP authorization or approval.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Network и egress",
+      "assertion": "Pods are non-isolated by default per traffic direction, and a NetworkPolicy has no effect unless the cluster network plugin implements its enforcement.",
+      "source": "https://kubernetes.io/docs/concepts/services-networking/network-policies/",
+      "anchor": "Prerequisites; The two sorts of pod isolation; What you can't do with network policies",
+      "scope": "Current L3/L4 NetworkPolicy semantics checked 2026-09-19; no claim is made about this repository having a CNI or live policy enforcement.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Capacity, fairness и cgroups",
+      "assertion": "ResourceQuota limits aggregate namespace consumption, requests inform scheduling, and Linux resource limits are passed to the runtime and enforced through kernel cgroups with resource-specific behavior.",
+      "source": "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+      "anchor": "Requests and limits; How Pods with resource requests are scheduled; How Kubernetes applies resource requests and limits",
+      "scope": "Current official documentation plus the ResourceQuota concept page checked 2026-09-19; resource governance is not presented as confidentiality or an application token budget.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Admission и workload shape",
+      "assertion": "seccomp restricts syscalls and RuntimeDefault uses a runtime-provided profile, while privileged mode can override key kernel hardening and stronger sandboxing carries additional resource/compatibility cost.",
+      "source": "https://kubernetes.io/docs/concepts/security/linux-kernel-security-constraints/",
+      "anchor": "seccomp; Considerations for seccomp; Kernel-level security features and privileged containers",
+      "scope": "Current official concept page and seccomp tutorial checked 2026-09-19; no hard-isolation guarantee for an unspecified cluster is inferred.",
+      "verdict": "verified"
+    },
+    {
+      "location": "Как наш локальный baseline отображается на Kubernetes",
+      "assertion": "The current local launcher fail-closes around five role profiles, uses Bubblewrap namespaces, explicit mounts, cleared environment and process resource limits, while STEP-0022 records dated offline namespace and MCP-auth checks.",
+      "source": "runtime/runner_isolation.py",
+      "anchor": "RUNNER_PROFILE_NAMES; IsolatedRunner.command; IsolatedRunner.run_json; _workspace_mount_args",
+      "scope": "Current code and dated local evidence inspected 2026-09-19; it is not Kubernetes, production or kernel-escape evidence.",
+      "verdict": "verified"
+    }
+  ],
+  "findings": [
+    {
+      "location": "Как наш локальный baseline отображается на Kubernetes",
+      "severity": "minor",
+      "rationale": "The first draft implied that moving a Bubblewrap runner to an ordinary Pod necessarily weakens the kernel boundary, although both normally rely on the host kernel.",
+      "resolved": true,
+      "resolution": "Replaced the comparison with the narrower claim that a Pod does not automatically strengthen the kernel boundary and that mount/network/resource restrictions must be reimplemented and verified; reread."
+    },
+    {
+      "location": "Контрпример и локальная проекция",
+      "severity": "minor",
+      "rationale": "A generic statement that every resource overrun is rejected hid different CPU and memory limit behavior, and 'private network namespace' could be confused with a configured private network.",
+      "resolved": true,
+      "resolution": "Changed the expected test result to the declared bounded outcome and described the local runner as a separate network namespace without configured egress; reread."
+    },
+    {
+      "location": "Extension outline publication requirements",
+      "severity": "minor",
+      "rationale": "The module outline retained a stale requirement for an actual visual gate that contradicted the user's text-only review instruction and central technical requirements.",
+      "resolved": true,
+      "resolution": "Replaced it with text-only source-semantic review and machine static build, explicitly excluding screenshot and visual/AX/browser PASS."
+    }
+  ],
+  "diagram_waiver": null
+}

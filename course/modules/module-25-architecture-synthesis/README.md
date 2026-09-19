@@ -1,6 +1,6 @@
 # 25 — Итоговый синтез: наш мультиагент как система
 
-Status: outline; lecture not written
+Status: lecture written; text-only reviewed
 
 Track: core
 
@@ -26,7 +26,7 @@ Primary concepts: `integrated architecture rationale`, `evidence-bounded system 
 - Собрать существующие concepts в четыре слоя и один Net Revenue architecture walkthrough.
 - Проследить known facts → requirements → implementation → independent quality → terminal outcome.
 - Отдельно показать доказанное offline/live, NEEDS_USER и оставшиеся integration gaps.
-- Сформулировать последствия смены одного layer, не повторяя определения/сравнение из 26.
+- Сформулировать последствия смены одного layer, не повторяя определения/сравнение из 24.
 
 Интуиция → предпосылки → причинность → контрпример → синтез, 3–5 вопросов и переход.
 Нет student coding tasks или обязательных запусков.
@@ -53,7 +53,7 @@ Offline/code evidence ограничено своей областью. Proposed
 
 ## Авторство и проверка
 
-Будущий текст: `course/lectures/LECTURE-0025-architecture-synthesis.md`; outline не лекция.
+Текст: [course/lectures/LECTURE-0025-architecture-synthesis.md](../../lectures/LECTURE-0025-architecture-synthesis.md).
 [Editorial guidelines](../../editorial-guidelines.md), [lecture template](../../templates/lecture.md),
 [review schema](../../templates/review.json) требуют вычитку, technical verification и recheck.
 Missing/stale receipt запрещает reviewed; diagrams проходят text-only source review

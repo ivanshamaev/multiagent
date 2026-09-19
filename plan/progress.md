@@ -774,3 +774,27 @@ settings, а manager/hybrid — статусом `not-implemented`. Separate
 editorial/technical/recheck и Mermaid source review выполнены только по
 тексту. Reader содержит 00–24; далее 25, architecture synthesis.
 Подробности: [evidence](evidence/STEP-0055-lecture-orchestration-comparison.md).
+
+## 2026-09-19 — STEP-0057: лекция 25
+
+Опубликована итоговая theory-only лекция об architectural closure,
+четырёх слоях платформы и пределах системных claims. Net Revenue прослежен
+от task/facts через specification и candidate до independent gates и
+terminal outcome. STEP-0010/0013/0020/0024 разделены по evidence mode;
+dynamic manager, fully-live READY и autonomous release не объявлены
+реализованными. Separate editorial/technical/recheck и Mermaid source review
+выполнены только по тексту. Core reader завершён: 00–25; далее optional 26.
+Подробности: [evidence](evidence/STEP-0057-lecture-architecture-synthesis.md).
+
+## 2026-09-19 — STEP-0058: опциональная лекция 26
+
+Опубликована theory-only extension о Kubernetes tenancy и deployment
+boundaries. Namespace-per-tenant, virtual control plane и dedicated cluster
+сопоставлены по модели угроз, blast radius, sharing, cost и operations;
+ServiceAccount/RBAC, admission/seccomp, NetworkPolicy, storage и
+ResourceQuota/cgroups разведены по enforcement scope. Локальный
+Bubblewrap/Compose baseline не выдан за Kubernetes evidence, а Kubernetes
+явно отмечен `not-implemented`. Separate editorial/technical/recheck и
+Mermaid source review выполнены только по тексту. Две production-сборки
+совпали побайтно; `make check` — 532 passed. Reader содержит 00–26.
+Подробности: [evidence](evidence/STEP-0058-lecture-kubernetes-tenancy.md).

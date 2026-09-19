@@ -125,3 +125,11 @@
   лекцию 24 о выборе между fixed workflow, agent-orchestrator, bounded hybrid
   и более простой альтернативой. Опубликованы 00–24; далее 25,
   architecture synthesis.
+- [STEP-0057](steps/STEP-0057-lecture-architecture-synthesis.md) публикует
+  лекцию 25 об architectural closure, четырёх слоях платформы и
+  evidence-bounded system claims. Все core-лекции 00–25 опубликованы;
+  далее optional deployment theory 26.
+- [STEP-0058](steps/STEP-0058-lecture-kubernetes-tenancy.md) публикует
+  optional лекцию 26 о Kubernetes tenancy, resource governance и выборе
+  deployment boundary. Курс содержит проверенные тексты 00–26; Kubernetes
+  runtime остаётся `not-implemented`.
