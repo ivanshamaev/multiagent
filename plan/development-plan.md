@@ -368,3 +368,9 @@ Bubblewrap/Compose baseline ограничен offline evidence; Kubernetes runt
 остаётся `not-implemented`. Text-only review и repeatable static build
 выполнены без screenshots/browser/visual/AX проверки. Лекции 00–26
 опубликованы.
+
+STEP-0059 исправляет boundary между course pages и repository evidence:
+вместо placeholder anchors builder создаёт path-safe GitHub blob links,
+сохраняет fragments и формирует кликабельный reference index. Publication
+receipts 00–26 обновлены в text-only scope; исходные лекции и content reviews
+не менялись. Pages обновится только после публикации commit из `main`.

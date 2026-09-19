@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from course.build import build, clean_env, normalize_svg
+from course.build import build, clean_env, normalize_svg, repository_url
 from course.site import curriculum, outline, roadmap, url, verify_links
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -60,8 +60,12 @@ def source_root(tmp_path: Path) -> Path:
         (fonts / "files" / f"noto-sans-{name}-400-normal.woff2").write_bytes(b"fixture-font")
     (fonts / "LICENSE").write_text("Fixture only\n")
     (tmp_path / "course/prototype").mkdir()
+    example = tmp_path / "runtime/example file.py"
+    example.parent.mkdir()
+    example.write_text("\n".join(f"line {number}" for number in range(1, 13)) + "\n")
     (tmp_path / "course/prototype/diagrams.md").write_text(
         "# Prototype\n\n[Other](../technical-requirements.md#model)\n\n"
+        "[Repository example](../../runtime/example%20file.py#L10-L12)\n\n"
         "```mermaid\nflowchart LR\naccTitle: Model\naccDescr: Test\nA-->B\n```\n"
     )
     (tmp_path / "course/technical-requirements.md").write_text(
@@ -146,8 +150,25 @@ def test_static_build_is_reproducible_and_sources_are_unchanged(source_root: Pat
     text = (source_root / "build/course/prototype.html").read_text()
     assert "unsafe-inline" not in text and "onclick=" not in text
     assert "technical-requirements.html#model" in text
+    expected = (
+        "https://github.com/ivanshamaev/multiagent/blob/main/runtime/example%20file.py#L10-L12"
+    )
+    assert f'href="{expected}"' in text
+    assert "references.html#ref-" not in text
+    references = (source_root / "build/course/references.html").read_text()
+    assert (
+        'href="https://github.com/ivanshamaev/multiagent/blob/main/'
+        'runtime/example%20file.py"' in references
+    )
+    assert "Открыть исходный файл в GitHub repository" in references
     assert "assets/viewer.js" in text
     assert not (source_root / "build/course/node_modules").exists()
+
+
+@pytest.mark.parametrize("relative", ["", "/etc/passwd", "../.env", "a/../b", r"a\\b"])
+def test_repository_url_rejects_escaping_or_non_posix_paths(relative: str) -> None:
+    with pytest.raises(ValueError, match="repository reference"):
+        repository_url(relative)
 
 
 def test_failure_does_not_overwrite_existing_output(source_root: Path) -> None:

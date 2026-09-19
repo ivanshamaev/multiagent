@@ -17,8 +17,8 @@ import subprocess
 import tempfile
 import xml.etree.ElementTree as ET
 from collections.abc import Callable
-from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from pathlib import Path, PurePosixPath
+from urllib.parse import quote, unquote, urlsplit
 
 import tinycss2
 
@@ -33,6 +33,7 @@ PAGES = {
     "course/prototype/diagrams.md": "index.html",
     "course/technical-requirements.md": "technical-requirements.html",
 }
+REPOSITORY_BLOB_BASE = "https://github.com/ivanshamaev/multiagent/blob/main/"
 CSP = (
     "default-src 'none'; script-src 'self'; style-src 'self'; style-src-attr 'none'; "
     "font-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; "
@@ -142,6 +143,23 @@ ATTRS = {
 
 def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def repository_url(relative: str, fragment: str = "") -> str:
+    """Map one contained repository path to its public GitHub browser URL."""
+
+    path = PurePosixPath(relative)
+    if (
+        not relative
+        or path.is_absolute()
+        or "\\" in relative
+        or any(part in {"", ".", ".."} for part in path.parts)
+    ):
+        raise ValueError("invalid repository reference")
+    href = REPOSITORY_BLOB_BASE + quote(relative, safe="/-._~")
+    if fragment:
+        href += "#" + quote(unquote(fragment), safe="-._~:/")
+    return href
 
 
 def safe_css(css: str, ids: set[str]) -> None:
@@ -586,8 +604,8 @@ def build(
                             href += "#" + url.fragment
                     else:
                         key = "ref-" + sha(relative.encode())[:12]
-                        references[key] = relative
-                        href = f"references.html#{key}"
+                        href = repository_url(relative, url.fragment)
+                        references[key] = (relative, repository_url(relative))
                     child.attrSet("href", href)
             css_name = Path(page_name).stem + "-diagrams.css"
             files[f"assets/{css_name}"] = "\n".join(css_parts).encode()
@@ -621,9 +639,10 @@ def build(
     body += "Пути приведены для contributor provenance, не как опубликованное evidence.</p><dl>"
     body += (
         "".join(
-            f'<dt id="{k}">{html.escape(v)}</dt>'
-            "<dd>Материал доступен в checkout, не на этом prototype.</dd>"
-            for k, v in sorted(references.items())
+            f'<dt id="{key}"><a href="{html.escape(href, quote=True)}">'
+            f"<code>{html.escape(relative)}</code></a></dt>"
+            "<dd>Открыть исходный файл в GitHub repository.</dd>"
+            for key, (relative, href) in sorted(references.items())
         )
         + "</dl>"
     )

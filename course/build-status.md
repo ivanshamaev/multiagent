@@ -309,3 +309,12 @@ technical/recheck и Mermaid source review сохранены. Candidate и дв
 production-сборки прошли; последние совпали побайтно
 (`87bf3367dcec915145a0f05c29d068b17f2f46d277b1f7ee8ae06a5e65019b36`).
 Скриншотов, browser/visual/AX review не было. Reader содержит лекции 00–26.
+
+## STEP-0059: прямые ссылки на repository examples
+
+Fallback links из всех lecture pages теперь открывают исходные файлы в GitHub
+repository, а не anchors с сообщением «Материал доступен в checkout».
+Fragments сохраняются, unsafe paths отклоняются, `references.html` стал
+кликабельным индексом. Publication receipts 00–26 пересчитаны в text-only
+scope; screenshots и browser/visual/AX review не выполнялись. Две production
+builds совпали побайтно.

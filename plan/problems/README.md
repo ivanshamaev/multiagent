@@ -34,3 +34,4 @@ regression check. Полноту индекса проверяет `make plan-ch
 | [PRB-0056](PRB-0056-roadmap-generated-id-collision.md) | Roadmap generated IDs/local links | resolved |
 | [PRB-0057](PRB-0057-long-inline-tokens-mobile-overflow.md) | Long inline tokens overflow mobile page | resolved |
 | [PRB-0058](PRB-0058-authored-lecture-outline-status.md) | Authored text mislabeled unwritten | resolved |
+| [PRB-0059](PRB-0059-course-repository-links-stop-at-placeholder.md) | Repository links stopped at placeholder index | resolved |

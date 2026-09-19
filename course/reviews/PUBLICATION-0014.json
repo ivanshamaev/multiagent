@@ -1,26 +1,30 @@
 {
   "schema_version": 2,
   "lecture_id": 14,
-  "reviewer": "Codex; text-only static publication check, no browser or visual review",
-  "checked_at": "2026-09-18T15:23:53Z",
+  "reviewer": "Codex; text-only static publication refresh for repository links, no browser or visual review",
+  "checked_at": "2026-09-19T18:16:52Z",
   "review_mode": "text-only",
-  "publication_digest": "a2a1d3c41fc17213313a76cb12bd33842d0a6f0d6f8f659c58dc7fd9b96ec87e",
-  "passes": {"static_build": true, "markdown_links": true, "diagram_semantics": true},
-  "renderer": {
-    "node": "v22.22.0",
-    "cli": "11.17.0",
-    "mermaid": "11.16.1",
-    "browser_version": "Google Chrome for Testing 153.0.8010.36",
-    "lock_sha256": "2e528e208a65c3ffd5c89446637e68812dc5c56f1e30762f24c2a2e3449fd928",
-    "diagram_config_sha256": "bc12b7e5869cf9fea920a4ed5b52619096949dc7c1c3de2cef760e0d105cdd8d",
-    "builder_sha256": "095fa29ffe2926bea7999900eee5f269a02376c9ef09c8e4e723a2c62d85f994",
-    "system_render_font_sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d",
-    "font_sha256": {
-      "latin": "0d352d8a993d3f79d860e44d74ee3e132649253f2af24caad088c3aed6ec08c8",
-      "cyrillic": "05af9e705d3b63aedba67197d19fb448b97353e1386930716c7e835b08f126ba"
-    }
+  "publication_digest": "e26ed9f4e6239083b53a15f11bc848619d1290a70bd5c729c8a5a1f87708e830",
+  "passes": {
+    "static_build": true,
+    "markdown_links": true,
+    "diagram_semantics": true
   },
-  "rendered_sha256": "73ba91013002d9c73222039b57d235bd99dbdbe0c8f69cae152c3cbe9f6b6696",
-  "scope": "Markdown/links and source-level diagram semantics checked; pinned static build completed and output hash bound. No screenshot, browser navigation, SVG/HTML visual review, AX inspection or AT interaction.",
-  "evidence": "plan/evidence/STEP-0045-lecture-data-engineer.md"
+  "renderer": {
+    "browser_version": "Google Chrome for Testing 153.0.8010.36",
+    "builder_sha256": "2991b9ad55632d82f85a064425e46d51e7fbdd7462bb40d9d276de3945d15098",
+    "cli": "11.17.0",
+    "diagram_config_sha256": "bc12b7e5869cf9fea920a4ed5b52619096949dc7c1c3de2cef760e0d105cdd8d",
+    "font_sha256": {
+      "cyrillic": "05af9e705d3b63aedba67197d19fb448b97353e1386930716c7e835b08f126ba",
+      "latin": "0d352d8a993d3f79d860e44d74ee3e132649253f2af24caad088c3aed6ec08c8"
+    },
+    "lock_sha256": "2e528e208a65c3ffd5c89446637e68812dc5c56f1e30762f24c2a2e3449fd928",
+    "mermaid": "11.16.1",
+    "node": "v22.22.0",
+    "system_render_font_sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d"
+  },
+  "rendered_sha256": "05179a94de8bfdeee2c067cee3d1343403c262b4f8476adbd2ea5d7c107490c2",
+  "scope": "Repository-link mapping, Markdown/links and source-level diagram semantics checked; pinned static build completed and output hash bound. Prior visual evidence is not carried forward. No screenshot, browser navigation, SVG/HTML visual review, AX inspection or AT interaction.",
+  "evidence": "plan/evidence/STEP-0059-github-repository-links.md"
 }

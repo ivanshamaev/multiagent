@@ -798,3 +798,13 @@ Bubblewrap/Compose baseline не выдан за Kubernetes evidence, а Kuberne
 Mermaid source review выполнены только по тексту. Две production-сборки
 совпали побайтно; `make check` — 532 passed. Reader содержит 00–26.
 Подробности: [evidence](evidence/STEP-0058-lecture-kubernetes-tenancy.md).
+
+## 2026-09-19 — STEP-0059: прямые repository links
+
+Исправлен publication fallback: 212 ссылок из lecture pages теперь ведут
+прямо на GitHub blob files, включая исходный ref на Airflow observer policy.
+Fragments сохраняются, traversal/absolute paths запрещены, reference index
+содержит 107 кликабельных entries. Все 27 publication receipts пересчитаны в
+text-only scope без изменения content receipts. Две production-сборки
+совпали побайтно; push и Pages deployment не выполнялись.
+Подробности: [evidence](evidence/STEP-0059-github-repository-links.md).

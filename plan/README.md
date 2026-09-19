@@ -133,3 +133,6 @@
   optional лекцию 26 о Kubernetes tenancy, resource governance и выборе
   deployment boundary. Курс содержит проверенные тексты 00–26; Kubernetes
   runtime остаётся `not-implemented`.
+- [STEP-0059](steps/STEP-0059-github-repository-links.md) заменяет placeholder
+  references на прямые GitHub blob links с сохранением fragments и оставляет
+  `references.html` кликабельным индексом repository examples.

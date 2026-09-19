@@ -1,48 +1,30 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "lecture_id": 4,
-  "reviewer": "Codex; same-author separate browser/visual passes, not independent review",
-  "checked_at": "2026-09-16T21:34:52Z",
-  "publication_digest": "b9837c7fdb2ecd4367b85b1f01841b50f95834e9bc6ceaab268c0d3b3820e002",
+  "reviewer": "Codex; text-only static publication refresh for repository links, no browser or visual review",
+  "checked_at": "2026-09-19T18:16:52Z",
+  "publication_digest": "4d5afe69506e29efdce6262789d359000ea9709cde63dbaa8e9c0a21655f5f82",
   "passes": {
-    "desktop": true,
-    "mobile": true,
-    "light": true,
-    "dark": true,
-    "no_js": true,
-    "keyboard": true,
-    "print": true,
-    "accessibility_tree": true,
-    "subpath": true,
-    "csp": true,
-    "links": true,
-    "visual": true
-  },
-  "assistive_technology": {
-    "tested": false,
-    "scope": "Chrome AX main landmark and named/described SVG checked; actual Orca/NVDA/VoiceOver interaction not tested."
+    "static_build": true,
+    "markdown_links": true,
+    "diagram_semantics": true
   },
   "renderer": {
     "browser_version": "Google Chrome for Testing 153.0.8010.36",
-    "builder_sha256": "095fa29ffe2926bea7999900eee5f269a02376c9ef09c8e4e723a2c62d85f994",
+    "builder_sha256": "2991b9ad55632d82f85a064425e46d51e7fbdd7462bb40d9d276de3945d15098",
     "cli": "11.17.0",
     "diagram_config_sha256": "bc12b7e5869cf9fea920a4ed5b52619096949dc7c1c3de2cef760e0d105cdd8d",
-    "font_sha256": {"cyrillic": "05af9e705d3b63aedba67197d19fb448b97353e1386930716c7e835b08f126ba", "latin": "0d352d8a993d3f79d860e44d74ee3e132649253f2af24caad088c3aed6ec08c8"},
+    "font_sha256": {
+      "cyrillic": "05af9e705d3b63aedba67197d19fb448b97353e1386930716c7e835b08f126ba",
+      "latin": "0d352d8a993d3f79d860e44d74ee3e132649253f2af24caad088c3aed6ec08c8"
+    },
     "lock_sha256": "2e528e208a65c3ffd5c89446637e68812dc5c56f1e30762f24c2a2e3449fd928",
     "mermaid": "11.16.1",
     "node": "v22.22.0",
     "system_render_font_sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d"
   },
-  "rendered_sha256": "2e9ad4823a2cccd3d004754774f84d356d1fd874292506d326c26aa7c2fd4b18",
-  "artifacts_sha256": {
-    "output/playwright/step35/lecture-4/dark.png": "db74318ad67299636432ba207f5eb9400398542394a1ba7accd9bdc55f11b562",
-    "output/playwright/step35/lecture-4/desktop.png": "9dbbf6264bc772ca283da51cf1fbe522c95664103fec5226aecb9e6d992a9ca8",
-    "output/playwright/step35/lecture-4/mobile-diagram.png": "1271744f17b039707920942d3c722df5ce940a16709d4bfbbfdd8b15ff7f21b6",
-    "output/playwright/step35/lecture-4/mobile.png": "1ffa93e12564509a0227192c8b425c37bc68ccd500209bccd75c86c0c83cb178",
-    "output/playwright/step35/lecture-4/no-js.png": "1ffa93e12564509a0227192c8b425c37bc68ccd500209bccd75c86c0c83cb178",
-    "output/playwright/step35/lecture-4/print-diagram.png": "a7c810a7c3a76e4ef68ec44e85a7ef31a547028715f819e2751269bd577b55bb",
-    "output/playwright/step35/lecture-4/print-top.png": "dfff9a20eee92bdb5e1d58d267504e641653b41106c9550adf2db42d5045cdb2"
-  },
-  "scope": "STEP-0035 final candidate reader on /course/: desktop/360px, light/dark, no-JS, keyboard/fullscreen focus, print, AX, CSP/subpath/links and seven screenshots inspected. Final title/nav recheck passed. No actual AT, paper/PDF, hardware touch or cross-browser audit.",
-  "evidence": "plan/evidence/STEP-0035-lecture-state-memory.md"
+  "rendered_sha256": "e3de06f821663fbb378c99873b41c531494e22954602960405053a17bc805547",
+  "scope": "Repository-link mapping, Markdown/links and source-level diagram semantics checked; pinned static build completed and output hash bound. Prior visual evidence is not carried forward. No screenshot, browser navigation, SVG/HTML visual review, AX inspection or AT interaction.",
+  "evidence": "plan/evidence/STEP-0059-github-repository-links.md",
+  "review_mode": "text-only"
 }
