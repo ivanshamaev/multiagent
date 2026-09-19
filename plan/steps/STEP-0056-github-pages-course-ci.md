@@ -25,6 +25,10 @@ Status: in progress
   версии шрифта на раннере отклоняется сборкой (`publication renderer fingerprint
   mismatch`) — поэтому шрифт зафиксирован в репозитории (SIL OFL 1.1, переиздание
   разрешено лицензией).
+- Ubuntu 24.04 раннеры блокируют unprivileged user namespaces (AppArmor), Chrome
+  puppeteer падает с `No usable sandbox`; в workflow `kernel.apparmor_restrict_unprivileged_userns=0`
+  выставляется sysctl до сборки. Изменять `build.py` (например, `--no-sandbox`)
+  нельзя: хэш сборщика входит в publication receipts.
 - GitHub-hosted runner может получить обновлённый Chromium из puppeteer cache
   официального pinned релиза; расхождение версий браузера не входит в fingerprint
   сравнение по хэшу, но SVG-рендер завязан на pinned `chromium` в `package-lock.json`.

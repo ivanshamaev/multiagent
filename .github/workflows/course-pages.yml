@@ -48,15 +48,8 @@ jobs:
       - name: Install locked renderer
         run: make course-renderer-install
 
-      - name: Fix Chrome SUID sandbox helper
-        run: |
-          set -euo pipefail
-          helper=$(find "$HOME/.cache/puppeteer" course/node_modules/.cache/puppeteer \
-            \( -name chrome_sandbox -o -name chrome-sandbox \) -type f 2>/dev/null | head -1 || true)
-          if [ -n "$helper" ]; then
-            sudo chown root:root "$helper"
-            sudo chmod 4755 "$helper"
-          fi
+      - name: Allow Chrome user namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Diagnose renderer (single test diagram)
         run: |
